@@ -6,6 +6,14 @@ import { CanvasRenderer } from './renderer';
 let desirabilityGrid: number[][] = Array.from({ length: gridSize }, () =>
   Array.from({ length: gridSize }, () => 0)
 );
+function getDesirabilityGrid() {
+  return desirabilityGrid;
+}
+
+let cursorAction = 'default';
+function getCursorAction() {
+  return cursorAction;
+}
 
 function updateDesirabilityGrid() {
   desirabilityGrid = Array.from({ length: gridSize }, () =>
@@ -25,14 +33,14 @@ function updateDesirabilityGrid() {
   renderer.baseValuesUpdated();
 }
 
-function getDesirabilityGrid() {
-  return desirabilityGrid;
-}
-
 const canvas = document.getElementById(
   'desirabilityCanvas'
 ) as HTMLCanvasElement;
-const renderer = new CanvasRenderer(canvas, getDesirabilityGrid);
+const renderer = new CanvasRenderer(
+  canvas,
+  getDesirabilityGrid,
+  getCursorAction
+);
 
 const resizeObserver = new ResizeObserver(() => {
   renderer.canvasSizeUpdated();
@@ -43,6 +51,30 @@ const rotateButton = document.getElementById('rotate-btn');
 if (rotateButton) {
   rotateButton.addEventListener('click', () => {
     renderer.toggleGridRotation();
+  });
+}
+const zoomInButton = document.getElementById('zoomin-btn');
+if (zoomInButton) {
+  zoomInButton.addEventListener('click', () => {
+    renderer.zoomIn();
+  });
+}
+const zoomOutButton = document.getElementById('zoomout-btn');
+if (zoomOutButton) {
+  zoomOutButton.addEventListener('click', () => {
+    renderer.zoomOut();
+  });
+}
+const panButton = document.getElementById('pan-btn');
+if (panButton) {
+  panButton.addEventListener('click', () => {
+    cursorAction = 'panning';
+  });
+}
+const defaultActionButton = document.getElementById('default-action-btn');
+if (defaultActionButton) {
+  defaultActionButton.addEventListener('click', () => {
+    cursorAction = 'default';
   });
 }
 
