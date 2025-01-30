@@ -1,4 +1,6 @@
-import { gridSize, rotationAngle } from './utils/constants';
+import { Building } from './classes/building';
+import { BUILDING_PRESETS, gridSize, rotationAngle } from './utils/constants';
+import { Point } from './utils/geometry';
 
 interface CanvasSize {
   width: number;
@@ -13,6 +15,11 @@ export class CanvasRenderer {
 
   private getBaseValues: () => number[][];
   private getCursorAction: () => string;
+  private getSelectedPreset: () => keyof typeof BUILDING_PRESETS;
+  private placeBuildingFromPreset: (
+    presetId: keyof typeof BUILDING_PRESETS,
+    position: Point
+  ) => Building;
 
   private isGridRotated = false;
   private tileSize = 45;
@@ -27,7 +34,12 @@ export class CanvasRenderer {
   constructor(
     canvas: HTMLCanvasElement,
     getBaseValues: () => number[][],
-    getCursorAction: () => string
+    getCursorAction: () => string,
+    getSelectedPreset: () => keyof typeof BUILDING_PRESETS,
+    placeBuildingFromPreset: (
+      presetId: keyof typeof BUILDING_PRESETS,
+      position: Point
+    ) => Building
   ) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
@@ -35,6 +47,9 @@ export class CanvasRenderer {
     this.ctx = ctx;
     this.getBaseValues = getBaseValues;
     this.getCursorAction = getCursorAction;
+    this.getSelectedPreset = getSelectedPreset;
+    this.placeBuildingFromPreset = placeBuildingFromPreset;
+
     this.canvasSizeUpdated();
 
     // Add event listeners for panning
@@ -197,6 +212,7 @@ export class CanvasRenderer {
 
       const tile = this.getTileUnderMouse(event);
       if (tile) {
+        this.placeBuildingFromPreset(this.getSelectedPreset(), tile);
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
       } else {
         console.log('Clicked outside the grid');
