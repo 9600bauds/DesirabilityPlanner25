@@ -763,6 +763,15 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
   },
 } as const;
 
+export function getRandomBuildingPreset() {
+  const allPresetKeys = Object.keys(BUILDING_PRESETS);
+  const randomPresetKey =
+    allPresetKeys[
+      Math.floor(Math.random() * Object.keys(allPresetKeys).length)
+    ];
+  return BUILDING_PRESETS[randomPresetKey];
+}
+
 /*
   BANDSTAND: {
     

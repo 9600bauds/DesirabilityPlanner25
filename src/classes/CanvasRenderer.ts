@@ -1,4 +1,6 @@
 import { gridSize, rotationAngle } from '../utils/constants';
+import { Point } from '../utils/geometry';
+import { Building } from './Building';
 import { GridState } from './GridState';
 
 interface CanvasSize {
@@ -138,6 +140,7 @@ export class CanvasRenderer {
 
   private render() {
     const baseValues = this.gridState.getDesirabilityGrid();
+    const placedBuildings = this.gridState.getPlacedBuildings();
     const { width, height } = this.currentSize;
 
     // Calculate offsets to center the grid AND apply pan offset
@@ -158,15 +161,56 @@ export class CanvasRenderer {
     // Render grid
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
-        this.renderTile(
-          baseValues[y][x],
-          offsetX + x * this.tileSize,
-          offsetY + (gridSize - 1 - y) * this.tileSize,
-          this.tileSize
-        );
+        this.renderTile(baseValues[y][x], { x, y }, offsetX, offsetY);
       }
     }
 
+    // Render buildings
+    placedBuildings.forEach((building) => {
+      this.renderBuilding(building, offsetX, offsetY);
+    });
+
+    if (this.isGridRotated) {
+      this.ctx.restore();
+    }
+  }
+
+  private renderBuilding(building: Building, offsetX: number, offsetY: number) {
+    const height = building.height * this.tileSize;
+    const width = building.width * this.tileSize;
+    const startX = offsetX + building.origin.x * this.tileSize;
+    const startY =
+      offsetY +
+      (gridSize - building.height - building.origin.y) * this.tileSize;
+
+    // Building rendering
+    this.ctx.fillStyle = '#f0f0f0';
+    this.ctx.fillRect(startX, startY, width, height);
+
+    // Optional: Border
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    this.ctx.strokeRect(startX, startY, width, height);
+
+    // Text rendering with rotation handling
+    if (this.isGridRotated) {
+      this.ctx.save();
+      this.ctx.translate(startX + width / 2, startY + height / 2);
+      this.ctx.rotate(-rotationAngle);
+      this.ctx.translate(-(startX + width / 2), -(startY + height / 2));
+    }
+
+    // Building name or identifier
+    this.ctx.fillStyle = '#000';
+    this.ctx.font = `${this.tileSize / 4}px monospace`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(
+      building.name || 'Building',
+      startX + width / 2,
+      startY + height / 2
+    );
+
+    // Restore context if rotated
     if (this.isGridRotated) {
       this.ctx.restore();
     }
@@ -174,10 +218,13 @@ export class CanvasRenderer {
 
   private renderTile(
     desirabilityValue: number,
-    x: number,
-    y: number,
-    size: number
+    origin: Point,
+    offsetX: number,
+    offsetY: number
   ) {
+    const startX = offsetX + origin.x * this.tileSize;
+    const startY = offsetY + (gridSize - 1 - origin.y) * this.tileSize;
+
     // Background
     if (desirabilityValue > 0) {
       this.ctx.fillStyle = `rgba(0, 200, 0, ${Math.min(1, desirabilityValue / 10)})`;
@@ -186,26 +233,39 @@ export class CanvasRenderer {
     } else {
       this.ctx.fillStyle = '#f0f0f0';
     }
-    this.ctx.fillRect(x, y, size, size);
+    this.ctx.fillRect(startX, startY, this.tileSize, this.tileSize);
 
     // Border
     this.ctx.strokeStyle = '#ddd';
-    this.ctx.strokeRect(x, y, size, size);
+    this.ctx.strokeRect(startX, startY, this.tileSize, this.tileSize);
 
-    // Text
-    this.ctx.save();
+    // Text (with rotation handling)
     if (this.isGridRotated) {
-      this.ctx.translate(x + size / 2, y + size / 2);
+      this.ctx.save();
+      this.ctx.translate(
+        startX + this.tileSize / 2,
+        startY + this.tileSize / 2
+      );
       this.ctx.rotate(-rotationAngle);
-      this.ctx.translate(-(x + size / 2), -(y + size / 2));
+      this.ctx.translate(
+        -(startX + this.tileSize / 2),
+        -(startY + this.tileSize / 2)
+      );
     }
 
     this.ctx.fillStyle = '#000';
-    this.ctx.font = `${size / 3}px monospace`;
+    this.ctx.font = `${this.tileSize / 3}px monospace`;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(desirabilityValue.toString(), x + size / 2, y + size / 2);
-    this.ctx.restore();
+    this.ctx.fillText(
+      desirabilityValue.toString(),
+      startX + this.tileSize / 2,
+      startY + this.tileSize / 2
+    );
+
+    if (this.isGridRotated) {
+      this.ctx.restore();
+    }
   }
 
   public toggleGridRotation(): void {

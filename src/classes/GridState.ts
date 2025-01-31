@@ -30,6 +30,10 @@ export class GridState {
     return this.desirabilityGrid;
   }
 
+  public getPlacedBuildings() {
+    return this.placedBuildings;
+  }
+
   private updateDesirabilityGrid() {
     this.desirabilityGrid = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => 0)
@@ -39,7 +43,7 @@ export class GridState {
       for (let y = 0; y < gridSize; y++) {
         const tilePoint: Point = { x, y };
         let totalDesirabilityEffect = 0;
-        this.placedBuildings.forEach((building) => {
+        this.getPlacedBuildings().forEach((building) => {
           totalDesirabilityEffect +=
             building.calculateDesirabilityEffect(tilePoint);
         });

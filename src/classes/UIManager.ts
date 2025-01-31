@@ -1,4 +1,7 @@
-import { BUILDING_PRESETS } from '../utils/building_presets';
+import {
+  BUILDING_PRESETS,
+  getRandomBuildingPreset,
+} from '../utils/building_presets';
 import { CanvasRenderer } from './CanvasRenderer';
 import { GridState } from './GridState';
 
@@ -85,7 +88,8 @@ export class UIManager {
 
       const tile = this.canvasRenderer.getTileUnderMouse(event);
       if (tile) {
-        this.gridState.placeBuilding(tile, this.getSelectedPreset());
+        this.gridState.placeBuilding(tile, getRandomBuildingPreset());
+        //this.gridState.placeBuilding(tile, this.getSelectedPreset());
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
       } else {
         console.log('Clicked outside the grid');
