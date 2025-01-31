@@ -1,6 +1,5 @@
-import { Building } from './classes/building';
-import { BUILDING_PRESETS, gridSize, rotationAngle } from './utils/constants';
-import { Point } from './utils/geometry';
+import { gridSize, rotationAngle } from '../utils/constants';
+import { GridState } from './GridState';
 
 interface CanvasSize {
   width: number;
@@ -13,13 +12,7 @@ export class CanvasRenderer {
   private ctx: CanvasRenderingContext2D;
   private currentSize: CanvasSize = { width: 0, height: 0, pixelRatio: 1 };
 
-  private getBaseValues: () => number[][];
-  private getCursorAction: () => string;
-  private getSelectedPreset: () => keyof typeof BUILDING_PRESETS;
-  private placeBuildingFromPreset: (
-    presetId: keyof typeof BUILDING_PRESETS,
-    position: Point
-  ) => Building;
+  private gridState: GridState;
 
   private isGridRotated = false;
   private tileSize = 45;
@@ -31,31 +24,16 @@ export class CanvasRenderer {
   private panOffsetX = 0;
   private panOffsetY = 0;
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    getBaseValues: () => number[][],
-    getCursorAction: () => string,
-    getSelectedPreset: () => keyof typeof BUILDING_PRESETS,
-    placeBuildingFromPreset: (
-      presetId: keyof typeof BUILDING_PRESETS,
-      position: Point
-    ) => Building
-  ) {
+  constructor(canvas: HTMLCanvasElement, gridState: GridState) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context!');
     this.ctx = ctx;
-    this.getBaseValues = getBaseValues;
-    this.getCursorAction = getCursorAction;
-    this.getSelectedPreset = getSelectedPreset;
-    this.placeBuildingFromPreset = placeBuildingFromPreset;
 
-    this.canvasSizeUpdated();
+    this.gridState = gridState;
+    this.gridState.subscribe(() => this.render()); //Rerender when gridstate notifies us of a change
 
-    // Add event listeners for panning
-    this.canvas.addEventListener('mousedown', this.handleMouseDown);
-    this.canvas.addEventListener('mousemove', this.handleMouseMove);
-    this.canvas.addEventListener('mouseup', this.handleMouseUp);
+    this.canvasSizeUpdated(); //Initial size setup
   }
 
   public canvasSizeUpdated() {
@@ -76,13 +54,46 @@ export class CanvasRenderer {
     this.render();
   }
 
-  public baseValuesUpdated() {
+  public startPanning(event: MouseEvent) {
+    this.isPanning = true;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    this.canvas.style.cursor = 'grabbing';
+  }
+
+  public handlePanning(event: MouseEvent) {
+    if (!this.isPanning) return;
+
+    let dragX = event.clientX - this.dragStartX;
+    let dragY = event.clientY - this.dragStartY;
+
+    if (this.isGridRotated) {
+      const cosAngle = Math.cos(rotationAngle);
+      const sinAngle = Math.sin(rotationAngle);
+
+      // Apply inverse rotation to the drag vector
+      const rotatedDragX = dragX * cosAngle + dragY * sinAngle;
+      const rotatedDragY = -dragX * sinAngle + dragY * cosAngle;
+
+      dragX = rotatedDragX;
+      dragY = rotatedDragY;
+    }
+
+    this.panOffsetX += dragX;
+    this.panOffsetY += dragY;
+
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+
     this.render();
   }
 
-  private getTileUnderMouse(
-    event: MouseEvent
-  ): { x: number; y: number } | null {
+  public stopPanning() {
+    this.isPanning = false; // Ensure panning is off for other actions
+    this.canvas.style.cursor = 'default';
+  }
+
+  public getTileUnderMouse(event: MouseEvent): { x: number; y: number } | null {
     const rect = this.canvas.getBoundingClientRect();
     let canvasX = event.clientX - rect.left;
     let canvasY = event.clientY - rect.top;
@@ -126,9 +137,8 @@ export class CanvasRenderer {
   }
 
   private render() {
-    const baseGrid: number[][] = this.getBaseValues();
+    const baseValues = this.gridState.getDesirabilityGrid();
     const { width, height } = this.currentSize;
-    const gridSize = baseGrid.length;
 
     // Calculate offsets to center the grid AND apply pan offset
     const offsetX = (width - gridSize * this.tileSize) / 2 + this.panOffsetX;
@@ -149,7 +159,7 @@ export class CanvasRenderer {
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         this.renderTile(
-          baseGrid[y][x],
+          baseValues[y][x],
           offsetX + x * this.tileSize,
           offsetY + (gridSize - 1 - y) * this.tileSize,
           this.tileSize
@@ -186,7 +196,7 @@ export class CanvasRenderer {
     this.ctx.save();
     if (this.isGridRotated) {
       this.ctx.translate(x + size / 2, y + size / 2);
-      this.ctx.rotate(rotationAngle);
+      this.ctx.rotate(-rotationAngle);
       this.ctx.translate(-(x + size / 2), -(y + size / 2));
     }
 
@@ -197,60 +207,6 @@ export class CanvasRenderer {
     this.ctx.fillText(desirabilityValue.toString(), x + size / 2, y + size / 2);
     this.ctx.restore();
   }
-
-  private handleMouseDown = (event: MouseEvent) => {
-    const cursorAction = this.getCursorAction();
-
-    if (cursorAction === 'panning') {
-      this.isPanning = true;
-      this.dragStartX = event.clientX;
-      this.dragStartY = event.clientY;
-      this.canvas.style.cursor = 'grabbing';
-    } else {
-      this.isPanning = false; // Ensure panning is off for other actions
-      this.canvas.style.cursor = 'default';
-
-      const tile = this.getTileUnderMouse(event);
-      if (tile) {
-        this.placeBuildingFromPreset(this.getSelectedPreset(), tile);
-        console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
-      } else {
-        console.log('Clicked outside the grid');
-      }
-    }
-  };
-
-  private handleMouseMove = (event: MouseEvent) => {
-    if (!this.isPanning) return;
-
-    let dragX = event.clientX - this.dragStartX;
-    let dragY = event.clientY - this.dragStartY;
-
-    if (this.isGridRotated) {
-      const cosAngle = Math.cos(rotationAngle);
-      const sinAngle = Math.sin(rotationAngle);
-
-      // Apply inverse rotation to the drag vector
-      const rotatedDragX = dragX * cosAngle + dragY * sinAngle;
-      const rotatedDragY = -dragX * sinAngle + dragY * cosAngle;
-
-      dragX = rotatedDragX;
-      dragY = rotatedDragY;
-    }
-
-    this.panOffsetX += dragX;
-    this.panOffsetY += dragY;
-
-    this.dragStartX = event.clientX;
-    this.dragStartY = event.clientY;
-
-    this.render();
-  };
-
-  private handleMouseUp = () => {
-    this.isPanning = false;
-    this.canvas.style.cursor = 'default';
-  };
 
   public toggleGridRotation(): void {
     this.isGridRotated = !this.isGridRotated;

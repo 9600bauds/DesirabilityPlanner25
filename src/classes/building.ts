@@ -1,30 +1,35 @@
 // src/building.ts
 
+import { globalMaxRange } from '../utils/constants';
 import { chebyshevDistance, Point } from '../utils/geometry';
-import { DesireBox } from './desireBox';
+import { DesireBox } from './DesireBox';
+
+export interface BuildingPreset {
+  name: string;
+  width: number;
+  height: number;
+  cost: number[];
+  employees: number;
+  desireBoxes: DesireBox[];
+}
 
 export class Building {
   origin: Point;
   height: number;
   width: number;
   name: string;
-  cost: number;
+  cost: number[];
+  employees: number;
   desireBoxes: DesireBox[];
 
-  constructor(
-    origin: Point,
-    height: number,
-    width: number,
-    name: string,
-    cost: number,
-    desireBoxes: DesireBox[]
-  ) {
+  constructor(origin: Point, preset: BuildingPreset) {
     this.origin = origin;
-    this.height = height;
-    this.width = width;
-    this.name = name;
-    this.cost = cost;
-    this.desireBoxes = desireBoxes;
+    this.height = preset.height;
+    this.width = preset.width;
+    this.name = preset.name;
+    this.cost = preset.cost;
+    this.employees = preset.employees;
+    this.desireBoxes = preset.desireBoxes;
   }
 
   public calculateDesirabilityEffect(point: Point): number {
@@ -35,8 +40,8 @@ export class Building {
       this.width
     );
 
-    if (distFromBuilding <= 0) {
-      return 0; // We don't affect tiles inside us because reasons
+    if (distFromBuilding <= 0 || distFromBuilding > globalMaxRange) {
+      return 0; // We don't affect tiles inside us because reasons, and the global max range has the final say (sorry no external boxes)
     }
 
     let desirabilityEffect = 0;
@@ -68,12 +73,3 @@ export class Building {
 export class ComplexBuilding extends Building {}
 
 export class House extends Building {}
-
-export interface BuildingPreset {
-  id: string;
-  name: string;
-  width: number;
-  height: number;
-  cost: number;
-  desireBoxes: DesireBox[];
-}
