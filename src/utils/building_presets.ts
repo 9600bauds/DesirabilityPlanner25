@@ -753,6 +753,7 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
   },
   STORAGEYARD: {
     name: 'Storage Yard',
+    color: '#F5E2B4',
     height: 3,
     width: 3,
     cost: [14, 56, 70, 84, 105],
@@ -762,6 +763,7 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
         relativeOrigin: { x: 0, y: 0 },
         height: 1,
         width: 1,
+        color: '#F8C1B5',
         baseDesirability: -5,
         stepDist: 2,
         stepVal: 2,

@@ -12,6 +12,7 @@ import { DesireBox } from './DesireBox';
 export interface BuildingPreset {
   name: string;
   color?: string;
+  borderColor?: string;
   width: number;
   height: number;
   cost: number[];
@@ -23,6 +24,7 @@ export class Building {
   origin: Point;
   name: string;
   color?: string;
+  borderColor?: string;
   width: number;
   height: number;
   cost: number[];
@@ -33,6 +35,7 @@ export class Building {
     this.origin = origin;
     this.name = preset.name;
     this.color = preset.color;
+    this.borderColor = preset.borderColor;
     this.height = preset.height;
     this.width = preset.width;
     this.cost = preset.cost;

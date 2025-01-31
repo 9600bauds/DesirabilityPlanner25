@@ -1,5 +1,5 @@
 import { gridSize, rotationAngle } from '../utils/constants';
-import { Point, Rectangle } from '../utils/geometry';
+import { addPoints, Point, Rectangle } from '../utils/geometry';
 import { Building } from './Building';
 import { GridState } from './GridState';
 
@@ -217,19 +217,40 @@ export class CanvasRenderer {
     }
   }
 
-  private drawRectangle(rectInTiles: Rectangle, color: string = '#f0f0f0') {
+  private drawRectangle(
+    rectInTiles: Rectangle,
+    color: null | string = '#f0f0f0',
+    borderColor: null | string = 'rgba(0,0,0,0.3)'
+  ) {
     const { origin, height, width } = this.rectangleToPx(rectInTiles);
 
-    this.ctx.fillStyle = color;
-    this.ctx.fillRect(origin.x, origin.y, width, height);
+    if (color) {
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(origin.x, origin.y, width, height);
+    }
 
-    this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    this.ctx.strokeRect(origin.x, origin.y, width, height);
+    if (borderColor) {
+      this.ctx.strokeStyle = borderColor;
+      this.ctx.strokeRect(origin.x, origin.y, width, height);
+    }
   }
 
   private drawBuilding(building: Building) {
     const boundingBox = building.getRectangleInTiles();
-    this.drawRectangle(boundingBox);
+    this.drawRectangle(boundingBox, building.color);
+    building.desireBoxes.forEach((box) => {
+      if ('color' in box) {
+        const desireBoundingBox = {
+          origin: addPoints(building.origin, box.relativeOrigin),
+          height: box.height,
+          width: box.width,
+        };
+        this.drawRectangle(desireBoundingBox, box.color);
+        if (box.label) {
+          this.drawNonRotatedText(desireBoundingBox, box.label);
+        }
+      }
+    });
     this.drawNonRotatedText(boundingBox, building.name);
   }
 
