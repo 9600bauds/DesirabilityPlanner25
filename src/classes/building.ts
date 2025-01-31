@@ -1,11 +1,17 @@
 // src/building.ts
 
 import { globalMaxRange } from '../utils/constants';
-import { chebyshevDistance, Point } from '../utils/geometry';
+import {
+  addPoints,
+  chebyshevDistance,
+  Point,
+  Rectangle,
+} from '../utils/geometry';
 import { DesireBox } from './DesireBox';
 
 export interface BuildingPreset {
   name: string;
+  color?: string;
   width: number;
   height: number;
   cost: number[];
@@ -15,21 +21,27 @@ export interface BuildingPreset {
 
 export class Building {
   origin: Point;
-  height: number;
-  width: number;
   name: string;
+  color?: string;
+  width: number;
+  height: number;
   cost: number[];
   employees: number;
   desireBoxes: DesireBox[];
 
   constructor(origin: Point, preset: BuildingPreset) {
     this.origin = origin;
+    this.name = preset.name;
+    this.color = preset.color;
     this.height = preset.height;
     this.width = preset.width;
-    this.name = preset.name;
     this.cost = preset.cost;
     this.employees = preset.employees;
     this.desireBoxes = preset.desireBoxes;
+  }
+
+  public getRectangleInTiles(): Rectangle {
+    return { origin: this.origin, width: this.width, height: this.height };
   }
 
   public calculateDesirabilityEffect(point: Point): number {
@@ -46,18 +58,22 @@ export class Building {
 
     let desirabilityEffect = 0;
     for (const box of this.desireBoxes) {
-      const boxOrigin: Point = {
-        x: this.origin.x + (box.relativeOrigin?.x || 0),
-        y: this.origin.y + (box.relativeOrigin?.y || 0),
-      };
-      const boxHeight = box.height ?? this.height; // ?? = nullish coalescing operator
-      const boxWidth = box.width ?? this.width;
-      const distFromBox = chebyshevDistance(
-        point,
-        boxOrigin,
-        boxHeight,
-        boxWidth
-      );
+      let distFromBox: number;
+      if ('relativeOrigin' in box) {
+        distFromBox = chebyshevDistance(
+          point,
+          addPoints(this.origin, box.relativeOrigin),
+          box.height,
+          box.width
+        );
+      } else {
+        distFromBox = chebyshevDistance(
+          point,
+          this.origin,
+          this.height,
+          this.width
+        );
+      }
       if (distFromBox > box.maxRange) {
         return 0; // Beyond max range
       }

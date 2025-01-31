@@ -1,4 +1,7 @@
-import { BUILDING_PRESETS } from '../utils/building_presets';
+import {
+  BUILDING_PRESETS,
+  getRandomBuildingPreset,
+} from '../utils/building_presets';
 import { CanvasRenderer } from './CanvasRenderer';
 import { GridState } from './GridState';
 

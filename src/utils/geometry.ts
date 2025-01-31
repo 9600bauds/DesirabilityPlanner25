@@ -3,6 +3,16 @@ export interface Point {
   y: number;
 }
 
+export interface Rectangle {
+  origin: Point;
+  height: number;
+  width: number;
+}
+
+export function addPoints(a: Point, b: Point): Point {
+  return { x: a.x + b.x, y: a.y + b.y };
+}
+
 export function chebyshevDistance(
   tilePoint: Point,
   rectOrigin: Point,

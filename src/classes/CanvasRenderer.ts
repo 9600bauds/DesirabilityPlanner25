@@ -1,5 +1,5 @@
 import { gridSize, rotationAngle } from '../utils/constants';
-import { Point } from '../utils/geometry';
+import { Point, Rectangle } from '../utils/geometry';
 import { Building } from './Building';
 import { GridState } from './GridState';
 
@@ -18,6 +18,9 @@ export class CanvasRenderer {
 
   private isGridRotated = false;
   private tileSize = 45;
+
+  private totalOffsetX = 0;
+  private totalOffsetY = 0;
 
   // Panning variables
   private isPanning = false;
@@ -38,6 +41,31 @@ export class CanvasRenderer {
     this.canvasSizeUpdated(); //Initial size setup
   }
 
+  private coordsToPx(point: Point): Point {
+    const x = this.totalOffsetX + point.x * this.tileSize;
+    const y = this.totalOffsetY + (gridSize - point.y) * this.tileSize;
+    return { x, y };
+  }
+
+  private rectangleCoordsToPx(rectangle: Rectangle): Rectangle {
+    const origin = this.coordsToPx({
+      x: rectangle.origin.x,
+      y: rectangle.origin.y + rectangle.height,
+    });
+    const width = rectangle.width * this.tileSize;
+    const height = rectangle.height * this.tileSize;
+
+    return { origin, width, height };
+  }
+
+  private updateTotalOffsets() {
+    this.totalOffsetX =
+      (this.currentSize.width - gridSize * this.tileSize) / 2 + this.panOffsetX;
+    this.totalOffsetY =
+      (this.currentSize.height - gridSize * this.tileSize) / 2 +
+      this.panOffsetY;
+  }
+
   public canvasSizeUpdated() {
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;
@@ -53,6 +81,7 @@ export class CanvasRenderer {
     };
 
     this.ctx.scale(pixelRatio, pixelRatio);
+    this.updateTotalOffsets();
     this.render();
   }
 
@@ -87,34 +116,26 @@ export class CanvasRenderer {
     this.dragStartX = event.clientX;
     this.dragStartY = event.clientY;
 
+    this.updateTotalOffsets();
     this.render();
   }
 
   public stopPanning() {
-    this.isPanning = false; // Ensure panning is off for other actions
+    this.isPanning = false;
     this.canvas.style.cursor = 'default';
   }
 
   public getTileUnderMouse(event: MouseEvent): { x: number; y: number } | null {
     const rect = this.canvas.getBoundingClientRect();
-    let canvasX = event.clientX - rect.left;
-    let canvasY = event.clientY - rect.top;
+    let canvasX = event.clientX - rect.left - this.totalOffsetX;
+    let canvasY = event.clientY - rect.top - this.totalOffsetY;
 
-    // Apply pixel ratio inverse to mouse coordinates
-    canvasX *= this.currentSize.pixelRatio;
-    canvasY *= this.currentSize.pixelRatio;
-
-    // Remove pan offsets
-    const gridSizePixels = gridSize * this.tileSize;
-    const offsetX =
-      (this.currentSize.width - gridSizePixels) / 2 + this.panOffsetX;
-    const offsetY =
-      (this.currentSize.height - gridSizePixels) / 2 + this.panOffsetY;
-
-    canvasX -= offsetX;
-    canvasY -= offsetY;
+    // Apply pixel ratio inverse to mouse coordinates //Seems to cause bugs on other monitors?
+    //canvasX *= this.currentSize.pixelRatio;
+    //canvasY *= this.currentSize.pixelRatio;s
 
     if (this.isGridRotated) {
+      const gridSizePixels = gridSize * this.tileSize;
       const centerX = gridSizePixels / 2 - this.panOffsetX;
       const centerY = gridSizePixels / 2 - this.panOffsetY;
 
@@ -143,10 +164,6 @@ export class CanvasRenderer {
     const placedBuildings = this.gridState.getPlacedBuildings();
     const { width, height } = this.currentSize;
 
-    // Calculate offsets to center the grid AND apply pan offset
-    const offsetX = (width - gridSize * this.tileSize) / 2 + this.panOffsetX;
-    const offsetY = (height - gridSize * this.tileSize) / 2 + this.panOffsetY;
-
     // Clear canvas
     this.ctx.clearRect(0, 0, width, height);
 
@@ -161,13 +178,13 @@ export class CanvasRenderer {
     // Render grid
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
-        this.renderTile(baseValues[y][x], { x, y }, offsetX, offsetY);
+        this.renderTile(baseValues[y][x], { x, y });
       }
     }
 
     // Render buildings
     placedBuildings.forEach((building) => {
-      this.renderBuilding(building, offsetX, offsetY);
+      this.drawBuilding(building);
     });
 
     if (this.isGridRotated) {
@@ -175,69 +192,52 @@ export class CanvasRenderer {
     }
   }
 
-  private renderRectangle(
-    origin: Point,
-    offsetX: number,
-    offsetY: number,
-    widthInTiles: number,
-    heightInTiles: number,
-    label?: string,
-    color: string = '#f0f0f0'
+  private drawNonRotatedText(
+    textBoxInTiles: Rectangle,
+    text: string,
+    color: string = '#000000',
+    fontSize: number = this.tileSize / 3
   ) {
-    const widthInPx = widthInTiles * this.tileSize;
-    const heightInPx = heightInTiles * this.tileSize;
-    const startX = offsetX + origin.x * this.tileSize;
-    const startY =
-      offsetY + (gridSize - heightInTiles - origin.y) * this.tileSize;
+    const { origin, height, width } = this.rectangleCoordsToPx(textBoxInTiles);
+    // Text rendering with rotation handling
+    if (this.isGridRotated) {
+      this.ctx.save();
+      this.ctx.translate(origin.x + width / 2, origin.y + height / 2);
+      this.ctx.rotate(-rotationAngle);
+      this.ctx.translate(-(origin.x + width / 2), -(origin.y + height / 2));
+    }
 
+    // Building name or identifier
     this.ctx.fillStyle = color;
-    this.ctx.fillRect(startX, startY, widthInPx, heightInPx);
+    this.ctx.font = `${fontSize}px monospace`;
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(text, origin.x + width / 2, origin.y + height / 2);
 
-    this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    this.ctx.strokeRect(startX, startY, widthInPx, heightInPx);
-    if (label) {
-      // Text rendering with rotation handling
-      if (this.isGridRotated) {
-        this.ctx.save();
-        this.ctx.translate(startX + widthInPx / 2, startY + heightInPx / 2);
-        this.ctx.rotate(-rotationAngle);
-        this.ctx.translate(
-          -(startX + widthInPx / 2),
-          -(startY + heightInPx / 2)
-        );
-      }
-
-      // Building name or identifier
-      this.ctx.fillStyle = '#000';
-      this.ctx.font = `${this.tileSize / 3}px monospace`;
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText(label, startX + widthInPx / 2, startY + heightInPx / 2);
-
-      // Restore context if rotated
-      if (this.isGridRotated) {
-        this.ctx.restore();
-      }
+    // Restore context if rotated
+    if (this.isGridRotated) {
+      this.ctx.restore();
     }
   }
 
-  private renderBuilding(building: Building, offsetX: number, offsetY: number) {
-    this.renderRectangle(
-      building.origin,
-      offsetX,
-      offsetY,
-      building.width,
-      building.height,
-      building.name
-    );
+  private drawRectangle(rectInTiles: Rectangle, color: string = '#f0f0f0') {
+    const { origin, height, width } = this.rectangleCoordsToPx(rectInTiles);
+
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(origin.x, origin.y, width, height);
+
+    this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    this.ctx.strokeRect(origin.x, origin.y, width, height);
   }
 
-  private renderTile(
-    desirabilityValue: number,
-    origin: Point,
-    offsetX: number,
-    offsetY: number
-  ) {
+  private drawBuilding(building: Building) {
+    const boundingBox = building.getRectangleInTiles();
+    this.drawRectangle(boundingBox);
+    this.drawNonRotatedText(boundingBox, building.name);
+  }
+
+  private renderTile(desirabilityValue: number, origin: Point) {
+    const boundingBox: Rectangle = { origin, height: 1, width: 1 };
     let color;
     if (desirabilityValue > 0) {
       color = `rgba(0, 200, 0, ${Math.min(1, desirabilityValue / 10)})`;
@@ -246,15 +246,8 @@ export class CanvasRenderer {
     } else {
       color = '#f0f0f0';
     }
-    this.renderRectangle(
-      origin,
-      offsetX,
-      offsetY,
-      1,
-      1,
-      desirabilityValue.toString(),
-      color
-    );
+    this.drawRectangle(boundingBox, color);
+    this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
   }
 
   public toggleGridRotation(): void {
@@ -264,6 +257,7 @@ export class CanvasRenderer {
 
   public zoomIn(): void {
     this.tileSize += 5;
+    this.updateTotalOffsets();
     this.render();
   }
 
@@ -271,6 +265,7 @@ export class CanvasRenderer {
     if (this.tileSize > 5) {
       this.tileSize -= 5;
     }
+    this.updateTotalOffsets();
     this.render();
   }
 }

@@ -22,7 +22,7 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
     ],
   },
   ARCHITECT: {
-    name: 'Architect’s Post',
+    name: 'Architect',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -817,16 +817,6 @@ export function getRandomBuildingPreset() {
     width: 4,
     cost: [100, 400, 500, 600, 750],
     employees: 20,
-    desireBoxes: [
-      { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
-    ],
-  },
-  STORAGEYARD: {
-    name: 'Storage Yard',
-    height: 3,
-    width: 3,
-    cost: [14, 56, 70, 84, 105],
-    employees: 6,
     desireBoxes: [
       { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
     ],
