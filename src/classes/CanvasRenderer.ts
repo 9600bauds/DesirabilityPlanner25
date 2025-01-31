@@ -115,8 +115,8 @@ export class CanvasRenderer {
     canvasY -= offsetY;
 
     if (this.isGridRotated) {
-      const centerX = gridSizePixels / 2;
-      const centerY = gridSizePixels / 2;
+      const centerX = gridSizePixels / 2 - this.panOffsetX;
+      const centerY = gridSizePixels / 2 - this.panOffsetY;
 
       const cosAngle = Math.cos(rotationAngle);
       const sinAngle = Math.sin(rotationAngle);
@@ -175,45 +175,61 @@ export class CanvasRenderer {
     }
   }
 
-  private renderBuilding(building: Building, offsetX: number, offsetY: number) {
-    const height = building.height * this.tileSize;
-    const width = building.width * this.tileSize;
-    const startX = offsetX + building.origin.x * this.tileSize;
+  private renderRectangle(
+    origin: Point,
+    offsetX: number,
+    offsetY: number,
+    widthInTiles: number,
+    heightInTiles: number,
+    label?: string,
+    color: string = '#f0f0f0'
+  ) {
+    const widthInPx = widthInTiles * this.tileSize;
+    const heightInPx = heightInTiles * this.tileSize;
+    const startX = offsetX + origin.x * this.tileSize;
     const startY =
-      offsetY +
-      (gridSize - building.height - building.origin.y) * this.tileSize;
+      offsetY + (gridSize - heightInTiles - origin.y) * this.tileSize;
 
-    // Building rendering
-    this.ctx.fillStyle = '#f0f0f0';
-    this.ctx.fillRect(startX, startY, width, height);
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(startX, startY, widthInPx, heightInPx);
 
-    // Optional: Border
     this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    this.ctx.strokeRect(startX, startY, width, height);
+    this.ctx.strokeRect(startX, startY, widthInPx, heightInPx);
+    if (label) {
+      // Text rendering with rotation handling
+      if (this.isGridRotated) {
+        this.ctx.save();
+        this.ctx.translate(startX + widthInPx / 2, startY + heightInPx / 2);
+        this.ctx.rotate(-rotationAngle);
+        this.ctx.translate(
+          -(startX + widthInPx / 2),
+          -(startY + heightInPx / 2)
+        );
+      }
 
-    // Text rendering with rotation handling
-    if (this.isGridRotated) {
-      this.ctx.save();
-      this.ctx.translate(startX + width / 2, startY + height / 2);
-      this.ctx.rotate(-rotationAngle);
-      this.ctx.translate(-(startX + width / 2), -(startY + height / 2));
+      // Building name or identifier
+      this.ctx.fillStyle = '#000';
+      this.ctx.font = `${this.tileSize / 3}px monospace`;
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(label, startX + widthInPx / 2, startY + heightInPx / 2);
+
+      // Restore context if rotated
+      if (this.isGridRotated) {
+        this.ctx.restore();
+      }
     }
+  }
 
-    // Building name or identifier
-    this.ctx.fillStyle = '#000';
-    this.ctx.font = `${this.tileSize / 4}px monospace`;
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(
-      building.name || 'Building',
-      startX + width / 2,
-      startY + height / 2
+  private renderBuilding(building: Building, offsetX: number, offsetY: number) {
+    this.renderRectangle(
+      building.origin,
+      offsetX,
+      offsetY,
+      building.width,
+      building.height,
+      building.name
     );
-
-    // Restore context if rotated
-    if (this.isGridRotated) {
-      this.ctx.restore();
-    }
   }
 
   private renderTile(
@@ -222,50 +238,23 @@ export class CanvasRenderer {
     offsetX: number,
     offsetY: number
   ) {
-    const startX = offsetX + origin.x * this.tileSize;
-    const startY = offsetY + (gridSize - 1 - origin.y) * this.tileSize;
-
-    // Background
+    let color;
     if (desirabilityValue > 0) {
-      this.ctx.fillStyle = `rgba(0, 200, 0, ${Math.min(1, desirabilityValue / 10)})`;
+      color = `rgba(0, 200, 0, ${Math.min(1, desirabilityValue / 10)})`;
     } else if (desirabilityValue < 0) {
-      this.ctx.fillStyle = `rgba(200, 0, 0, ${Math.min(1, Math.abs(desirabilityValue) / 10)})`;
+      color = `rgba(200, 0, 0, ${Math.min(1, Math.abs(desirabilityValue) / 10)})`;
     } else {
-      this.ctx.fillStyle = '#f0f0f0';
+      color = '#f0f0f0';
     }
-    this.ctx.fillRect(startX, startY, this.tileSize, this.tileSize);
-
-    // Border
-    this.ctx.strokeStyle = '#ddd';
-    this.ctx.strokeRect(startX, startY, this.tileSize, this.tileSize);
-
-    // Text (with rotation handling)
-    if (this.isGridRotated) {
-      this.ctx.save();
-      this.ctx.translate(
-        startX + this.tileSize / 2,
-        startY + this.tileSize / 2
-      );
-      this.ctx.rotate(-rotationAngle);
-      this.ctx.translate(
-        -(startX + this.tileSize / 2),
-        -(startY + this.tileSize / 2)
-      );
-    }
-
-    this.ctx.fillStyle = '#000';
-    this.ctx.font = `${this.tileSize / 3}px monospace`;
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(
+    this.renderRectangle(
+      origin,
+      offsetX,
+      offsetY,
+      1,
+      1,
       desirabilityValue.toString(),
-      startX + this.tileSize / 2,
-      startY + this.tileSize / 2
+      color
     );
-
-    if (this.isGridRotated) {
-      this.ctx.restore();
-    }
   }
 
   public toggleGridRotation(): void {

@@ -181,16 +181,6 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
       { baseDesirability: -8, stepDist: 2, stepVal: 2, maxRange: 4 },
     ],
   },
-  FORT: {
-    name: 'Fort',
-    height: 4,
-    width: 7,
-    cost: [200, 800, 1000, 1200, 1500],
-    employees: 0,
-    desireBoxes: [
-      { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
-    ],
-  },
   GARDEN: {
     name: 'Garden',
     height: 1,
@@ -761,6 +751,24 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
       { baseDesirability: -6, stepDist: 1, stepVal: 2, maxRange: 3 },
     ],
   },
+  STORAGEYARD: {
+    name: 'Storage Yard',
+    height: 3,
+    width: 3,
+    cost: [14, 56, 70, 84, 105],
+    employees: 6,
+    desireBoxes: [
+      {
+        relativeOrigin: { x: 0, y: 2 },
+        height: 1,
+        width: 1,
+        baseDesirability: -5,
+        stepDist: 2,
+        stepVal: 2,
+        maxRange: 3,
+      },
+    ],
+  },
 } as const;
 
 export function getRandomBuildingPreset() {
@@ -774,18 +782,16 @@ export function getRandomBuildingPreset() {
 
 /*
   BANDSTAND: {
-    
-    name: 'Bandstand',
-    height: 3,
-    width: 3,
-    cost: [30, 130, 150, 180, 225],
-    employees: 12,
-    desireBoxes: [
-      { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
-    ],
-  },
-    BOOTH: {
-    
+      name: 'Bandstand',
+      height: 3,
+      width: 3,
+      cost: [30, 130, 150, 180, 225],
+      employees: 12,
+      desireBoxes: [
+        { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
+      ],
+    },
+  BOOTH: {
     name: 'Booth',
     height: 2,
     width: 2,
@@ -795,8 +801,17 @@ export function getRandomBuildingPreset() {
       { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
     ],
   },
-    PAVILION: {
-    
+  FORT: { //I have no idea how the desirability for this one is calculated.
+    name: 'Fort',
+    height: 4,
+    width: 7,
+    cost: [200, 800, 1000, 1200, 1500],
+    employees: 0,
+    desireBoxes: [
+      { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
+    ],
+  },
+  PAVILION: {
     name: 'Pavilion',
     height: 4,
     width: 4,
@@ -806,8 +821,7 @@ export function getRandomBuildingPreset() {
       { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
     ],
   },
-    STORAGEYARD: {
-    
+  STORAGEYARD: {
     name: 'Storage Yard',
     height: 3,
     width: 3,
@@ -817,8 +831,7 @@ export function getRandomBuildingPreset() {
       { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
     ],
   },
-    TEMPLECOMPLEX: {
-    
+  TEMPLECOMPLEX: {
     name: 'Temple Complex',
     height: 7,
     width: 1,
