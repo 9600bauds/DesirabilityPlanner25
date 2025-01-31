@@ -45,7 +45,7 @@ export class GridState {
         let totalDesirabilityEffect = 0;
         this.getPlacedBuildings().forEach((building) => {
           totalDesirabilityEffect +=
-            building.calculateDesirabilityEffect(tilePoint);
+            building.recursiveDesirabilityEffect(tilePoint);
         });
         this.desirabilityGrid[y][x] += totalDesirabilityEffect;
       }

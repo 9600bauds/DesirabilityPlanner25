@@ -1,35 +1,26 @@
 // src/building.ts
 
-import { globalMaxRange } from '../utils/constants';
 import {
   addPoints,
   chebyshevDistance,
   Point,
   Rectangle,
 } from '../utils/geometry';
+import { BUILDING_PRESETS } from '../utils/building_presets';
+import { BuildingPreset } from './BuildingPreset';
 import { DesireBox } from './DesireBox';
-
-export interface BuildingPreset {
-  name: string;
-  color?: string;
-  borderColor?: string;
-  width: number;
-  height: number;
-  cost: number[];
-  employees: number;
-  desireBoxes: DesireBox[];
-}
 
 export class Building {
   origin: Point;
-  name: string;
+  name?: string;
   color?: string;
   borderColor?: string;
   width: number;
   height: number;
-  cost: number[];
-  employees: number;
-  desireBoxes: DesireBox[];
+  cost: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
+  employeesRequired: number;
+  desireBox?: DesireBox;
+  children?: Building[];
 
   constructor(origin: Point, preset: BuildingPreset) {
     this.origin = origin;
@@ -39,15 +30,41 @@ export class Building {
     this.height = preset.height;
     this.width = preset.width;
     this.cost = preset.cost;
-    this.employees = preset.employees;
-    this.desireBoxes = preset.desireBoxes;
+    this.employeesRequired = preset.employeesRequired;
+    this.desireBox = preset.desireBox;
+    if (preset.children) {
+      this.children = [];
+      preset.children.forEach((presetChild) => {
+        const childOrigin = addPoints(origin, presetChild.relativeOrigin);
+        const childPreset = BUILDING_PRESETS[presetChild.childKey];
+        const child = new Building(childOrigin, childPreset);
+        this.children.push(child);
+      });
+    }
+    console.log('Created building: ', this);
   }
 
   public getRectangleInTiles(): Rectangle {
     return { origin: this.origin, width: this.width, height: this.height };
   }
 
-  public calculateDesirabilityEffect(point: Point): number {
+  public recursiveDesirabilityEffect(point: Point): number {
+    let desirabilityEffect = this.selfDesirabilityEffect(point);
+
+    if (this.children) {
+      this.children.forEach((child) => {
+        desirabilityEffect += child.recursiveDesirabilityEffect(point);
+      });
+    }
+
+    return desirabilityEffect;
+  }
+
+  public selfDesirabilityEffect(point: Point): number {
+    if (!this.desireBox) return 0;
+
+    let desirabilityEffect = 0;
+
     const distFromBuilding = chebyshevDistance(
       point,
       this.origin,
@@ -55,35 +72,13 @@ export class Building {
       this.width
     );
 
-    if (distFromBuilding <= 0 || distFromBuilding > globalMaxRange) {
-      return 0; // We don't affect tiles inside us because reasons, and the global max range has the final say (sorry no external boxes)
+    if (distFromBuilding <= 0 || distFromBuilding > this.desireBox.maxRange) {
+      return 0; // We don't affect tiles inside us because reasons
     }
 
-    let desirabilityEffect = 0;
-    for (const box of this.desireBoxes) {
-      let distFromBox: number;
-      if ('relativeOrigin' in box) {
-        distFromBox = chebyshevDistance(
-          point,
-          addPoints(this.origin, box.relativeOrigin),
-          box.height,
-          box.width
-        );
-      } else {
-        distFromBox = chebyshevDistance(
-          point,
-          this.origin,
-          this.height,
-          this.width
-        );
-      }
-      if (distFromBox > box.maxRange) {
-        return 0; // Beyond max range
-      }
-      const stepsAway = Math.ceil(distFromBox / box.stepDist);
-      const distanceModifier = (stepsAway - 1) * box.stepVal;
-      desirabilityEffect += box.baseDesirability + distanceModifier;
-    }
+    const stepsAway = Math.ceil(distFromBuilding / this.desireBox.stepDist);
+    const distanceModifier = (stepsAway - 1) * this.desireBox.stepVal;
+    desirabilityEffect += this.desireBox.baseDesirability + distanceModifier;
 
     return desirabilityEffect;
   }

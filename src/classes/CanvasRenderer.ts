@@ -204,7 +204,6 @@ export class CanvasRenderer {
       this.ctx.translate(-(origin.x + width / 2), -(origin.y + height / 2));
     }
 
-    // Building name or identifier
     this.ctx.fillStyle = color;
     this.ctx.font = `${fontSize}px monospace`;
     this.ctx.textAlign = 'center';
@@ -238,20 +237,14 @@ export class CanvasRenderer {
   private drawBuilding(building: Building) {
     const boundingBox = building.getRectangleInTiles();
     this.drawRectangle(boundingBox, building.color);
-    building.desireBoxes.forEach((box) => {
-      if ('color' in box) {
-        const desireBoundingBox = {
-          origin: addPoints(building.origin, box.relativeOrigin),
-          height: box.height,
-          width: box.width,
-        };
-        this.drawRectangle(desireBoundingBox, box.color);
-        if (box.label) {
-          this.drawNonRotatedText(desireBoundingBox, box.label);
-        }
-      }
-    });
-    this.drawNonRotatedText(boundingBox, building.name);
+    if (building.children) {
+      building.children.forEach((child) => {
+        this.drawBuilding(child);
+      });
+    }
+    if (building.name) {
+      this.drawNonRotatedText(boundingBox, building.name);
+    }
   }
 
   private renderTile(desirabilityValue: number, origin: Point) {
