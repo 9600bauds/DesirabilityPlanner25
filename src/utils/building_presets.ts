@@ -759,7 +759,7 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
     employees: 6,
     desireBoxes: [
       {
-        relativeOrigin: { x: 0, y: 2 },
+        relativeOrigin: { x: 0, y: 0 },
         height: 1,
         width: 1,
         baseDesirability: -5,

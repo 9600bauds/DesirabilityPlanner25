@@ -43,15 +43,12 @@ export class CanvasRenderer {
 
   private coordsToPx(point: Point): Point {
     const x = this.totalOffsetX + point.x * this.tileSize;
-    const y = this.totalOffsetY + (gridSize - point.y) * this.tileSize;
+    const y = this.totalOffsetY + point.y * this.tileSize;
     return { x, y };
   }
 
-  private rectangleCoordsToPx(rectangle: Rectangle): Rectangle {
-    const origin = this.coordsToPx({
-      x: rectangle.origin.x,
-      y: rectangle.origin.y + rectangle.height,
-    });
+  private rectangleToPx(rectangle: Rectangle): Rectangle {
+    const origin = this.coordsToPx(rectangle.origin);
     const width = rectangle.width * this.tileSize;
     const height = rectangle.height * this.tileSize;
 
@@ -150,7 +147,7 @@ export class CanvasRenderer {
     }
 
     const gridX = Math.floor(canvasX / this.tileSize);
-    const gridY = gridSize - 1 - Math.floor(canvasY / this.tileSize); // Invert Y for grid coordinates
+    const gridY = Math.floor(canvasY / this.tileSize);
 
     if (gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize) {
       return { x: gridX, y: gridY };
@@ -198,7 +195,7 @@ export class CanvasRenderer {
     color: string = '#000000',
     fontSize: number = this.tileSize / 3
   ) {
-    const { origin, height, width } = this.rectangleCoordsToPx(textBoxInTiles);
+    const { origin, height, width } = this.rectangleToPx(textBoxInTiles);
     // Text rendering with rotation handling
     if (this.isGridRotated) {
       this.ctx.save();
@@ -221,7 +218,7 @@ export class CanvasRenderer {
   }
 
   private drawRectangle(rectInTiles: Rectangle, color: string = '#f0f0f0') {
-    const { origin, height, width } = this.rectangleCoordsToPx(rectInTiles);
+    const { origin, height, width } = this.rectangleToPx(rectInTiles);
 
     this.ctx.fillStyle = color;
     this.ctx.fillRect(origin.x, origin.y, width, height);
