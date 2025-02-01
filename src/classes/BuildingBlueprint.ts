@@ -12,6 +12,7 @@ export interface BuildingBlueprint {
   employeesRequired?: number;
   desireBox?: DesireBox;
   children?: ChildBlueprint[];
+  category?: string;
 }
 
 export interface ChildBlueprint {

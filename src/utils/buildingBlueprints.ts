@@ -1,5 +1,17 @@
 import { BuildingBlueprint } from '../classes/BuildingBlueprint';
 
+export enum BuildingCategory {
+  FOOD = 'Food and Farming',
+  FUN = 'Entertainment',
+  HEALTH = 'Health and Sanitation',
+  INDUSTRY = 'Industrial Buildings',
+  RELIGION = 'Religion',
+  GOVT = 'Municipal Buildings',
+  STORAGE = 'Storage and Distribution',
+  EDUCATION = 'Education',
+  MILITARY = 'Military Structures',
+}
+
 export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
   ACADEMY: {
     name: 'Academy',
@@ -8,6 +20,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [200, 800, 1000, 1200, 1500],
     employeesRequired: 20,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.MILITARY,
   },
   APOTHECARY: {
     name: 'Apothecary',
@@ -16,6 +29,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [6, 24, 30, 36, 45],
     employeesRequired: 5,
     desireBox: { baseDesirability: 1, stepDist: 1, stepVal: -1, maxRange: 1 },
+    category: BuildingCategory.HEALTH,
   },
   ARCHITECT: {
     name: 'Architect',
@@ -24,6 +38,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [6, 24, 30, 36, 45],
     employeesRequired: 5,
     // No desirability effect!
+    category: BuildingCategory.GOVT,
   },
   BAZAAR: {
     name: 'Bazaar',
@@ -32,6 +47,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [8, 32, 40, 48, 60],
     employeesRequired: 5,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.STORAGE,
   },
   BREWERY: {
     name: 'Brewery',
@@ -40,6 +56,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [15, 60, 75, 90, 112],
     employeesRequired: 12,
     desireBox: { baseDesirability: -5, stepDist: 1, stepVal: 1, maxRange: 5 },
+    category: BuildingCategory.INDUSTRY,
   },
   BRICKWORKS: {
     name: 'Brickworks',
@@ -48,6 +65,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [12, 48, 60, 72, 90],
     employeesRequired: 12,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   CATTLERANCH: {
     name: 'Cattle Ranch',
@@ -56,6 +74,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [15, 60, 75, 90, 112],
     employeesRequired: 12,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.FOOD,
   },
   CHARIOTMAKER: {
     name: 'Chariot Maker',
@@ -64,6 +83,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [50, 200, 250, 300, 375],
     employeesRequired: 30,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.MILITARY,
   },
   CLAYPIT: {
     name: 'Clay Pit',
@@ -72,6 +92,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [8, 32, 40, 48, 60],
     employeesRequired: 8,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.INDUSTRY,
   },
   CONSERVATORY: {
     name: 'Conservatory',
@@ -80,6 +101,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 8,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.FUN,
   },
   COURTHOUSE: {
     name: 'Courthouse',
@@ -88,6 +110,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 10,
     desireBox: { baseDesirability: 8, stepDist: 2, stepVal: -2, maxRange: 3 },
+    category: BuildingCategory.GOVT,
   },
   DANCESCHOOL: {
     name: 'Dance School',
@@ -96,6 +119,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 10,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.FUN,
   },
   DENTIST: {
     name: 'Dentist',
@@ -104,6 +128,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 2,
     desireBox: { baseDesirability: 2, stepDist: 1, stepVal: -1, maxRange: 2 },
+    category: BuildingCategory.HEALTH,
   },
   DOCK: {
     name: 'Dock',
@@ -112,6 +137,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 12,
     desireBox: { baseDesirability: -12, stepDist: 2, stepVal: 2, maxRange: 6 },
+    category: BuildingCategory.STORAGE,
   },
   FERRYTERMINAL: {
     name: 'Ferry Terminal',
@@ -120,6 +146,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [8, 32, 40, 48, 60],
     employeesRequired: 5,
     desireBox: { baseDesirability: -5, stepDist: 2, stepVal: 2, maxRange: 4 },
+    category: BuildingCategory.GOVT,
   },
   FESTIVALPAVILION: {
     name: 'Festival Pavilion',
@@ -128,6 +155,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [100, 400, 500, 600, 750],
     employeesRequired: 0,
     desireBox: { baseDesirability: 16, stepDist: 2, stepVal: -3, maxRange: 5 },
+    category: BuildingCategory.RELIGION,
   },
   FIREHOUSE: {
     name: 'Firehouse',
@@ -136,6 +164,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [6, 24, 30, 36, 45],
     employeesRequired: 6,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.GOVT,
   },
   FISHINGWHARF: {
     name: 'Fishing Wharf',
@@ -144,6 +173,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [12, 48, 60, 72, 90],
     employeesRequired: 6,
     desireBox: { baseDesirability: -8, stepDist: 2, stepVal: 2, maxRange: 4 },
+    category: BuildingCategory.FOOD,
   },
   GARDEN: {
     name: 'Garden',
@@ -152,6 +182,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [3, 10, 12, 14, 18],
     employeesRequired: 0,
     desireBox: { baseDesirability: 3, stepDist: 1, stepVal: -1, maxRange: 3 },
+    category: BuildingCategory.GOVT,
   },
   GATEHOUSE: {
     name: 'Gatehouse',
@@ -160,6 +191,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [80, 320, 400, 480, 600],
     employeesRequired: 0,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.MILITARY,
   },
   GRANARY: {
     name: 'Granary',
@@ -168,6 +200,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [50, 200, 250, 300, 375],
     employeesRequired: 12,
     desireBox: { baseDesirability: -8, stepDist: 1, stepVal: 2, maxRange: 4 },
+    category: BuildingCategory.STORAGE,
   },
   ARTISAN: {
     name: 'Guild, Artisans',
@@ -176,6 +209,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 20,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   BRICKLAYER: {
     name: 'Guild, Bricklayers',
@@ -184,6 +218,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 10,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   CARPENTER: {
     name: 'Guild, Carpenters',
@@ -192,6 +227,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 8,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   STONEMASON: {
     name: 'Guild, Stonemasons',
@@ -200,6 +236,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 12,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   HUNTINGLODGE: {
     name: 'Hunting Lodge',
@@ -208,6 +245,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [5, 20, 25, 30, 37],
     employeesRequired: 6,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 2, maxRange: 4 },
+    category: BuildingCategory.FOOD,
   },
   JEWELER: {
     name: 'Jeweler',
@@ -216,6 +254,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [18, 75, 90, 110, 135],
     employeesRequired: 12,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.INDUSTRY,
   },
   JUGGLERSCHOOL: {
     name: 'Juggler School',
@@ -224,6 +263,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 5,
     desireBox: { baseDesirability: 2, stepDist: 1, stepVal: -1, maxRange: 2 },
+    category: BuildingCategory.FUN,
   },
   LAMPMAKER: {
     name: 'Lamp Maker',
@@ -232,6 +272,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 12,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   LIBRARY: {
     name: 'Library',
@@ -240,6 +281,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [90, 360, 450, 540, 675],
     employeesRequired: 30,
     desireBox: { baseDesirability: 8, stepDist: 2, stepVal: -2, maxRange: 6 },
+    category: BuildingCategory.EDUCATION,
   },
   MANSIONSMALL: {
     name: 'Mansion, Personal',
@@ -248,6 +290,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 0,
     desireBox: { baseDesirability: 12, stepDist: 2, stepVal: -2, maxRange: 4 },
+    category: BuildingCategory.GOVT,
   },
   MANSIONMEDIUM: {
     name: 'Mansion, Family',
@@ -256,6 +299,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [80, 320, 400, 480, 600],
     employeesRequired: 0,
     desireBox: { baseDesirability: 20, stepDist: 2, stepVal: -3, maxRange: 5 },
+    category: BuildingCategory.GOVT,
   },
   MANSIONLARGE: {
     name: 'Mansion, Dynasty',
@@ -264,6 +308,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [140, 560, 700, 840, 1050],
     employeesRequired: 0,
     desireBox: { baseDesirability: 28, stepDist: 2, stepVal: -4, maxRange: 6 },
+    category: BuildingCategory.GOVT,
   },
   COPPERMINE: {
     name: 'Mine, Copper',
@@ -272,6 +317,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 10,
     desireBox: { baseDesirability: -12, stepDist: 2, stepVal: 2, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   GEMSTONEMINE: {
     name: 'Mine, Gemstone',
@@ -280,6 +326,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [80, 320, 400, 480, 600],
     employeesRequired: 8,
     desireBox: { baseDesirability: -12, stepDist: 2, stepVal: 2, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   GOLDMINE: {
     name: 'Mine, Gold',
@@ -288,6 +335,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [50, 200, 250, 300, 375],
     employeesRequired: 12,
     desireBox: { baseDesirability: -16, stepDist: 2, stepVal: 3, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   MORTUARY: {
     name: 'Mortuary',
@@ -296,6 +344,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 8,
     desireBox: { baseDesirability: -3, stepDist: 2, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.HEALTH,
   },
   PAINTMAKER: {
     name: 'Paint Maker',
@@ -304,6 +353,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 12,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   PALACESMALL: {
     name: 'Palace, Village',
@@ -312,6 +362,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [180, 720, 900, 1080, 1350],
     employeesRequired: 20,
     desireBox: { baseDesirability: 20, stepDist: 2, stepVal: -4, maxRange: 4 },
+    category: BuildingCategory.GOVT,
   },
   PALACEMEDIUM: {
     name: 'Palace, Town',
@@ -320,6 +371,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [200, 800, 1000, 1200, 1500],
     employeesRequired: 25,
     desireBox: { baseDesirability: 22, stepDist: 2, stepVal: -5, maxRange: 5 },
+    category: BuildingCategory.GOVT,
   },
   PALACEBIG: {
     name: 'Palace, City',
@@ -328,6 +380,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [240, 950, 1200, 1440, 1800],
     employeesRequired: 30,
     desireBox: { baseDesirability: 24, stepDist: 2, stepVal: -6, maxRange: 6 },
+    category: BuildingCategory.GOVT,
   },
   PAPYRUSMAKER: {
     name: 'Papyrus Maker',
@@ -336,6 +389,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 12,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   PHYSICIAN: {
     name: 'Physician',
@@ -344,6 +398,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 8,
     desireBox: { baseDesirability: 2, stepDist: 1, stepVal: -1, maxRange: 2 },
+    category: BuildingCategory.HEALTH,
   },
   PLAZA: {
     name: 'Plaza',
@@ -352,6 +407,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [3, 12, 15, 18, 22],
     employeesRequired: 0,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -2, maxRange: 2 },
+    category: BuildingCategory.GOVT,
   },
   POLICESTATION: {
     name: 'Police Station',
@@ -360,6 +416,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [6, 24, 30, 36, 45],
     employeesRequired: 6,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.GOVT,
   },
   POTTER: {
     name: 'Potter',
@@ -368,6 +425,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [12, 48, 60, 72, 90],
     employeesRequired: 12,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.INDUSTRY,
   },
   GRANITE: {
     name: 'Quarry, Granite',
@@ -376,6 +434,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 12,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   LIMESTONE: {
     name: 'Quarry, Limestone',
@@ -384,6 +443,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [15, 60, 75, 90, 112],
     employeesRequired: 12,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   PLAINSTONE: {
     name: 'Quarry, Plain Stone',
@@ -392,6 +452,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [15, 60, 75, 90, 112],
     employeesRequired: 12,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   SANDSTONE: {
     name: 'Quarry, Sandstone',
@@ -400,6 +461,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 12,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   RECRUITER: {
     name: 'Recruiter',
@@ -408,6 +470,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 10,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.MILITARY,
   },
   REEDGATHERER: {
     name: 'Reed Gatherer',
@@ -416,6 +479,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 8,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.INDUSTRY,
   },
   ROAD: {
     name: 'Road',
@@ -432,6 +496,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [1, 4, 4, 5, 6],
     employeesRequired: 0,
     desireBox: { baseDesirability: 0, stepDist: 0, stepVal: 0, maxRange: 0 },
+    category: BuildingCategory.GOVT,
   },
   SCRIBESCHOOL: {
     name: 'Scribe School',
@@ -440,6 +505,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 10,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
+    category: BuildingCategory.EDUCATION,
   },
   SENETHOUSE: {
     name: 'Senet House',
@@ -448,6 +514,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [300, 1200, 1500, 1800, 2250],
     employeesRequired: 25,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 2, maxRange: 3 },
+    category: BuildingCategory.FUN,
   },
   SHIPWRIGHT: {
     name: 'Shipwright',
@@ -456,6 +523,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [70, 280, 350, 420, 525],
     employeesRequired: 20,
     desireBox: { baseDesirability: -12, stepDist: 2, stepVal: 2, maxRange: 6 },
+    category: BuildingCategory.INDUSTRY,
   },
   SHRINE: {
     name: 'Shrine',
@@ -464,6 +532,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 0,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
+    category: BuildingCategory.RELIGION,
   },
   STATUESMALL: {
     name: 'Statue, Small',
@@ -472,6 +541,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [3, 10, 12, 14, 18],
     employeesRequired: 0,
     desireBox: { baseDesirability: 3, stepDist: 1, stepVal: -1, maxRange: 3 },
+    category: BuildingCategory.GOVT,
   },
   STATUEMEDIUM: {
     name: 'Statue, Medium',
@@ -480,6 +550,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [12, 48, 60, 72, 90],
     employeesRequired: 0,
     desireBox: { baseDesirability: 10, stepDist: 1, stepVal: -2, maxRange: 4 },
+    category: BuildingCategory.GOVT,
   },
   STATUELARGE: {
     name: 'Statue, Large',
@@ -488,6 +559,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 0,
     desireBox: { baseDesirability: 14, stepDist: 2, stepVal: -2, maxRange: 5 },
+    category: BuildingCategory.GOVT,
   },
   TAXCOLLECTOR: {
     name: 'Tax Collector',
@@ -496,6 +568,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [15, 60, 75, 90, 112],
     employeesRequired: 6,
     desireBox: { baseDesirability: 3, stepDist: 1, stepVal: -1, maxRange: 3 },
+    category: BuildingCategory.GOVT,
   },
   TEMPLE: {
     name: 'Temple',
@@ -504,6 +577,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 8,
     desireBox: { baseDesirability: 6, stepDist: 2, stepVal: -2, maxRange: 6 },
+    category: BuildingCategory.RELIGION,
   },
   TOWER: {
     name: 'Tower',
@@ -512,6 +586,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [70, 270, 350, 420, 525],
     employeesRequired: 6,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 1, maxRange: 6 },
+    category: BuildingCategory.MILITARY,
   },
   TRANSPORTWHARF: {
     name: 'Transport Wharf',
@@ -520,6 +595,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [40, 160, 200, 240, 300],
     employeesRequired: 5,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 2 },
+    category: BuildingCategory.MILITARY,
   },
   WALL: {
     name: 'Wall',
@@ -528,6 +604,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [7, 28, 35, 42, 52],
     employeesRequired: 0,
     desireBox: { baseDesirability: 0, stepDist: 0, stepVal: 0, maxRange: 0 },
+    category: BuildingCategory.MILITARY,
   },
   WARSHIPWHARF: {
     name: 'Warship Wharf',
@@ -536,6 +613,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [120, 480, 600, 720, 900],
     employeesRequired: 15,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 4 },
+    category: BuildingCategory.MILITARY,
   },
   WATERLIFT: {
     name: 'Water Lift',
@@ -544,6 +622,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [6, 24, 30, 36, 45],
     employeesRequired: 5,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.FOOD,
   },
   WATERSUPPLY: {
     name: 'Water Supply',
@@ -552,6 +631,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 5,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
+    category: BuildingCategory.HEALTH,
   },
   WEAPONSMITH: {
     name: 'Weaponsmith',
@@ -560,6 +640,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [24, 100, 120, 145, 180],
     employeesRequired: 12,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.MILITARY,
   },
   WEAVER: {
     name: 'Weaver',
@@ -568,6 +649,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [16, 64, 80, 96, 120],
     employeesRequired: 12,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.INDUSTRY,
   },
   WELL: {
     name: 'Well',
@@ -576,6 +658,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [1, 4, 5, 6, 7],
     employeesRequired: 0,
     desireBox: { baseDesirability: 1, stepDist: 1, stepVal: -1, maxRange: 1 },
+    category: BuildingCategory.HEALTH,
   },
   WOODCUTTER: {
     name: 'Wood Cutter',
@@ -584,6 +667,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 8,
     desireBox: { baseDesirability: -4, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.INDUSTRY,
   },
   WORKCAMP: {
     name: 'Work Camp',
@@ -592,6 +676,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [12, 48, 60, 72, 90],
     employeesRequired: 20,
     desireBox: { baseDesirability: -3, stepDist: 1, stepVal: 1, maxRange: 3 },
+    category: BuildingCategory.FOOD,
   },
   ZOO: {
     name: 'Zoo',
@@ -600,6 +685,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [500, 1500, 2000, 2200, 2600],
     employeesRequired: 30,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 2, maxRange: 3 },
+    category: BuildingCategory.FUN,
   },
   STORAGEYARD: {
     name: 'Storage Yard',
@@ -610,15 +696,46 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     employeesRequired: 6,
     //No desirebox of its own!
     children: [{ childKey: 'STORAGEYARD_HUT', relativeOrigin: { x: 0, y: 0 } }],
+    category: BuildingCategory.STORAGE,
   },
   STORAGEYARD_HUT: {
-    name: 'hut',
     color: '#F8C1B5',
     height: 1,
     width: 1,
-    cost: [0, 0, 0, 0, 0],
-    employeesRequired: 0,
     desireBox: { baseDesirability: -5, stepDist: 2, stepVal: 2, maxRange: 3 },
+  },
+  TEMPLECOMPLEX: {
+    name: 'Temple Complex',
+    height: 7,
+    width: 13,
+    cost: [400, 1600, 2000, 2400, 3000],
+    employeesRequired: 50,
+    children: [
+      { childKey: 'TC_ALTAR', relativeOrigin: { x: 4, y: 2 } },
+      { childKey: 'TC_ALTAR', relativeOrigin: { x: 7, y: 2 } },
+      { childKey: 'TC_ALTAR', relativeOrigin: { x: 10, y: 2 } },
+    ],
+    category: BuildingCategory.RELIGION,
+  },
+  TC_ALTAR: {
+    height: 3,
+    width: 3,
+    desireBox: { baseDesirability: 20, stepDist: 2, stepVal: -4, maxRange: 6 },
+  },
+  FORT: {
+    //I have no idea how the desirability for this one is calculated.
+    name: 'Fort',
+    height: 3,
+    width: 3,
+    cost: [200, 800, 1000, 1200, 1500],
+    desireBox: { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
+    children: [{ childKey: 'FORT_YARD', relativeOrigin: { x: 3, y: -1 } }],
+    category: BuildingCategory.MILITARY,
+  },
+  FORT_YARD: {
+    height: 4,
+    width: 4,
+    desireBox: { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
   },
 } as const;
 
@@ -658,28 +775,12 @@ export function getRandomBuildingBlueprint(): BuildingBlueprint {
     employeesRequired: 8,
 desireBox: { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x }
   },
-  FORT: { //I have no idea how the desirability for this one is calculated.
-    name: 'Fort',
-    height: 4,
-    width: 7,
-    cost: [200, 800, 1000, 1200, 1500],
-    employeesRequired: 0,
-desireBox: { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 }
-  },
   PAVILION: {
     name: 'Pavilion',
     height: 4,
     width: 4,
     cost: [100, 400, 500, 600, 750],
     employeesRequired: 20,
-desireBox: { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x }
-  },
-  TEMPLECOMPLEX: {
-    name: 'Temple Complex',
-    height: 7,
-    width: 1,
-    cost: [400, 1600, 2000, 2400, 3000],
-    employeesRequired: 50,
 desireBox: { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x }
   },
   */
