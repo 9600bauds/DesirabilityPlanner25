@@ -92,8 +92,7 @@ export class UIManager {
       const tile = this.canvasRenderer.getTileUnderMouse(event);
       if (tile) {
         //this.gridState.placeBuilding(tile, getRandomBuildingBlueprint());
-        this.gridState.placeBuilding(tile, BUILDING_BLUEPRINTS['STORAGEYARD']);
-        //this.gridState.placeBuilding(tile, this.getSelectedBlueprint());
+        this.gridState.placeBuilding(tile, this.getSelectedBlueprint());
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
       } else {
         console.log('Clicked outside the grid');

@@ -17,10 +17,11 @@ export class Building {
   borderColor?: string;
   width: number;
   height: number;
-  cost: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
-  employeesRequired: number;
+  cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
+  employeesRequired: number = 0;
   desireBox?: DesireBox;
   children?: Building[];
+  parent?: Building;
 
   constructor(origin: Point, blueprint: BuildingBlueprint) {
     this.origin = origin;
@@ -29,8 +30,12 @@ export class Building {
     this.borderColor = blueprint.borderColor;
     this.height = blueprint.height;
     this.width = blueprint.width;
-    this.cost = blueprint.cost;
-    this.employeesRequired = blueprint.employeesRequired;
+    if (blueprint.cost) {
+      this.cost = blueprint.cost;
+    }
+    if (blueprint.employeesRequired) {
+      this.employeesRequired = blueprint.employeesRequired;
+    }
     this.desireBox = blueprint.desireBox;
     if (blueprint.children) {
       this.children = [];
@@ -39,6 +44,7 @@ export class Building {
         const childBlueprint = getBlueprint(blueprintChild.childKey);
         const child = new Building(childOrigin, childBlueprint);
         this.children?.push(child);
+        child.parent = this;
       });
     }
     console.log('Created building: ', this);

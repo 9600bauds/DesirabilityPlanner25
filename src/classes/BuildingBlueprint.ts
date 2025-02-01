@@ -8,8 +8,8 @@ export interface BuildingBlueprint {
   borderColor?: string;
   width: number;
   height: number;
-  cost: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
-  employeesRequired: number;
+  cost?: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
+  employeesRequired?: number;
   desireBox?: DesireBox;
   children?: ChildBlueprint[];
 }
