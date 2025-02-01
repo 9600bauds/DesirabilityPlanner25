@@ -1,13 +1,14 @@
 import {
-  BUILDING_PRESETS,
-  getRandomBuildingPreset,
-} from '../utils/building_presets';
+  BUILDING_BLUEPRINTS,
+  getBlueprint,
+  getRandomBuildingBlueprint,
+} from '../utils/buildingBlueprints';
 import { CanvasRenderer } from './CanvasRenderer';
 import { GridState } from './GridState';
 
 export class UIManager {
   private cursorAction: 'default' | 'panning' = 'default';
-  private selectedPresetKey: keyof typeof BUILDING_PRESETS = 'GARDEN';
+  private selectedBlueprintKey: keyof typeof BUILDING_BLUEPRINTS = 'GARDEN';
 
   private canvasRenderer: CanvasRenderer;
   private gridState: GridState;
@@ -68,16 +69,18 @@ export class UIManager {
     return this.cursorAction;
   }
 
-  public getSelectedPreset() {
-    return BUILDING_PRESETS[this.selectedPresetKey];
+  public getSelectedBlueprint() {
+    return getBlueprint(this.selectedBlueprintKey);
   }
 
-  public getSelectedPresetKey() {
-    return this.selectedPresetKey;
+  public getSelectedBlueprintKey() {
+    return this.selectedBlueprintKey;
   }
 
-  public setSelectedPresetKey(presetKey: keyof typeof BUILDING_PRESETS) {
-    this.selectedPresetKey = presetKey;
+  public setSelectedBlueprintKey(
+    blueprintKey: keyof typeof BUILDING_BLUEPRINTS
+  ) {
+    this.selectedBlueprintKey = blueprintKey;
   }
 
   private handleMouseDown = (event: MouseEvent) => {
@@ -88,9 +91,9 @@ export class UIManager {
 
       const tile = this.canvasRenderer.getTileUnderMouse(event);
       if (tile) {
-        //this.gridState.placeBuilding(tile, getRandomBuildingPreset());
-        this.gridState.placeBuilding(tile, BUILDING_PRESETS['STORAGEYARD']);
-        //this.gridState.placeBuilding(tile, this.getSelectedPreset());
+        //this.gridState.placeBuilding(tile, getRandomBuildingBlueprint());
+        this.gridState.placeBuilding(tile, BUILDING_BLUEPRINTS['STORAGEYARD']);
+        //this.gridState.placeBuilding(tile, this.getSelectedBlueprint());
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
       } else {
         console.log('Clicked outside the grid');

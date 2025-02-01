@@ -30,8 +30,12 @@ export default tseslint.config({
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/restrict-plus-operands': 'off',
-    '@typescript-eslint/no-unused-vars': [
+    /*'@typescript-eslint/no-unused-vars': [
       'error',
+      { 'argsIgnorePattern': '^_', 'varsIgnorePattern': '^_' }
+    ],*/
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
       { 'argsIgnorePattern': '^_', 'varsIgnorePattern': '^_' }
     ],
     'prettier/prettier': 'error',

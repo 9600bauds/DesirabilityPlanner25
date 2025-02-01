@@ -1,5 +1,5 @@
 import { gridSize, rotationAngle } from '../utils/constants';
-import { addPoints, Point, Rectangle } from '../utils/geometry';
+import { Point, Rectangle } from '../utils/geometry';
 import { Building } from './Building';
 import { GridState } from './GridState';
 

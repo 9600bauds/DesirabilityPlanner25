@@ -1,6 +1,6 @@
-import { BuildingPreset, ChildPreset } from '../classes/Building';
+import { BuildingBlueprint } from '../classes/BuildingBlueprint';
 
-export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
+export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
   ACADEMY: {
     name: 'Academy',
     height: 4,
@@ -622,13 +622,21 @@ export const BUILDING_PRESETS: Record<string, BuildingPreset> = {
   },
 } as const;
 
-export function getRandomBuildingPreset() {
-  const allPresetKeys = Object.keys(BUILDING_PRESETS);
-  const randomPresetKey =
-    allPresetKeys[
-      Math.floor(Math.random() * Object.keys(allPresetKeys).length)
-    ];
-  return BUILDING_PRESETS[randomPresetKey];
+export function getBlueprint(
+  key: keyof typeof BUILDING_BLUEPRINTS //keyof doesn't actually really DO anything if the record keys are of type string, go TS!
+): BuildingBlueprint {
+  if (!(key in BUILDING_BLUEPRINTS)) {
+    throw new Error(`Could not find building of key: ${key}`);
+  }
+  return BUILDING_BLUEPRINTS[key];
+}
+
+export function getRandomBuildingBlueprint(): BuildingBlueprint {
+  const allBlueprintKeys = Object.keys(BUILDING_BLUEPRINTS);
+
+  const randomBlueprintKey =
+    allBlueprintKeys[Math.floor(Math.random() * allBlueprintKeys.length)];
+  return BUILDING_BLUEPRINTS[randomBlueprintKey];
 }
 
 /*

@@ -6,8 +6,8 @@ import {
   Point,
   Rectangle,
 } from '../utils/geometry';
-import { BUILDING_PRESETS } from '../utils/building_presets';
-import { BuildingPreset } from './BuildingPreset';
+import { getBlueprint } from '../utils/buildingBlueprints';
+import { BuildingBlueprint } from './BuildingBlueprint';
 import { DesireBox } from './DesireBox';
 
 export class Building {
@@ -22,23 +22,23 @@ export class Building {
   desireBox?: DesireBox;
   children?: Building[];
 
-  constructor(origin: Point, preset: BuildingPreset) {
+  constructor(origin: Point, blueprint: BuildingBlueprint) {
     this.origin = origin;
-    this.name = preset.name;
-    this.color = preset.color;
-    this.borderColor = preset.borderColor;
-    this.height = preset.height;
-    this.width = preset.width;
-    this.cost = preset.cost;
-    this.employeesRequired = preset.employeesRequired;
-    this.desireBox = preset.desireBox;
-    if (preset.children) {
+    this.name = blueprint.name;
+    this.color = blueprint.color;
+    this.borderColor = blueprint.borderColor;
+    this.height = blueprint.height;
+    this.width = blueprint.width;
+    this.cost = blueprint.cost;
+    this.employeesRequired = blueprint.employeesRequired;
+    this.desireBox = blueprint.desireBox;
+    if (blueprint.children) {
       this.children = [];
-      preset.children.forEach((presetChild) => {
-        const childOrigin = addPoints(origin, presetChild.relativeOrigin);
-        const childPreset = BUILDING_PRESETS[presetChild.childKey];
-        const child = new Building(childOrigin, childPreset);
-        this.children.push(child);
+      blueprint.children.forEach((blueprintChild) => {
+        const childOrigin = addPoints(origin, blueprintChild.relativeOrigin);
+        const childBlueprint = getBlueprint(blueprintChild.childKey);
+        const child = new Building(childOrigin, childBlueprint);
+        this.children?.push(child);
       });
     }
     console.log('Created building: ', this);
