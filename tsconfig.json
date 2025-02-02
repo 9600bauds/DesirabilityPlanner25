@@ -3,12 +3,16 @@
     "target": "ES2020",
     "module": "CommonJS",
     "outDir": "./dist",
+    "jsx": "react-jsx", // Or "react-jsxdev" for development with better error messages
+    "jsxImportSource": "react", // Important for React 17+ and the new JSX transform
+    "moduleResolution": "node", // Ensure module resolution is set (usually already is)
+    "esModuleInterop": true, // Recommended for better compatibility with CommonJS modules
+    "allowSyntheticDefaultImports": true, // Recommended for better compatibility with CommonJS modules,
     "strict": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "vite.config.ts"],
   "exclude": ["node_modules"]
 }

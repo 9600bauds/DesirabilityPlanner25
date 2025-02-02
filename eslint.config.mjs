@@ -5,7 +5,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier'; // Import the Prettier config
 
 export default tseslint.config({
-  files: ['**/*.ts'],
+  files: ['**/*.ts', '**/*.tsx'],
   extends: [
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,

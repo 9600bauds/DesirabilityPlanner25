@@ -29,37 +29,6 @@ export class UIManager {
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
     canvas.addEventListener('mouseup', this.handleMouseUp);
-
-    const rotateButton = document.getElementById('rotate-btn');
-    if (rotateButton) {
-      rotateButton.addEventListener('click', () => {
-        canvasRenderer.toggleGridRotation();
-      });
-    }
-    const zoomInButton = document.getElementById('zoomin-btn');
-    if (zoomInButton) {
-      zoomInButton.addEventListener('click', () => {
-        canvasRenderer.zoomIn();
-      });
-    }
-    const zoomOutButton = document.getElementById('zoomout-btn');
-    if (zoomOutButton) {
-      zoomOutButton.addEventListener('click', () => {
-        canvasRenderer.zoomOut();
-      });
-    }
-    const panButton = document.getElementById('pan-btn');
-    if (panButton) {
-      panButton.addEventListener('click', () => {
-        this.setCursorAction('panning');
-      });
-    }
-    const defaultActionButton = document.getElementById('default-action-btn');
-    if (defaultActionButton) {
-      defaultActionButton.addEventListener('click', () => {
-        this.setCursorAction('default');
-      });
-    }
   }
 
   public setCursorAction(action: 'default' | 'panning') {
@@ -86,6 +55,12 @@ export class UIManager {
   ) {
     this.selectedBlueprintKey = blueprintKey;
   }
+
+  public setBlueprintKeyButPublic = (
+    blueprintKey: keyof typeof BUILDING_BLUEPRINTS
+  ) => {
+    this.selectedBlueprintKey = blueprintKey;
+  };
 
   private handleMouseDown = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
