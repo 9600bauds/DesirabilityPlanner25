@@ -2,7 +2,7 @@ import {
   BUILDING_BLUEPRINTS,
   getBlueprint,
   getRandomBuildingBlueprint,
-} from '../utils/buildingBlueprints';
+} from '../definitions/buildingBlueprints';
 import { CanvasRenderer } from './CanvasRenderer';
 import { GridState } from './GridState';
 
@@ -70,7 +70,11 @@ export class UIManager {
   }
 
   public getSelectedBlueprint() {
-    return getBlueprint(this.selectedBlueprintKey);
+    const currentBlueprintKey = this.getSelectedBlueprintKey();
+    if (!currentBlueprintKey) {
+      return null;
+    }
+    return getBlueprint(currentBlueprintKey);
   }
 
   public getSelectedBlueprintKey() {
@@ -91,8 +95,12 @@ export class UIManager {
 
       const tile = this.canvasRenderer.getTileUnderMouse(event);
       if (tile) {
-        //this.gridState.placeBuilding(tile, getRandomBuildingBlueprint());
-        this.gridState.placeBuilding(tile, this.getSelectedBlueprint());
+        const blueprint = this.getSelectedBlueprint();
+        if (blueprint) {
+          this.canvasRenderer.stopPanning();
+          this.gridState.placeBuilding(tile, blueprint);
+          //this.gridState.placeBuilding(tile, getRandomBuildingBlueprint());
+        }
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
       } else {
         console.log('Clicked outside the grid');

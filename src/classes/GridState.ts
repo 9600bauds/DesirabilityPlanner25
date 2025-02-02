@@ -1,7 +1,7 @@
 import { Point } from '../utils/geometry';
 import { Building } from './Building';
 import { gridSize } from '../utils/constants';
-import { BuildingBlueprint } from './BuildingBlueprint';
+import { BuildingBlueprint } from '../definitions/buildingBlueprints';
 
 export class GridState {
   private desirabilityGrid: number[][];

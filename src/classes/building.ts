@@ -6,8 +6,8 @@ import {
   Point,
   Rectangle,
 } from '../utils/geometry';
-import { getBlueprint } from '../utils/buildingBlueprints';
-import { BuildingBlueprint } from './BuildingBlueprint';
+import { getBlueprint } from '../definitions/buildingBlueprints';
+import { BuildingBlueprint } from '../definitions/buildingBlueprints';
 import { DesireBox } from './DesireBox';
 
 export class Building {
