@@ -40,13 +40,13 @@ export class Building {
     this.desireBox = blueprint.desireBox;
     if (blueprint.children) {
       this.children = [];
-      blueprint.children.forEach((blueprintChild) => {
+      for (const blueprintChild of blueprint.children) {
         const childOrigin = addPoints(origin, blueprintChild.relativeOrigin);
         const childBlueprint = getBlueprint(blueprintChild.childKey);
         const child = new Building(childOrigin, childBlueprint);
         this.children?.push(child);
         child.parent = this;
-      });
+      }
     }
     console.log('Created building: ', this);
   }
@@ -63,9 +63,11 @@ export class Building {
       }
     }
     if (this.children) {
-      this.children.forEach((child) => {
-        child.getTilesOccupied().forEach((point) => tilesOccupied.add(point));
-      });
+      for (const child of this.children) {
+        for (const point of child.getTilesOccupied()) {
+          tilesOccupied.add(point);
+        }
+      }
     }
     return tilesOccupied;
   }
@@ -78,9 +80,9 @@ export class Building {
     let desirabilityEffect = this.selfDesirabilityEffect(point);
 
     if (this.children) {
-      this.children.forEach((child) => {
+      for (const child of this.children) {
         desirabilityEffect += child.recursiveDesirabilityEffect(point);
-      });
+      }
     }
 
     return desirabilityEffect;

@@ -34,12 +34,12 @@ class GridStateManager {
 
   public eraseRect(rect: Rectangle) {
     let success = false;
-    this.activeGridState.getPlacedBuildings().forEach((building) => {
+    for (const building of this.activeGridState.getPlacedBuildings()) {
       if (building.interceptsRectangle(rect)) {
         this.activeGridState.removeBuilding(building);
         success = true;
       }
-    });
+    }
     if (success) {
       this.notifyListeners();
     }

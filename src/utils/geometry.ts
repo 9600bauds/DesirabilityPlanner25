@@ -5,6 +5,8 @@ export interface Point {
 
 export interface Rectangle {
   origin: Point;
+  //Note that for all rectangle math, height and width are effectively +1:
+  //A rectangle that starts at y=0 and ends at y=0 is considered to have a height of 1.
   height: number;
   width: number;
 }
@@ -23,10 +25,8 @@ export function createRectangleFromPoints(p1: Point, p2: Point): Rectangle {
 }
 
 export function rectangleInterceptsPoint(p: Point, r: Rectangle): boolean {
-  const isInsideHorizontal =
-    p.x >= r.origin.x && p.x <= r.origin.x + r.width - 1;
-  const isInsideVertical =
-    p.y >= r.origin.y && p.y <= r.origin.y + r.height - 1;
+  const isInsideHorizontal = p.x >= r.origin.x && p.x < r.origin.x + r.width;
+  const isInsideVertical = p.y >= r.origin.y && p.y < r.origin.y + r.height;
 
   return isInsideHorizontal && isInsideVertical;
 }

@@ -241,9 +241,9 @@ class CanvasRenderer {
     }
 
     // Render buildings
-    placedBuildings.forEach((building) => {
+    for (const building of placedBuildings) {
       this.drawBuilding(building);
-    });
+    }
 
     if (this.isGridRotated) {
       this.ctx.restore();
@@ -303,18 +303,18 @@ class CanvasRenderer {
       return;
     }
     if (building.children) {
-      building.children.forEach((child) => {
+      for (const child of building.children) {
         this.drawBuilding(child);
-      });
+      }
     }
     if (this.isDragging && building.interceptsRectangle(this.dragBox)) {
-      building.getTilesOccupied().forEach((tile) => {
+      for (const tile of building.getTilesOccupied()) {
         this.drawRectangle(
           { origin: tile, height: 1, width: 1 },
           'rgba(255, 0, 0, 0.2)',
           null
         );
-      });
+      }
     }
     if (building.name) {
       this.drawNonRotatedText(boundingBox, building.name);
