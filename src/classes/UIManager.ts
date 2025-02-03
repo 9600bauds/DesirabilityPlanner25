@@ -6,8 +6,10 @@ import {
 import CanvasRenderer from './CanvasRenderer';
 import GridStateManager from './GridStateManager';
 
+type CursorAction = 'default' | 'panning' | 'erasing';
+
 class UIManager {
-  private cursorAction: 'default' | 'panning' = 'default';
+  private cursorAction: CursorAction = 'erasing';
   private selectedBlueprintKey: keyof typeof BUILDING_BLUEPRINTS = 'GARDEN';
 
   private canvasRenderer: CanvasRenderer;
@@ -60,10 +62,12 @@ class UIManager {
   private handleMouseDown = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
       this.canvasRenderer.startPanning(event);
+    } else if (this.cursorAction === 'erasing') {
+      this.canvasRenderer.startDragging(event);
     } else {
       this.canvasRenderer.stopPanning();
 
-      const tile = this.canvasRenderer.getTileUnderMouse(event);
+      const tile = this.canvasRenderer.getMouseCoords(event);
       if (tile) {
         const blueprint = this.getSelectedBlueprint();
         if (blueprint) {
@@ -81,11 +85,14 @@ class UIManager {
   private handleMouseMove = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
       this.canvasRenderer.handlePanning(event);
+    } else if (this.cursorAction === 'erasing') {
+      this.canvasRenderer.handleDragging(event);
     }
   };
 
   private handleMouseUp = () => {
     this.canvasRenderer.stopPanning();
+    this.canvasRenderer.stopDragging();
   };
 }
 

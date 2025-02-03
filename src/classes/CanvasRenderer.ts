@@ -25,10 +25,15 @@ class CanvasRenderer {
 
   // Panning variables
   private isPanning = false;
-  private dragStartX = 0;
-  private dragStartY = 0;
+  private lastPanX = 0;
+  private lastPanY = 0;
   private panOffsetX = 0;
   private panOffsetY = 0;
+
+  // Clickdrag variables
+  private isDragging = false;
+  private dragStartTile: Point | null = null;
+  private dragLastTile: Point | null = null;
 
   constructor(canvas: HTMLCanvasElement, gridStateManager: GridStateManager) {
     this.canvas = canvas;
@@ -37,42 +42,18 @@ class CanvasRenderer {
     this.ctx = ctx;
 
     this.gridState = gridStateManager.getActiveGridState();
-    gridStateManager.subscribe(this.gridStateWasUpdated);
+    gridStateManager.subscribe(this.gridStateUpdated);
 
     const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
     resizeObserver.observe(canvas);
-
-    this.canvasSizeUpdated(); //Initial size setup
   }
 
-  private gridStateWasUpdated = (updatedGridState: GridState) => {
+  private gridStateUpdated = (updatedGridState: GridState) => {
     this.gridState = updatedGridState;
     this.render();
   };
 
-  private coordsToPx(point: Point): Point {
-    const x = this.totalOffsetX + point.x * this.tileSize;
-    const y = this.totalOffsetY + point.y * this.tileSize;
-    return { x, y };
-  }
-
-  private rectangleToPx(rectangle: Rectangle): Rectangle {
-    const origin = this.coordsToPx(rectangle.origin);
-    const width = rectangle.width * this.tileSize;
-    const height = rectangle.height * this.tileSize;
-
-    return { origin, width, height };
-  }
-
-  private updateTotalOffsets() {
-    this.totalOffsetX =
-      (this.currentSize.width - gridSize * this.tileSize) / 2 + this.panOffsetX;
-    this.totalOffsetY =
-      (this.currentSize.height - gridSize * this.tileSize) / 2 +
-      this.panOffsetY;
-  }
-
-  public canvasSizeUpdated() {
+  private canvasSizeUpdated() {
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;
     const pixelRatio = window.devicePixelRatio || 1;
@@ -91,50 +72,16 @@ class CanvasRenderer {
     this.render();
   }
 
-  public startPanning(event: MouseEvent) {
-    this.isPanning = true;
-    this.dragStartX = event.clientX;
-    this.dragStartY = event.clientY;
-    this.canvas.style.cursor = 'grabbing';
+  private coordsToPx(point: Point): Point {
+    const x = this.totalOffsetX + point.x * this.tileSize;
+    const y = this.totalOffsetY + point.y * this.tileSize;
+    return { x, y };
   }
 
-  public handlePanning(event: MouseEvent) {
-    if (!this.isPanning) return;
-
-    let dragX = event.clientX - this.dragStartX;
-    let dragY = event.clientY - this.dragStartY;
-
-    if (this.isGridRotated) {
-      const cosAngle = Math.cos(rotationAngle);
-      const sinAngle = Math.sin(rotationAngle);
-
-      // Apply inverse rotation to the drag vector
-      const rotatedDragX = dragX * cosAngle + dragY * sinAngle;
-      const rotatedDragY = -dragX * sinAngle + dragY * cosAngle;
-
-      dragX = rotatedDragX;
-      dragY = rotatedDragY;
-    }
-
-    this.panOffsetX += dragX;
-    this.panOffsetY += dragY;
-
-    this.dragStartX = event.clientX;
-    this.dragStartY = event.clientY;
-
-    this.updateTotalOffsets();
-    this.render();
-  }
-
-  public stopPanning() {
-    this.isPanning = false;
-    this.canvas.style.cursor = 'default';
-  }
-
-  public getTileUnderMouse(event: MouseEvent): { x: number; y: number } | null {
+  private pxToCoords(point: Point): Point | null {
     const rect = this.canvas.getBoundingClientRect();
-    let canvasX = event.clientX - rect.left - this.totalOffsetX;
-    let canvasY = event.clientY - rect.top - this.totalOffsetY;
+    let canvasX = point.x - rect.left - this.totalOffsetX;
+    let canvasY = point.y - rect.top - this.totalOffsetY;
 
     // Apply pixel ratio inverse to mouse coordinates //Seems to cause bugs on other monitors?
     //canvasX *= this.currentSize.pixelRatio;
@@ -155,14 +102,106 @@ class CanvasRenderer {
       canvasY = -relativeX * sinAngle + relativeY * cosAngle + centerY;
     }
 
-    const gridX = Math.floor(canvasX / this.tileSize);
-    const gridY = Math.floor(canvasY / this.tileSize);
+    const x = Math.floor(canvasX / this.tileSize);
+    const y = Math.floor(canvasY / this.tileSize);
 
-    if (gridX >= 0 && gridX < gridSize && gridY >= 0 && gridY < gridSize) {
-      return { x: gridX, y: gridY };
+    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+      return { x, y };
     } else {
       return null;
     }
+  }
+
+  public getMouseCoords(event: MouseEvent): Point | null {
+    return this.pxToCoords({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  }
+
+  private rectangleToPx(rectangle: Rectangle): Rectangle {
+    const origin = this.coordsToPx(rectangle.origin);
+    const width = rectangle.width * this.tileSize;
+    const height = rectangle.height * this.tileSize;
+
+    return { origin, width, height };
+  }
+
+  private updateTotalOffsets() {
+    this.totalOffsetX =
+      (this.currentSize.width - gridSize * this.tileSize) / 2 + this.panOffsetX;
+    this.totalOffsetY =
+      (this.currentSize.height - gridSize * this.tileSize) / 2 +
+      this.panOffsetY;
+  }
+
+  public startPanning(event: MouseEvent) {
+    this.isPanning = true;
+    this.lastPanX = event.clientX;
+    this.lastPanY = event.clientY;
+    this.canvas.style.cursor = 'grabbing';
+  }
+
+  public handlePanning(event: MouseEvent) {
+    if (!this.isPanning) return;
+
+    let dragX = event.clientX - this.lastPanX;
+    let dragY = event.clientY - this.lastPanY;
+
+    if (this.isGridRotated) {
+      const cosAngle = Math.cos(rotationAngle);
+      const sinAngle = Math.sin(rotationAngle);
+
+      // Apply inverse rotation to the drag vector
+      const rotatedDragX = dragX * cosAngle + dragY * sinAngle;
+      const rotatedDragY = -dragX * sinAngle + dragY * cosAngle;
+
+      dragX = rotatedDragX;
+      dragY = rotatedDragY;
+    }
+
+    this.panOffsetX += dragX;
+    this.panOffsetY += dragY;
+
+    this.lastPanX = event.clientX;
+    this.lastPanY = event.clientY;
+
+    this.updateTotalOffsets();
+    this.render();
+  }
+
+  public stopPanning() {
+    this.isPanning = false;
+    this.canvas.style.cursor = 'default';
+  }
+
+  public startDragging(event: MouseEvent) {
+    this.isDragging = true;
+    this.dragStartTile = this.getMouseCoords(event);
+    this.dragLastTile = this.dragStartTile;
+  }
+
+  public handleDragging(event: MouseEvent) {
+    if (!this.isDragging) return;
+
+    const thisTile = this.getMouseCoords(event);
+    if (thisTile === this.dragLastTile) return;
+    this.dragLastTile = thisTile;
+    console.log(
+      'Start: (',
+      this.dragStartTile?.x,
+      ',',
+      this.dragStartTile?.y,
+      '), Now: (',
+      this.dragLastTile?.x,
+      ',',
+      this.dragLastTile?.y,
+      ')'
+    );
+  }
+
+  public stopDragging() {
+    this.isDragging = false;
   }
 
   private render() {
