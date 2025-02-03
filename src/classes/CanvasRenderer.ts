@@ -316,8 +316,8 @@ class CanvasRenderer {
         );
       }
     }
-    if (building.name) {
-      this.drawNonRotatedText(boundingBox, building.name);
+    if (building.label) {
+      this.drawNonRotatedText(boundingBox, building.label);
     }
   }
 

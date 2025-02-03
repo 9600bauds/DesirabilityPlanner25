@@ -13,7 +13,7 @@ import { DesireBox } from './DesireBox';
 
 export class Building {
   origin: Point;
-  name?: string;
+  label?: string;
   color?: string;
   borderColor?: string;
   width: number;
@@ -26,7 +26,7 @@ export class Building {
 
   constructor(origin: Point, blueprint: BuildingBlueprint) {
     this.origin = origin;
-    this.name = blueprint.name;
+    this.label = blueprint.label;
     this.color = blueprint.color;
     this.borderColor = blueprint.borderColor;
     this.height = blueprint.height;

@@ -1,7 +1,10 @@
 // src/components/Sidebar.tsx
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
-import { BUILDING_BLUEPRINTS } from '../definitions/buildingBlueprints';
+import {
+  BUILDING_BLUEPRINTS,
+  BuildingBlueprint,
+} from '../definitions/buildingBlueprints';
 
 interface SidebarProps {
   onRotateClick: () => void;
@@ -9,9 +12,7 @@ interface SidebarProps {
   onZoomInClick: () => void;
   onZoomOutClick: () => void;
   onDefaultActionClick: () => void;
-  setSelectedBlueprintKey: (
-    blueprintKey: keyof typeof BUILDING_BLUEPRINTS
-  ) => void;
+  setSelectedBlueprints: (blueprints: BuildingBlueprint[]) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -20,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onZoomInClick,
   onZoomOutClick,
   onDefaultActionClick,
-  setSelectedBlueprintKey,
+  setSelectedBlueprints,
 }) => {
   return (
     <div
@@ -62,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         Default Action
       </button>
-      <BuildingSelector setSelectedBlueprintKey={setSelectedBlueprintKey} />
+      <BuildingSelector setSelectedBlueprints={setSelectedBlueprints} />
     </div>
   );
 };

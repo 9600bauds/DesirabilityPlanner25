@@ -1,18 +1,45 @@
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
-import { BUILDING_BLUEPRINTS } from '../definitions/buildingBlueprints';
+import {
+  BUILDING_BLUEPRINTS,
+  BuildingBlueprint,
+} from '../definitions/buildingBlueprints';
 import { BUILDING_CATEGORIES } from '../definitions/buildingCategories';
 
 interface BuildingSelectorProps {
-  setSelectedBlueprintKey: (blueprintId: string) => void;
+  setSelectedBlueprints: (blueprints: BuildingBlueprint[]) => void;
 }
 
-const BuildingSelector = ({
-  setSelectedBlueprintKey,
-}: BuildingSelectorProps) => {
-  const getBlueprintsForCategory = (category: string) => {
-    return Object.entries(BUILDING_BLUEPRINTS).filter(
+type menuOptionMap = Map<string, BuildingBlueprint[]>;
+
+const BuildingSelector = ({ setSelectedBlueprints }: BuildingSelectorProps) => {
+  //
+  const getOptionArraysForCategory = (category: string): menuOptionMap => {
+    const options: menuOptionMap = new Map<string, BuildingBlueprint[]>();
+
+    const blueprintsInThisCategory = Object.entries(BUILDING_BLUEPRINTS).filter(
       ([_, blueprint]) => blueprint.category === category
+    );
+    for (const [menuName, blueprint] of blueprintsInThisCategory) {
+      const splitMenuName = menuName.split('_')[0];
+      const arr: BuildingBlueprint[] = options.get(splitMenuName) ?? [];
+      arr.push(blueprint);
+      options.set(splitMenuName, arr);
+    }
+    console.log(options);
+    return options;
+  };
+
+  const optionsToButtons = (key: string) => {
+    return Array.from(getOptionArraysForCategory(key).entries()).map(
+      ([menuName, blueprints]) => (
+        <MenuItem
+          key={menuName}
+          onClick={() => setSelectedBlueprints(blueprints)}
+        >
+          {menuName}
+        </MenuItem>
+      )
     );
   };
 
@@ -29,11 +56,7 @@ const BuildingSelector = ({
               </MenuButton>
             }
           >
-            {getBlueprintsForCategory(key).map(([id, blueprint]) => (
-              <MenuItem key={id} onClick={() => setSelectedBlueprintKey(id)}>
-                {blueprint.name}
-              </MenuItem>
-            ))}
+            {optionsToButtons(key)}
           </Menu>
         );
       })}

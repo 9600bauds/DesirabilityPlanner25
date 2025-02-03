@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         onZoomInClick={() => canvasRenderer.zoomIn()}
         onZoomOutClick={() => canvasRenderer.zoomOut()}
         onDefaultActionClick={() => uiManager.setCursorAction('default')}
-        setSelectedBlueprintKey={uiManager.setBlueprintKeyButPublic}
+        setSelectedBlueprints={uiManager.setSelectedBlueprints}
       />
     );
   } else {

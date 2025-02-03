@@ -1,7 +1,7 @@
 import {
   BUILDING_BLUEPRINTS,
+  BuildingBlueprint,
   getBlueprint,
-  getRandomBuildingBlueprint,
 } from '../definitions/buildingBlueprints';
 import CanvasRenderer from './CanvasRenderer';
 import GridStateManager from './GridStateManager';
@@ -10,7 +10,8 @@ type CursorAction = 'default' | 'panning' | 'erasing';
 
 class UIManager {
   private cursorAction: CursorAction = 'erasing';
-  private selectedBlueprintKey: keyof typeof BUILDING_BLUEPRINTS = 'GARDEN';
+  private selectedBlueprints?: BuildingBlueprint[];
+  private selectedArray: number = 0;
 
   private canvasRenderer: CanvasRenderer;
   private gridStateManager: GridStateManager;
@@ -26,6 +27,8 @@ class UIManager {
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
     canvas.addEventListener('mouseup', this.handleMouseUp);
+
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   public setCursorAction(action: CursorAction) {
@@ -35,28 +38,16 @@ class UIManager {
     return this.cursorAction;
   }
 
-  public getSelectedBlueprint() {
-    const currentBlueprintKey = this.getSelectedBlueprintKey();
-    if (!currentBlueprintKey) {
+  public getSelectedBlueprint = (): BuildingBlueprint | null => {
+    if (!this.selectedBlueprints) {
       return null;
     }
-    return getBlueprint(currentBlueprintKey);
-  }
+    return this.selectedBlueprints[this.selectedArray];
+  };
 
-  public getSelectedBlueprintKey() {
-    return this.selectedBlueprintKey;
-  }
-
-  public setSelectedBlueprintKey(
-    blueprintKey: keyof typeof BUILDING_BLUEPRINTS
-  ) {
-    this.selectedBlueprintKey = blueprintKey;
-  }
-
-  public setBlueprintKeyButPublic = (
-    blueprintKey: keyof typeof BUILDING_BLUEPRINTS
-  ) => {
-    this.selectedBlueprintKey = blueprintKey;
+  public setSelectedBlueprints = (blueprints: BuildingBlueprint[]) => {
+    this.selectedBlueprints = blueprints;
+    this.selectedArray = 0;
   };
 
   private handleMouseDown = (event: MouseEvent) => {
@@ -73,7 +64,6 @@ class UIManager {
         if (blueprint) {
           this.canvasRenderer.stopPanning();
           this.gridStateManager.tryPlaceBuilding(tile, blueprint);
-          //this.gridState.placeBuilding(tile, getRandomBuildingBlueprint());
         }
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
       } else {
@@ -95,6 +85,20 @@ class UIManager {
     if (this.cursorAction === 'erasing') {
       const erasedRect = this.canvasRenderer.stopDragging();
       if (erasedRect) this.gridStateManager.eraseRect(erasedRect);
+    }
+  };
+
+  private handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'r' || event.key === 'R') {
+      this.rotateSelectedBlueprint();
+    }
+  };
+
+  private rotateSelectedBlueprint = () => {
+    console.log(this.selectedBlueprints);
+    if (this.selectedBlueprints && this.selectedBlueprints.length > 0) {
+      this.selectedArray =
+        (this.selectedArray + 1) % this.selectedBlueprints.length;
     }
   };
 }
