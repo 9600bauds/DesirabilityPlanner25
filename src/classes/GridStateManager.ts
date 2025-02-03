@@ -1,5 +1,5 @@
 import { BuildingBlueprint } from '../definitions/buildingBlueprints';
-import { Point } from '../utils/geometry';
+import { Point, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 
 class GridStateManager {
@@ -26,7 +26,21 @@ class GridStateManager {
   }
 
   public tryPlaceBuilding(position: Point, blueprint: BuildingBlueprint): void {
-    if (this.activeGridState.placeBuilding(position, blueprint)) {
+    const success = this.activeGridState.placeBuilding(position, blueprint);
+    if (success) {
+      this.notifyListeners();
+    }
+  }
+
+  public eraseRect(rect: Rectangle) {
+    let success = false;
+    this.activeGridState.getPlacedBuildings().forEach((building) => {
+      if (building.interceptsRectangle(rect)) {
+        this.activeGridState.removeBuilding(building);
+        success = true;
+      }
+    });
+    if (success) {
       this.notifyListeners();
     }
   }

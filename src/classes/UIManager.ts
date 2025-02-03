@@ -28,7 +28,7 @@ class UIManager {
     canvas.addEventListener('mouseup', this.handleMouseUp);
   }
 
-  public setCursorAction(action: 'default' | 'panning') {
+  public setCursorAction(action: CursorAction) {
     this.cursorAction = action;
   }
   public getCursorAction() {
@@ -92,7 +92,10 @@ class UIManager {
 
   private handleMouseUp = () => {
     this.canvasRenderer.stopPanning();
-    this.canvasRenderer.stopDragging();
+    if (this.cursorAction === 'erasing') {
+      const erasedRect = this.canvasRenderer.stopDragging();
+      if (erasedRect) this.gridStateManager.eraseRect(erasedRect);
+    }
   };
 }
 

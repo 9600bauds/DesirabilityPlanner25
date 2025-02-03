@@ -50,6 +50,11 @@ class GridState {
     this.updateDesirabilityGrid();
     return newBuilding;
   }
+  public removeBuilding(building: Building): void {
+    console.log('removing', building);
+    this.placedBuildings.delete(building);
+    this.updateDesirabilityGrid();
+  }
 }
 
 export default GridState;

@@ -9,6 +9,40 @@ export interface Rectangle {
   width: number;
 }
 
+export function createRectangleFromPoints(p1: Point, p2: Point): Rectangle {
+  const originX = Math.min(p1.x, p2.x);
+  const originY = Math.min(p1.y, p2.y);
+  const width = Math.abs(p1.x - p2.x) + 1;
+  const height = Math.abs(p1.y - p2.y) + 1;
+
+  return {
+    origin: { x: originX, y: originY },
+    width: width,
+    height: height,
+  };
+}
+
+export function rectangleInterceptsPoint(p: Point, r: Rectangle): boolean {
+  const isInsideHorizontal =
+    p.x >= r.origin.x && p.x <= r.origin.x + r.width - 1;
+  const isInsideVertical =
+    p.y >= r.origin.y && p.y <= r.origin.y + r.height - 1;
+
+  return isInsideHorizontal && isInsideVertical;
+}
+
+export function rectangleInterceptsSetOfPoints(
+  rect: Rectangle,
+  points: Set<Point>
+) {
+  for (const point of points) {
+    if (rectangleInterceptsPoint(point, rect)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function addPoints(a: Point, b: Point): Point {
   return { x: a.x + b.x, y: a.y + b.y };
 }

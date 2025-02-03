@@ -5,6 +5,7 @@ import {
   chebyshevDistance,
   Point,
   Rectangle,
+  rectangleInterceptsSetOfPoints,
 } from '../utils/geometry';
 import { getBlueprint } from '../definitions/buildingBlueprints';
 import { BuildingBlueprint } from '../definitions/buildingBlueprints';
@@ -52,6 +53,25 @@ export class Building {
 
   public getRectangleInTiles(): Rectangle {
     return { origin: this.origin, width: this.width, height: this.height };
+  }
+
+  public getTilesOccupied(): Set<Point> {
+    const tilesOccupied = new Set<Point>();
+    for (let x = this.origin.x; x < this.origin.x + this.width; x++) {
+      for (let y = this.origin.y; y < this.origin.y + this.height; y++) {
+        tilesOccupied.add({ x, y });
+      }
+    }
+    if (this.children) {
+      this.children.forEach((child) => {
+        child.getTilesOccupied().forEach((point) => tilesOccupied.add(point));
+      });
+    }
+    return tilesOccupied;
+  }
+
+  public interceptsRectangle(rect: Rectangle): boolean {
+    return rectangleInterceptsSetOfPoints(rect, this.getTilesOccupied());
   }
 
   public recursiveDesirabilityEffect(point: Point): number {

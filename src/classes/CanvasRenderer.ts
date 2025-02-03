@@ -1,5 +1,5 @@
 import { gridSize, rotationAngle } from '../utils/constants';
-import { Point, Rectangle } from '../utils/geometry';
+import { createRectangleFromPoints, Point, Rectangle } from '../utils/geometry';
 import { Building } from './Building';
 import GridState from './GridState';
 import GridStateManager from './GridStateManager';
@@ -32,8 +32,9 @@ class CanvasRenderer {
 
   // Clickdrag variables
   private isDragging = false;
-  private dragStartTile: Point | null = null;
-  private dragLastTile: Point | null = null;
+  private dragStartTile: Point = { x: 0, y: 0 };
+  private dragLastTile: Point = { x: 0, y: 0 };
+  private dragBox: Rectangle = { origin: { x: 0, y: 0 }, height: 0, width: 0 };
 
   constructor(canvas: HTMLCanvasElement, gridStateManager: GridStateManager) {
     this.canvas = canvas;
@@ -176,32 +177,39 @@ class CanvasRenderer {
   }
 
   public startDragging(event: MouseEvent) {
+    const thisTile = this.getMouseCoords(event);
+    if (!thisTile) {
+      return;
+    }
     this.isDragging = true;
-    this.dragStartTile = this.getMouseCoords(event);
-    this.dragLastTile = this.dragStartTile;
+    this.dragStartTile = thisTile;
+    this.dragLastTile = thisTile;
+    this.dragBox = createRectangleFromPoints(
+      this.dragStartTile,
+      this.dragLastTile
+    );
+    this.render();
   }
 
   public handleDragging(event: MouseEvent) {
     if (!this.isDragging) return;
-
     const thisTile = this.getMouseCoords(event);
-    if (thisTile === this.dragLastTile) return;
+    if (!thisTile || thisTile === this.dragLastTile) {
+      return;
+    }
     this.dragLastTile = thisTile;
-    console.log(
-      'Start: (',
-      this.dragStartTile?.x,
-      ',',
-      this.dragStartTile?.y,
-      '), Now: (',
-      this.dragLastTile?.x,
-      ',',
-      this.dragLastTile?.y,
-      ')'
+    this.dragBox = createRectangleFromPoints(
+      this.dragStartTile,
+      this.dragLastTile
     );
+    this.render();
   }
 
   public stopDragging() {
+    if (!this.isDragging) return;
     this.isDragging = false;
+    this.render();
+    return this.dragBox;
   }
 
   private render() {
@@ -226,6 +234,10 @@ class CanvasRenderer {
       for (let x = 0; x < gridSize; x++) {
         this.renderTile(baseValues[y][x], { x, y });
       }
+    }
+
+    if (this.isDragging) {
+      this.drawRectangle(this.dragBox, 'rgba(255, 0, 0, 0.1)');
     }
 
     // Render buildings
@@ -286,9 +298,22 @@ class CanvasRenderer {
   private drawBuilding(building: Building) {
     const boundingBox = building.getRectangleInTiles();
     this.drawRectangle(boundingBox, building.color);
+    if (building.parent) {
+      // Do not draw overlays for children
+      return;
+    }
     if (building.children) {
       building.children.forEach((child) => {
         this.drawBuilding(child);
+      });
+    }
+    if (this.isDragging && building.interceptsRectangle(this.dragBox)) {
+      building.getTilesOccupied().forEach((tile) => {
+        this.drawRectangle(
+          { origin: tile, height: 1, width: 1 },
+          'rgba(255, 0, 0, 0.2)',
+          null
+        );
       });
     }
     if (building.name) {
