@@ -1,7 +1,8 @@
 import { gridSize, rotationAngle } from '../utils/constants';
 import { Point, Rectangle } from '../utils/geometry';
 import { Building } from './Building';
-import { GridState } from './GridState';
+import GridState from './GridState';
+import GridStateManager from './GridStateManager';
 
 interface CanvasSize {
   width: number;
@@ -9,7 +10,7 @@ interface CanvasSize {
   pixelRatio: number;
 }
 
-export class CanvasRenderer {
+class CanvasRenderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private currentSize: CanvasSize = { width: 0, height: 0, pixelRatio: 1 };
@@ -29,17 +30,25 @@ export class CanvasRenderer {
   private panOffsetX = 0;
   private panOffsetY = 0;
 
-  constructor(canvas: HTMLCanvasElement, gridState: GridState) {
+  constructor(canvas: HTMLCanvasElement, gridStateManager: GridStateManager) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context!');
     this.ctx = ctx;
 
-    this.gridState = gridState;
-    this.gridState.subscribe(() => this.render()); //Rerender when gridstate notifies us of a change
+    this.gridState = gridStateManager.getActiveGridState();
+    gridStateManager.subscribe(this.gridStateWasUpdated);
+
+    const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
+    resizeObserver.observe(canvas);
 
     this.canvasSizeUpdated(); //Initial size setup
   }
+
+  private gridStateWasUpdated = (updatedGridState: GridState) => {
+    this.gridState = updatedGridState;
+    this.render();
+  };
 
   private coordsToPx(point: Point): Point {
     const x = this.totalOffsetX + point.x * this.tileSize;
@@ -157,6 +166,7 @@ export class CanvasRenderer {
   }
 
   private render() {
+    console.log('Rerendering grid...');
     const baseValues = this.gridState.getDesirabilityGrid();
     const placedBuildings = this.gridState.getPlacedBuildings();
     const { width, height } = this.currentSize;
@@ -280,3 +290,5 @@ export class CanvasRenderer {
     this.render();
   }
 }
+
+export default CanvasRenderer;

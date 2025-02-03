@@ -3,28 +3,15 @@ import { Building } from './Building';
 import { gridSize } from '../utils/constants';
 import { BuildingBlueprint } from '../definitions/buildingBlueprints';
 
-export class GridState {
+class GridState {
   private desirabilityGrid: number[][];
   private placedBuildings: Set<Building>;
-
-  private listeners: Set<() => void>;
 
   constructor() {
     this.desirabilityGrid = Array.from({ length: gridSize }, () =>
       Array.from({ length: gridSize }, () => 0)
     );
     this.placedBuildings = new Set();
-    this.listeners = new Set();
-  }
-
-  // Observer pattern methods
-  public subscribe(listener: () => void) {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener); // Return unsubscribe function
-  }
-
-  private notifyListeners() {
-    this.listeners.forEach((listener) => listener());
   }
 
   public getDesirabilityGrid() {
@@ -51,7 +38,6 @@ export class GridState {
         this.desirabilityGrid[y][x] += totalDesirabilityEffect;
       }
     }
-    this.notifyListeners();
   }
 
   public placeBuilding(
@@ -65,3 +51,5 @@ export class GridState {
     return newBuilding;
   }
 }
+
+export default GridState;

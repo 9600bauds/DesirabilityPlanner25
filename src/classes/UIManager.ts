@@ -3,28 +3,23 @@ import {
   getBlueprint,
   getRandomBuildingBlueprint,
 } from '../definitions/buildingBlueprints';
-import { CanvasRenderer } from './CanvasRenderer';
-import { GridState } from './GridState';
+import CanvasRenderer from './CanvasRenderer';
+import GridStateManager from './GridStateManager';
 
-export class UIManager {
+class UIManager {
   private cursorAction: 'default' | 'panning' = 'default';
   private selectedBlueprintKey: keyof typeof BUILDING_BLUEPRINTS = 'GARDEN';
 
   private canvasRenderer: CanvasRenderer;
-  private gridState: GridState;
+  private gridStateManager: GridStateManager;
 
   constructor(
     canvas: HTMLCanvasElement,
     canvasRenderer: CanvasRenderer,
-    gridState: GridState
+    gridStateManager: GridStateManager
   ) {
     this.canvasRenderer = canvasRenderer;
-    this.gridState = gridState;
-
-    const resizeObserver = new ResizeObserver(() => {
-      canvasRenderer.canvasSizeUpdated();
-    });
-    resizeObserver.observe(canvas);
+    this.gridStateManager = gridStateManager;
 
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
@@ -73,7 +68,7 @@ export class UIManager {
         const blueprint = this.getSelectedBlueprint();
         if (blueprint) {
           this.canvasRenderer.stopPanning();
-          this.gridState.placeBuilding(tile, blueprint);
+          this.gridStateManager.tryPlaceBuilding(tile, blueprint);
           //this.gridState.placeBuilding(tile, getRandomBuildingBlueprint());
         }
         console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
@@ -93,3 +88,5 @@ export class UIManager {
     this.canvasRenderer.stopPanning();
   };
 }
+
+export default UIManager;

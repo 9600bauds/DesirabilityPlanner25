@@ -1,10 +1,8 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { CanvasRenderer } from './classes/CanvasRenderer';
-import { GridState } from './classes/GridState';
-import { UIManager } from './classes/UIManager';
+import CanvasRenderer from './classes/CanvasRenderer';
+import UIManager from './classes/UIManager';
 import Sidebar from './components/Sidebar';
-import BuildingSelector from './components/BuildingSelector';
+import GridStateManager from './classes/GridStateManager';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById(
@@ -15,9 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const gridState = new GridState();
-  const canvasRenderer = new CanvasRenderer(canvas, gridState);
-  const uiManager = new UIManager(canvas, canvasRenderer, gridState);
+  const gridStateManager = new GridStateManager();
+
+  const canvasRenderer = new CanvasRenderer(canvas, gridStateManager);
+
+  const uiManager = new UIManager(canvas, canvasRenderer, gridStateManager);
 
   // Render React component into the sidebar
   const sidebar = document.getElementById('sidebar');
