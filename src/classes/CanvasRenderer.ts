@@ -1,6 +1,6 @@
 import { gridSize, rotationAngle } from '../utils/constants';
 import { createRectangleFromPoints, Point, Rectangle } from '../utils/geometry';
-import { Building } from './Building';
+import Building from './Building';
 import GridState from './GridState';
 import GridStateManager from './GridStateManager';
 
@@ -140,7 +140,6 @@ class CanvasRenderer {
     this.isPanning = true;
     this.lastPanX = event.clientX;
     this.lastPanY = event.clientY;
-    this.canvas.style.cursor = 'grabbing';
   }
 
   public handlePanning(event: MouseEvent) {
@@ -173,7 +172,6 @@ class CanvasRenderer {
 
   public stopPanning() {
     this.isPanning = false;
-    this.canvas.style.cursor = 'default';
   }
 
   public startDragging(event: MouseEvent) {

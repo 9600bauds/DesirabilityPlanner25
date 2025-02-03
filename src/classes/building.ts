@@ -11,7 +11,7 @@ import { getBlueprint } from '../definitions/buildingBlueprints';
 import { BuildingBlueprint } from '../definitions/buildingBlueprints';
 import { DesireBox } from './DesireBox';
 
-export class Building {
+class Building {
   origin: Point;
   label?: string;
   color?: string;
@@ -24,28 +24,34 @@ export class Building {
   children?: Building[];
   parent?: Building;
 
-  constructor(origin: Point, blueprint: BuildingBlueprint) {
+  constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
     this.origin = origin;
-    this.label = blueprint.label;
     this.color = blueprint.color;
     this.borderColor = blueprint.borderColor;
     this.height = blueprint.height;
     this.width = blueprint.width;
-    if (blueprint.cost) {
-      this.cost = blueprint.cost;
-    }
-    if (blueprint.employeesRequired) {
-      this.employeesRequired = blueprint.employeesRequired;
-    }
     this.desireBox = blueprint.desireBox;
+    if (parent) {
+      this.parent = parent;
+      if (!parent.children) {
+        parent.children = [];
+      }
+      parent.children.push(this);
+    } else {
+      //Children are always 0 cost and have no label
+      this.label = blueprint.label;
+      if (blueprint.cost) {
+        this.cost = blueprint.cost;
+      }
+      if (blueprint.employeesRequired) {
+        this.employeesRequired = blueprint.employeesRequired;
+      }
+    }
     if (blueprint.children) {
-      this.children = [];
       for (const blueprintChild of blueprint.children) {
         const childOrigin = addPoints(origin, blueprintChild.relativeOrigin);
         const childBlueprint = getBlueprint(blueprintChild.childKey);
-        const child = new Building(childOrigin, childBlueprint);
-        this.children?.push(child);
-        child.parent = this;
+        const _child = new Building(childOrigin, childBlueprint, this);
       }
     }
     console.log('Created building: ', this);
@@ -112,6 +118,4 @@ export class Building {
   }
 }
 
-export class ComplexBuilding extends Building {}
-
-export class House extends Building {}
+export default Building;

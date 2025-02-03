@@ -9,18 +9,18 @@ import {
 interface SidebarProps {
   onRotateClick: () => void;
   onPanClick: () => void;
+  onEraserClick: () => void;
   onZoomInClick: () => void;
   onZoomOutClick: () => void;
-  onDefaultActionClick: () => void;
   setSelectedBlueprints: (blueprints: BuildingBlueprint[]) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   onRotateClick,
   onPanClick,
+  onEraserClick,
   onZoomInClick,
   onZoomOutClick,
-  onDefaultActionClick,
   setSelectedBlueprints,
 }) => {
   return (
@@ -43,6 +43,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         <i className="material-icons">pan_tool</i>
       </button>
       <button
+        id="pan-btn"
+        className="btn btn-primary rounded-circle"
+        onClick={onEraserClick}
+      >
+        <i className="material-symbols-outlined">ink_eraser</i>
+      </button>
+      <button
         id="zoomin-btn"
         className="btn btn-primary rounded-circle"
         onClick={onZoomInClick}
@@ -55,13 +62,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         onClick={onZoomOutClick}
       >
         <i className="material-icons">zoom_out</i>
-      </button>
-      <button
-        id="default-action-btn"
-        className="btn btn-secondary sidebar-button"
-        onClick={onDefaultActionClick}
-      >
-        Default Action
       </button>
       <BuildingSelector setSelectedBlueprints={setSelectedBlueprints} />
     </div>

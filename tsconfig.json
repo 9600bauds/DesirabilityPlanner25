@@ -10,7 +10,7 @@
     "allowSyntheticDefaultImports": true, // Recommended for better compatibility with CommonJS modules,
     "strict": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": false,
     "sourceMap": true
   },
   "include": ["src/**/*", "vite.config.ts"],

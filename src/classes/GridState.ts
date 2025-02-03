@@ -1,5 +1,5 @@
 import { Point } from '../utils/geometry';
-import { Building } from './Building';
+import Building from './Building';
 import { gridSize } from '../utils/constants';
 import { BuildingBlueprint } from '../definitions/buildingBlueprints';
 
@@ -51,7 +51,6 @@ class GridState {
     return newBuilding;
   }
   public removeBuilding(building: Building): void {
-    console.log('removing', building);
     this.placedBuildings.delete(building);
     this.updateDesirabilityGrid();
   }

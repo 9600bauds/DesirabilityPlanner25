@@ -1,15 +1,11 @@
-import {
-  BUILDING_BLUEPRINTS,
-  BuildingBlueprint,
-  getBlueprint,
-} from '../definitions/buildingBlueprints';
+import { BuildingBlueprint } from '../definitions/buildingBlueprints';
 import CanvasRenderer from './CanvasRenderer';
 import GridStateManager from './GridStateManager';
 
-type CursorAction = 'default' | 'panning' | 'erasing';
+type CursorAction = 'placing' | 'panning' | 'erasing';
 
 class UIManager {
-  private cursorAction: CursorAction = 'erasing';
+  private cursorAction: CursorAction = 'placing';
   private selectedBlueprints?: BuildingBlueprint[];
   private selectedArray: number = 0;
 
@@ -29,6 +25,11 @@ class UIManager {
     canvas.addEventListener('mouseup', this.handleMouseUp);
 
     document.addEventListener('keydown', this.handleKeyDown);
+
+    //No rightclick menu on the canvas
+    canvas.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+    });
   }
 
   public setCursorAction(action: CursorAction) {
@@ -46,28 +47,42 @@ class UIManager {
   };
 
   public setSelectedBlueprints = (blueprints: BuildingBlueprint[]) => {
+    this.deselectBlueprint();
+    this.setCursorAction('placing');
     this.selectedBlueprints = blueprints;
     this.selectedArray = 0;
   };
 
-  private handleMouseDown = (event: MouseEvent) => {
-    if (this.cursorAction === 'panning') {
-      this.canvasRenderer.startPanning(event);
-    } else if (this.cursorAction === 'erasing') {
-      this.canvasRenderer.startDragging(event);
-    } else {
-      this.canvasRenderer.stopPanning();
+  private deselectBlueprint() {
+    this.selectedBlueprints = undefined;
+    this.selectedArray = 0;
+    this.setCursorAction('panning');
+  }
 
-      const tile = this.canvasRenderer.getMouseCoords(event);
-      if (tile) {
-        const blueprint = this.getSelectedBlueprint();
-        if (blueprint) {
-          this.canvasRenderer.stopPanning();
-          this.gridStateManager.tryPlaceBuilding(tile, blueprint);
-        }
-        console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
+  private handleMouseDown = (event: MouseEvent) => {
+    if (event.buttons === 2) {
+      //Right click
+      this.deselectBlueprint();
+    } else if (event.buttons === 1) {
+      //Left click
+      if (this.cursorAction === 'panning') {
+        this.canvasRenderer.startPanning(event);
+      } else if (this.cursorAction === 'erasing') {
+        this.canvasRenderer.startDragging(event);
       } else {
-        console.log('Clicked outside the grid');
+        this.canvasRenderer.stopPanning();
+
+        const tile = this.canvasRenderer.getMouseCoords(event);
+        if (tile) {
+          const blueprint = this.getSelectedBlueprint();
+          if (blueprint) {
+            this.canvasRenderer.stopPanning();
+            this.gridStateManager.tryPlaceBuilding(tile, blueprint);
+          }
+          console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
+        } else {
+          console.log('Clicked outside the grid');
+        }
       }
     }
   };

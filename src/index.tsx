@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <Sidebar
         onRotateClick={() => canvasRenderer.toggleGridRotation()}
         onPanClick={() => uiManager.setCursorAction('panning')}
+        onEraserClick={() => uiManager.setCursorAction('erasing')}
         onZoomInClick={() => canvasRenderer.zoomIn()}
         onZoomOutClick={() => canvasRenderer.zoomOut()}
-        onDefaultActionClick={() => uiManager.setCursorAction('default')}
         setSelectedBlueprints={uiManager.setSelectedBlueprints}
       />
     );
