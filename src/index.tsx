@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const gridStateManager = new GridStateManager();
 
-  const canvasRenderer = new CanvasRenderer(canvas, gridStateManager);
+  const canvasRenderer = new CanvasRenderer(canvas);
 
   const uiManager = new UIManager(canvas, canvasRenderer, gridStateManager);
 
@@ -25,11 +25,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const reactRoot = ReactDOM.createRoot(sidebar); // Create a React root in the sidebar element
     reactRoot.render(
       <Sidebar
-        onRotateClick={() => canvasRenderer.toggleGridRotation()}
+        onRotateClick={() =>
+          canvasRenderer.toggleGridRotation(
+            gridStateManager.getActiveGridState().getDesirabilityGrid(),
+            gridStateManager.getActiveGridState().getPlacedBuildings()
+          )
+        }
         onPanClick={() => uiManager.setCursorAction('panning')}
         onEraserClick={() => uiManager.setCursorAction('erasing')}
-        onZoomInClick={() => canvasRenderer.zoomIn()}
-        onZoomOutClick={() => canvasRenderer.zoomOut()}
+        onZoomInClick={() =>
+          canvasRenderer.zoomIn(
+            gridStateManager.getActiveGridState().getDesirabilityGrid(),
+            gridStateManager.getActiveGridState().getPlacedBuildings()
+          )
+        }
+        onZoomOutClick={() =>
+          canvasRenderer.zoomOut(
+            gridStateManager.getActiveGridState().getDesirabilityGrid(),
+            gridStateManager.getActiveGridState().getPlacedBuildings()
+          )
+        }
         setSelectedBlueprints={uiManager.setSelectedBlueprints}
       />
     );

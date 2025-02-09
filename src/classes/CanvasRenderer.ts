@@ -1,7 +1,6 @@
 import { gridSize, rotationAngle } from '../utils/constants';
 import { createRectangleFromPoints, Point, Rectangle } from '../utils/geometry';
 import Building from './Building';
-import GridState from './GridState';
 import GridStateManager from './GridStateManager';
 
 interface CanvasSize {
@@ -14,8 +13,6 @@ class CanvasRenderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private currentSize: CanvasSize = { width: 0, height: 0, pixelRatio: 1 };
-
-  private gridState: GridState;
 
   private isGridRotated = false;
   private tileSize = 45;
@@ -36,25 +33,17 @@ class CanvasRenderer {
   private dragLastTile: Point = { x: 0, y: 0 };
   private dragBox: Rectangle = { origin: { x: 0, y: 0 }, height: 0, width: 0 };
 
-  constructor(canvas: HTMLCanvasElement, gridStateManager: GridStateManager) {
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context!');
     this.ctx = ctx;
-
-    this.gridState = gridStateManager.getActiveGridState();
-    gridStateManager.subscribe(this.gridStateUpdated);
-
-    const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
-    resizeObserver.observe(canvas);
   }
 
-  private gridStateUpdated = (updatedGridState: GridState) => {
-    this.gridState = updatedGridState;
-    this.render();
-  };
-
-  private canvasSizeUpdated() {
+  public updateCanvasSize(
+    baseValues: number[][],
+    placedBuildings: Set<Building>
+  ) {
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;
     const pixelRatio = window.devicePixelRatio || 1;
@@ -70,7 +59,7 @@ class CanvasRenderer {
 
     this.ctx.scale(pixelRatio, pixelRatio);
     this.updateTotalOffsets();
-    this.render();
+    this.render(baseValues, placedBuildings);
   }
 
   private coordsToPx(point: Point): Point {
@@ -142,7 +131,11 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
   }
 
-  public handlePanning(event: MouseEvent) {
+  public handlePanning(
+    event: MouseEvent,
+    baseValues: number[][],
+    placedBuildings: Set<Building>
+  ) {
     if (!this.isPanning) return;
 
     let dragX = event.clientX - this.lastPanX;
@@ -167,53 +160,62 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
 
     this.updateTotalOffsets();
-    this.render();
+    this.render(baseValues, placedBuildings);
   }
 
   public stopPanning() {
     this.isPanning = false;
   }
 
-  public startDragging(event: MouseEvent) {
+  public startDragging(
+    event: MouseEvent,
+    baseValues: number[][],
+    placedBuildings: Set<Building>
+  ) {
     const thisTile = this.getMouseCoords(event);
     if (!thisTile) {
       return;
     }
     this.isDragging = true;
     this.dragStartTile = thisTile;
-    this.dragLastTile = thisTile;
-    this.dragBox = createRectangleFromPoints(
-      this.dragStartTile,
-      this.dragLastTile
-    );
-    this.render();
+    this.updateDragPosition(thisTile, baseValues, placedBuildings);
   }
 
-  public handleDragging(event: MouseEvent) {
+  public handleDragging(
+    event: MouseEvent,
+    baseValues: number[][],
+    placedBuildings: Set<Building>
+  ) {
     if (!this.isDragging) return;
     const thisTile = this.getMouseCoords(event);
     if (!thisTile || thisTile === this.dragLastTile) {
       return;
     }
-    this.dragLastTile = thisTile;
+    this.updateDragPosition(thisTile, baseValues, placedBuildings);
+  }
+
+  private updateDragPosition(
+    newPos: Point,
+    baseValues: number[][],
+    placedBuildings: Set<Building>
+  ) {
+    this.dragLastTile = newPos;
     this.dragBox = createRectangleFromPoints(
       this.dragStartTile,
       this.dragLastTile
     );
-    this.render();
+    this.render(baseValues, placedBuildings);
   }
 
-  public stopDragging() {
+  public stopDragging(baseValues: number[][], placedBuildings: Set<Building>) {
     if (!this.isDragging) return;
     this.isDragging = false;
-    this.render();
+    this.render(baseValues, placedBuildings);
     return this.dragBox;
   }
 
-  private render() {
+  public render(baseValues: number[][], placedBuildings: Set<Building>) {
     console.log('Rerendering grid...');
-    const baseValues = this.gridState.getDesirabilityGrid();
-    const placedBuildings = this.gridState.getPlacedBuildings();
     const { width, height } = this.currentSize;
 
     // Clear canvas
@@ -235,7 +237,7 @@ class CanvasRenderer {
     }
 
     if (this.isDragging) {
-      this.drawRectangle(this.dragBox, 'rgba(255, 0, 0, 0.1)');
+      this.drawRectangle(this.dragBox, null, 'rgba(255, 0, 0, 0.6)');
     }
 
     // Render buildings
@@ -333,23 +335,26 @@ class CanvasRenderer {
     this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
   }
 
-  public toggleGridRotation(): void {
+  public toggleGridRotation(
+    baseValues: number[][],
+    placedBuildings: Set<Building>
+  ): void {
     this.isGridRotated = !this.isGridRotated;
-    this.render();
+    this.render(baseValues, placedBuildings);
   }
 
-  public zoomIn(): void {
+  public zoomIn(baseValues: number[][], placedBuildings: Set<Building>): void {
     this.tileSize += 5;
     this.updateTotalOffsets();
-    this.render();
+    this.render(baseValues, placedBuildings);
   }
 
-  public zoomOut(): void {
+  public zoomOut(baseValues: number[][], placedBuildings: Set<Building>): void {
     if (this.tileSize > 5) {
       this.tileSize -= 5;
     }
     this.updateTotalOffsets();
-    this.render();
+    this.render(baseValues, placedBuildings);
   }
 }
 
