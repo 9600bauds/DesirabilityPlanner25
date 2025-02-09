@@ -102,9 +102,6 @@ class UIManager {
               this.canvasRenderer.render(this.renderGetters);
             }
           }
-          console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
-        } else {
-          console.log('Clicked outside the grid');
         }
       }
     }
@@ -151,10 +148,10 @@ class UIManager {
   };
 
   private rotateSelectedBlueprint = () => {
-    console.log(this.selectedBlueprints);
     if (this.selectedBlueprints && this.selectedBlueprints.length > 0) {
       this.selectedArray =
         (this.selectedArray + 1) % this.selectedBlueprints.length;
+      this.canvasRenderer.render(this.renderGetters);
     }
   };
 }

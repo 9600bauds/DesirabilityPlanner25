@@ -61,7 +61,6 @@ class Building {
         const _child = new Building(childOrigin, childBlueprint, this);
       }
     }
-    console.log('Created building: ', this);
   }
 
   public getRectangleInTiles(): Rectangle {

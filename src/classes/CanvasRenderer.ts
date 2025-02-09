@@ -317,7 +317,6 @@ class CanvasRenderer {
         strongOutlineBlack,
         3
       );
-      console.log(virtualBuilding.getTilesOccupied());
       for (const tile of virtualBuilding.getTilesOccupied()) {
         if (getters.isTileOccupied(tile)) {
           this.drawRectangle(

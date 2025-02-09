@@ -26,7 +26,6 @@ const BuildingSelector = ({ setSelectedBlueprints }: BuildingSelectorProps) => {
       arr.push(blueprint);
       options.set(splitMenuName, arr);
     }
-    console.log(options);
     return options;
   };
 
