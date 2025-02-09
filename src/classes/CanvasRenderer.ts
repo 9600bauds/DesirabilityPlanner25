@@ -6,6 +6,7 @@ import {
   isPointInSet,
   Line,
   Point,
+  PointSet,
   Rectangle,
 } from '../utils/geometry';
 import Building from './Building';
@@ -231,7 +232,7 @@ class CanvasRenderer {
 
     const buildingsBeingRemoved: Set<Building> = new Set();
     const buildingsBeingAdded: Set<Building> = new Set();
-    const occupiedTiles: Set<Point> = new Set();
+    const occupiedTiles: PointSet = new PointSet();
 
     if (cursorAction === 'placing') {
       if (this.lastMouseoverTile && selectedBlueprint) {
@@ -262,7 +263,7 @@ class CanvasRenderer {
     }
     for (const building of buildingsBeingRemoved) {
       for (const tile of building.getTilesOccupied()) {
-        occupiedTiles.delete(tile);
+        occupiedTiles.remove(tile);
       }
     }
 
@@ -281,7 +282,7 @@ class CanvasRenderer {
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const thisPoint = { x, y };
-        if (isPointInSet(thisPoint, occupiedTiles)) continue;
+        if (occupiedTiles.has(thisPoint)) continue;
         let desirabilityForThisTile = baseValues[y][x];
         for (const building of buildingsBeingAdded) {
           desirabilityForThisTile +=
@@ -293,10 +294,6 @@ class CanvasRenderer {
         }
         this.renderTile(desirabilityForThisTile, { x, y });
       }
-    }
-
-    if (this.isDragging) {
-      this.drawRectangle(this.dragBox, null, 'rgba(255, 0, 0, 0.6)');
     }
 
     // Render buildings
@@ -327,6 +324,10 @@ class CanvasRenderer {
           );
         }
       }
+    }
+
+    if (cursorAction === 'erasing' && this.isDragging) {
+      this.drawRectangle(this.dragBox, null, 'rgba(255, 0, 0, 0.6)');
     }
 
     if (this.isGridRotated) {
@@ -380,7 +381,7 @@ class CanvasRenderer {
   }
 
   private drawPointSetOutline(
-    points: Set<Point>,
+    points: PointSet,
     color: string = 'rgba(0,0,0,0.8)',
     lineWidth: number = 2
   ) {
@@ -391,28 +392,28 @@ class CanvasRenderer {
     for (const point of points) {
       // Check all 4 sides of this tile to see if there's any neighboring tiles there
       // Right edge
-      if (!isPointInSet({ x: point.x + 1, y: point.y }, points)) {
+      if (!points.has({ x: point.x + 1, y: point.y })) {
         edges.push({
           p1: { x: point.x + 1, y: point.y },
           p2: { x: point.x + 1, y: point.y + 1 },
         });
       }
       // Left edge
-      if (!isPointInSet({ x: point.x - 1, y: point.y }, points)) {
+      if (!points.has({ x: point.x - 1, y: point.y })) {
         edges.push({
           p1: { x: point.x, y: point.y },
           p2: { x: point.x, y: point.y + 1 },
         });
       }
       // Bottom edge
-      if (!isPointInSet({ x: point.x, y: point.y + 1 }, points)) {
+      if (!points.has({ x: point.x, y: point.y + 1 })) {
         edges.push({
           p1: { x: point.x, y: point.y + 1 },
           p2: { x: point.x + 1, y: point.y + 1 },
         });
       }
       // Top edge
-      if (!isPointInSet({ x: point.x, y: point.y - 1 }, points)) {
+      if (!points.has({ x: point.x, y: point.y - 1 })) {
         edges.push({
           p1: { x: point.x, y: point.y },
           p2: { x: point.x + 1, y: point.y },

@@ -7,13 +7,51 @@ export function arePointsEqual(p1: Point, p2: Point): boolean {
   return p1.x === p2.x && p1.y === p2.y;
 }
 
-export function isPointInSet(p: Point, set: Set<Point>): boolean {
-  for (const point of set) {
-    if (arePointsEqual(p, point)) {
-      return true;
+export class PointSet {
+  private points: Point[] = [];
+
+  has(point: Point): boolean {
+    for (const existingPoint of this.points) {
+      if (arePointsEqual(point, existingPoint)) {
+        return true;
+      }
     }
+    return false;
   }
-  return false;
+
+  add(point: Point): void {
+    if (this.has(point)) return;
+    this.points.push(point);
+  }
+
+  remove(point: Point): boolean {
+    for (let i = 0; i < this.points.length; i++) {
+      if (arePointsEqual(point, this.points[i])) {
+        this.points.splice(i, 1); // Remove the point at index i
+        return true; // Point was found and removed
+      }
+    }
+    return false; // Point not found
+  }
+
+  get size(): number {
+    return this.points.length;
+  }
+
+  [Symbol.iterator](): Iterator<Point> {
+    let index = 0;
+    const points = this.points;
+
+    return {
+      next(): IteratorResult<Point> {
+        if (index < points.length) {
+          return { value: points[index++], done: false };
+        } else {
+          return { value: undefined, done: true };
+        }
+      },
+    };
+  }
 }
 
 export interface Line {
@@ -51,7 +89,7 @@ export function rectangleInterceptsPoint(p: Point, r: Rectangle): boolean {
 
 export function rectangleInterceptsSetOfPoints(
   rect: Rectangle,
-  points: Set<Point>
+  points: PointSet
 ) {
   for (const point of points) {
     if (rectangleInterceptsPoint(point, rect)) {

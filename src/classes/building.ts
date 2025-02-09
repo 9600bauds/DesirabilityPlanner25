@@ -5,6 +5,7 @@ import {
   arePointsEqual,
   chebyshevDistance,
   Point,
+  PointSet,
   Rectangle,
   rectangleInterceptsSetOfPoints,
 } from '../utils/geometry';
@@ -64,7 +65,7 @@ class Building {
     return { origin: this.origin, width: this.width, height: this.height };
   }
 
-  public getTilesOccupied = (): Set<Point> => {
+  public getTilesOccupied = (): PointSet => {
     return getAllTiles(this.origin, this.blueprint);
   };
 
