@@ -41,8 +41,10 @@ export function rgbToHex(r: number, g: number, b: number): string {
   );
 }
 
+export const redLowTransparency = 'rgba(255, 0, 0, 0.2)';
 export const redMidTransparency = 'rgba(255, 0, 0, 0.4)';
 export const redHighTransparency = 'rgba(255, 0, 0, 1)';
+export const greenLowTransparency = 'rgba(0, 255, 0, 0.2)';
 export const greenMidTransparency = 'rgba(0, 255, 0, 0.4)';
-export const weakOutlineBlack = 'rgba(0,0,0,0.3)';
+export const weakOutlineBlack = 'rgba(0,0,0,0.2)';
 export const strongOutlineBlack = 'rgba(0,0,0,0.8)';

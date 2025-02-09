@@ -1,6 +1,7 @@
 import RenderGetters from '../interfaces/RenderGetters';
 import {
   desirabilityColor,
+  greenLowTransparency,
   greenMidTransparency,
   redHighTransparency,
   redMidTransparency,
@@ -269,11 +270,11 @@ class CanvasRenderer {
         occupiedTiles.add(tile);
       }
     }
-    for (const building of buildingsBeingRemoved) {
+    /*for (const building of buildingsBeingRemoved) {
       for (const tile of building.getTilesOccupied()) {
         occupiedTiles.remove(tile);
       }
-    }
+    }*/
 
     // Clear canvas
     this.ctx.clearRect(0, 0, width, height);
@@ -308,7 +309,10 @@ class CanvasRenderer {
     // Render buildings
     for (const building of placedBuildings) {
       const isBeingDeleted = buildingsBeingRemoved.has(building);
-      this.drawBuilding(building, isBeingDeleted);
+      this.drawBuilding(
+        building,
+        isBeingDeleted ? redMidTransparency : undefined
+      );
     }
 
     for (const virtualBuilding of buildingsBeingAdded) {
@@ -317,20 +321,32 @@ class CanvasRenderer {
         strongOutlineBlack,
         3
       );
+      const blockedTiles = new PointSet();
+      const openTiles = new PointSet();
       for (const tile of virtualBuilding.getTilesOccupied()) {
         if (getters.isTileOccupied(tile)) {
+          blockedTiles.add(tile);
+        } else {
+          openTiles.add(tile);
+        }
+      }
+      if (blockedTiles.size) {
+        for (const tile of blockedTiles) {
           this.drawRectangle(
             { origin: tile, height: 1, width: 1 },
             undefined,
             redMidTransparency
           );
-        } else {
+        }
+        for (const tile of openTiles) {
           this.drawRectangle(
             { origin: tile, height: 1, width: 1 },
             undefined,
             greenMidTransparency
           );
         }
+      } else {
+        this.drawBuilding(virtualBuilding, greenLowTransparency);
       }
     }
 
@@ -447,7 +463,7 @@ class CanvasRenderer {
     this.ctx.restore();
   }
 
-  private drawBuilding(building: Building, isBeingDeleted = false) {
+  private drawBuilding(building: Building, overlayColor?: string) {
     const boundingBox = building.getRectangleInTiles();
     if (building.color) {
       this.drawRectangle(boundingBox, undefined, building.color);
@@ -461,12 +477,12 @@ class CanvasRenderer {
         this.drawBuilding(child);
       }
     }
-    if (isBeingDeleted) {
+    if (overlayColor) {
       for (const tile of building.getTilesOccupied()) {
         this.drawRectangle(
           { origin: tile, height: 1, width: 1 },
           undefined,
-          redMidTransparency
+          overlayColor
         );
       }
     }
@@ -474,7 +490,7 @@ class CanvasRenderer {
       this.drawPointSetOutline(
         building.getTilesOccupied(),
         building.borderColor,
-        2
+        1
       );
     }
     if (building.label) {
