@@ -20,14 +20,14 @@ class GridStateManager {
     return this.getActiveGridState().getPlacedBuildings();
   };
 
-  public isTileOccupied(tile: Point) {
+  public isTileOccupied = (tile: Point) => {
     for (const building of this.activeGridState.getPlacedBuildings()) {
       if (building.interceptsPoint(tile)) return true;
     }
     return false;
-  }
+  };
 
-  public canPlaceBuilding(position: Point, blueprint: BuildingBlueprint) {
+  public canPlaceBuilding = (position: Point, blueprint: BuildingBlueprint) => {
     const buildingTiles = getAllTiles(position, blueprint);
     for (const tile of buildingTiles) {
       if (this.isTileOccupied(tile)) {
@@ -35,7 +35,7 @@ class GridStateManager {
       }
     }
     return true;
-  }
+  };
 
   public tryPlaceBuilding(position: Point, blueprint: BuildingBlueprint) {
     if (!this.canPlaceBuilding(position, blueprint)) {

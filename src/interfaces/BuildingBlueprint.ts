@@ -1,5 +1,5 @@
 import { DesireBox } from './DesireBox';
-import { addPoints, Point } from '../utils/geometry';
+import { addPoints, isPointInSet, Point } from '../utils/geometry';
 import { BUILDING_CATEGORIES } from './BuildingCategory';
 
 export interface BuildingBlueprint {
@@ -33,7 +33,10 @@ export function getAllTiles(origin: Point, bp: BuildingBlueprint): Set<Point> {
   const tiles = new Set<Point>();
   for (let x = origin.x; x < origin.x + bp.width; x++) {
     for (let y = origin.y; y < origin.y + bp.height; y++) {
-      tiles.add({ x, y });
+      const thisTile: Point = { x, y };
+      if (!isPointInSet(thisTile, tiles)) {
+        tiles.add(thisTile);
+      }
     }
   }
   if (bp.children) {
@@ -41,6 +44,9 @@ export function getAllTiles(origin: Point, bp: BuildingBlueprint): Set<Point> {
       const childBlueprint = getBlueprint(child.childKey);
       const childOrigin = addPoints(origin, child.relativeOrigin);
       for (const point of getAllTiles(childOrigin, childBlueprint)) {
+        if (!isPointInSet(point, tiles)) {
+          tiles.add(point);
+        }
         tiles.add(point);
       }
     }

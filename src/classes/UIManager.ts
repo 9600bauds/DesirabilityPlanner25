@@ -28,6 +28,7 @@ class UIManager {
       getBuildings: gridStateManager.getBuildings,
       getCursorAction: this.getCursorAction,
       getSelectedBlueprint: this.getSelectedBlueprint,
+      isTileOccupied: gridStateManager.isTileOccupied,
     };
 
     canvas.addEventListener('mousedown', this.handleMouseDown);

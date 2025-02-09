@@ -3,6 +3,8 @@ import { gridSize, rotationAngle } from '../utils/constants';
 import {
   arePointsEqual,
   createRectangleFromPoints,
+  isPointInSet,
+  Line,
   Point,
   Rectangle,
 } from '../utils/geometry';
@@ -229,6 +231,7 @@ class CanvasRenderer {
 
     const buildingsBeingRemoved: Set<Building> = new Set();
     const buildingsBeingAdded: Set<Building> = new Set();
+    const occupiedTiles: Set<Point> = new Set();
 
     if (cursorAction === 'placing') {
       if (this.lastMouseoverTile && selectedBlueprint) {
@@ -247,6 +250,21 @@ class CanvasRenderer {
         }
       }
     }
+    for (const building of placedBuildings) {
+      for (const tile of building.getTilesOccupied()) {
+        occupiedTiles.add(tile);
+      }
+    }
+    for (const building of buildingsBeingAdded) {
+      for (const tile of building.getTilesOccupied()) {
+        occupiedTiles.add(tile);
+      }
+    }
+    for (const building of buildingsBeingRemoved) {
+      for (const tile of building.getTilesOccupied()) {
+        occupiedTiles.delete(tile);
+      }
+    }
 
     // Clear canvas
     this.ctx.clearRect(0, 0, width, height);
@@ -263,6 +281,7 @@ class CanvasRenderer {
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const thisPoint = { x, y };
+        if (isPointInSet(thisPoint, occupiedTiles)) continue;
         let desirabilityForThisTile = baseValues[y][x];
         for (const building of buildingsBeingAdded) {
           desirabilityForThisTile +=
@@ -284,6 +303,30 @@ class CanvasRenderer {
     for (const building of placedBuildings) {
       const isBeingDeleted = buildingsBeingRemoved.has(building);
       this.drawBuilding(building, isBeingDeleted);
+    }
+
+    for (const virtualBuilding of buildingsBeingAdded) {
+      this.drawPointSetOutline(
+        virtualBuilding.getTilesOccupied(),
+        'rgba(0,0,0,0.8)',
+        2
+      );
+      console.log(virtualBuilding.getTilesOccupied());
+      for (const tile of virtualBuilding.getTilesOccupied()) {
+        if (getters.isTileOccupied(tile)) {
+          this.drawRectangle(
+            { origin: tile, height: 1, width: 1 },
+            'rgba(255, 0, 0, 0.2)',
+            null
+          );
+        } else {
+          this.drawRectangle(
+            { origin: tile, height: 1, width: 1 },
+            'rgba(0, 255, 0, 0.2)',
+            null
+          );
+        }
+      }
     }
 
     if (this.isGridRotated) {
@@ -334,6 +377,63 @@ class CanvasRenderer {
       this.ctx.strokeStyle = borderColor;
       this.ctx.strokeRect(origin.x, origin.y, width, height);
     }
+  }
+
+  private drawPointSetOutline(
+    points: Set<Point>,
+    color: string = 'rgba(0,0,0,0.8)',
+    lineWidth: number = 2
+  ) {
+    if (points.size === 0) return;
+
+    const edges: Line[] = [];
+
+    for (const point of points) {
+      // Check all 4 sides of this tile to see if there's any neighboring tiles there
+      // Right edge
+      if (!isPointInSet({ x: point.x + 1, y: point.y }, points)) {
+        edges.push({
+          p1: { x: point.x + 1, y: point.y },
+          p2: { x: point.x + 1, y: point.y + 1 },
+        });
+      }
+      // Left edge
+      if (!isPointInSet({ x: point.x - 1, y: point.y }, points)) {
+        edges.push({
+          p1: { x: point.x, y: point.y },
+          p2: { x: point.x, y: point.y + 1 },
+        });
+      }
+      // Bottom edge
+      if (!isPointInSet({ x: point.x, y: point.y + 1 }, points)) {
+        edges.push({
+          p1: { x: point.x, y: point.y + 1 },
+          p2: { x: point.x + 1, y: point.y + 1 },
+        });
+      }
+      // Top edge
+      if (!isPointInSet({ x: point.x, y: point.y - 1 }, points)) {
+        edges.push({
+          p1: { x: point.x, y: point.y },
+          p2: { x: point.x + 1, y: point.y },
+        });
+      }
+    }
+
+    this.ctx.save();
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.beginPath();
+
+    for (const edge of edges) {
+      const p1Px = this.coordsToPx(edge.p1);
+      const p2Px = this.coordsToPx(edge.p2);
+      this.ctx.moveTo(p1Px.x, p1Px.y);
+      this.ctx.lineTo(p2Px.x, p2Px.y);
+    }
+
+    this.ctx.stroke();
+    this.ctx.restore();
   }
 
   private drawBuilding(building: Building, isBeingDeleted = false) {

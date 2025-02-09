@@ -7,6 +7,20 @@ export function arePointsEqual(p1: Point, p2: Point): boolean {
   return p1.x === p2.x && p1.y === p2.y;
 }
 
+export function isPointInSet(p: Point, set: Set<Point>): boolean {
+  for (const point of set) {
+    if (arePointsEqual(p, point)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export interface Line {
+  p1: Point;
+  p2: Point;
+}
+
 export interface Rectangle {
   origin: Point;
   //Note that for all rectangle math, height and width are effectively +1:
