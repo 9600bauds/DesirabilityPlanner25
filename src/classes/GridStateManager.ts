@@ -1,11 +1,20 @@
-import { BuildingBlueprint } from '../definitions/buildingBlueprints';
+import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
 import { Point, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 
 class GridStateManager {
   private activeGridState = new GridState();
+
   public getActiveGridState = () => {
     return this.activeGridState;
+  };
+
+  public getBaseValues = () => {
+    return this.getActiveGridState().getDesirabilityGrid();
+  };
+
+  public getBuildings = () => {
+    return this.getActiveGridState().getPlacedBuildings();
   };
 
   public tryPlaceBuilding(position: Point, blueprint: BuildingBlueprint) {

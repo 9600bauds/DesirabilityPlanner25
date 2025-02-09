@@ -4,7 +4,7 @@ import BuildingSelector from './BuildingSelector';
 import {
   BUILDING_BLUEPRINTS,
   BuildingBlueprint,
-} from '../definitions/buildingBlueprints';
+} from '../interfaces/BuildingBlueprint';
 
 interface SidebarProps {
   onRotateClick: () => void;

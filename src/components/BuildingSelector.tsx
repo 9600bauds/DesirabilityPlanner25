@@ -3,8 +3,8 @@ import '@szhsin/react-menu/dist/index.css';
 import {
   BUILDING_BLUEPRINTS,
   BuildingBlueprint,
-} from '../definitions/buildingBlueprints';
-import { BUILDING_CATEGORIES } from '../definitions/buildingCategories';
+} from '../interfaces/BuildingBlueprint';
+import { BUILDING_CATEGORIES } from '../interfaces/BuildingCategory';
 
 interface BuildingSelectorProps {
   setSelectedBlueprints: (blueprints: BuildingBlueprint[]) => void;

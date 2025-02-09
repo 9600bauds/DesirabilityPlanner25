@@ -7,9 +7,9 @@ import {
   Rectangle,
   rectangleInterceptsSetOfPoints,
 } from '../utils/geometry';
-import { getBlueprint } from '../definitions/buildingBlueprints';
-import { BuildingBlueprint } from '../definitions/buildingBlueprints';
-import { DesireBox } from './DesireBox';
+import { getBlueprint } from '../interfaces/BuildingBlueprint';
+import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
+import { DesireBox } from '../interfaces/DesireBox';
 
 class Building {
   origin: Point;

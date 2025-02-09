@@ -1,6 +1,6 @@
-import { DesireBox } from '../classes/DesireBox';
+import { DesireBox } from './DesireBox';
 import { Point } from '../utils/geometry';
-import { BUILDING_CATEGORIES } from './buildingCategories';
+import { BUILDING_CATEGORIES } from './BuildingCategory';
 
 export interface BuildingBlueprint {
   label?: string;

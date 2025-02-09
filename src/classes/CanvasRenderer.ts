@@ -1,7 +1,7 @@
+import RenderGetters from '../interfaces/RenderGetters';
 import { gridSize, rotationAngle } from '../utils/constants';
 import { createRectangleFromPoints, Point, Rectangle } from '../utils/geometry';
 import Building from './Building';
-import GridStateManager from './GridStateManager';
 
 interface CanvasSize {
   width: number;
@@ -40,10 +40,7 @@ class CanvasRenderer {
     this.ctx = ctx;
   }
 
-  public updateCanvasSize(
-    baseValues: number[][],
-    placedBuildings: Set<Building>
-  ) {
+  public updateCanvasSize(getters: RenderGetters) {
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;
     const pixelRatio = window.devicePixelRatio || 1;
@@ -59,7 +56,7 @@ class CanvasRenderer {
 
     this.ctx.scale(pixelRatio, pixelRatio);
     this.updateTotalOffsets();
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
   }
 
   private coordsToPx(point: Point): Point {
@@ -131,11 +128,7 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
   }
 
-  public handlePanning(
-    event: MouseEvent,
-    baseValues: number[][],
-    placedBuildings: Set<Building>
-  ) {
+  public handlePanning(event: MouseEvent, getters: RenderGetters) {
     if (!this.isPanning) return;
 
     let dragX = event.clientX - this.lastPanX;
@@ -160,63 +153,53 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
 
     this.updateTotalOffsets();
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
   }
 
   public stopPanning() {
     this.isPanning = false;
   }
 
-  public startDragging(
-    event: MouseEvent,
-    baseValues: number[][],
-    placedBuildings: Set<Building>
-  ) {
+  public startDragging(event: MouseEvent, getters: RenderGetters) {
     const thisTile = this.getMouseCoords(event);
     if (!thisTile) {
       return;
     }
     this.isDragging = true;
     this.dragStartTile = thisTile;
-    this.updateDragPosition(thisTile, baseValues, placedBuildings);
+    this.updateDragPosition(thisTile, getters);
   }
 
-  public handleDragging(
-    event: MouseEvent,
-    baseValues: number[][],
-    placedBuildings: Set<Building>
-  ) {
+  public handleDragging(event: MouseEvent, getters: RenderGetters) {
     if (!this.isDragging) return;
     const thisTile = this.getMouseCoords(event);
     if (!thisTile || thisTile === this.dragLastTile) {
       return;
     }
-    this.updateDragPosition(thisTile, baseValues, placedBuildings);
+    this.updateDragPosition(thisTile, getters);
   }
 
-  private updateDragPosition(
-    newPos: Point,
-    baseValues: number[][],
-    placedBuildings: Set<Building>
-  ) {
+  private updateDragPosition(newPos: Point, getters: RenderGetters) {
     this.dragLastTile = newPos;
     this.dragBox = createRectangleFromPoints(
       this.dragStartTile,
       this.dragLastTile
     );
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
   }
 
-  public stopDragging(baseValues: number[][], placedBuildings: Set<Building>) {
+  public stopDragging(getters: RenderGetters) {
     if (!this.isDragging) return;
     this.isDragging = false;
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
     return this.dragBox;
   }
 
-  public render(baseValues: number[][], placedBuildings: Set<Building>) {
+  public render(getters: RenderGetters) {
     console.log('Rerendering grid...');
     const { width, height } = this.currentSize;
+    const baseValues = getters.getBaseValues();
+    const placedBuildings = getters.getBuildings();
 
     // Clear canvas
     this.ctx.clearRect(0, 0, width, height);
@@ -335,26 +318,23 @@ class CanvasRenderer {
     this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
   }
 
-  public toggleGridRotation(
-    baseValues: number[][],
-    placedBuildings: Set<Building>
-  ): void {
+  public toggleGridRotation(getters: RenderGetters): void {
     this.isGridRotated = !this.isGridRotated;
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
   }
 
-  public zoomIn(baseValues: number[][], placedBuildings: Set<Building>): void {
+  public zoomIn(getters: RenderGetters): void {
     this.tileSize += 5;
     this.updateTotalOffsets();
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
   }
 
-  public zoomOut(baseValues: number[][], placedBuildings: Set<Building>): void {
+  public zoomOut(getters: RenderGetters): void {
     if (this.tileSize > 5) {
       this.tileSize -= 5;
     }
     this.updateTotalOffsets();
-    this.render(baseValues, placedBuildings);
+    this.render(getters);
   }
 }
 

@@ -1,8 +1,9 @@
-import { BuildingBlueprint } from '../definitions/buildingBlueprints';
+import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
+import RenderGetters from '../interfaces/RenderGetters';
 import CanvasRenderer from './CanvasRenderer';
 import GridStateManager from './GridStateManager';
 
-type CursorAction = 'placing' | 'panning' | 'erasing';
+export type CursorAction = 'placing' | 'panning' | 'erasing';
 
 class UIManager {
   private cursorAction: CursorAction = 'panning';
@@ -12,6 +13,8 @@ class UIManager {
   private canvasRenderer: CanvasRenderer;
   private gridStateManager: GridStateManager;
 
+  public renderGetters: RenderGetters;
+
   constructor(
     canvas: HTMLCanvasElement,
     canvasRenderer: CanvasRenderer,
@@ -19,6 +22,13 @@ class UIManager {
   ) {
     this.canvasRenderer = canvasRenderer;
     this.gridStateManager = gridStateManager;
+
+    this.renderGetters = {
+      getBaseValues: gridStateManager.getBaseValues,
+      getBuildings: gridStateManager.getBuildings,
+      getCursorAction: this.getCursorAction,
+      getSelectedBlueprint: this.getSelectedBlueprint,
+    };
 
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
@@ -35,12 +45,12 @@ class UIManager {
     document.addEventListener('keydown', this.handleKeyDown);
   }
 
-  public setCursorAction(action: CursorAction) {
+  public setCursorAction = (action: CursorAction) => {
     this.cursorAction = action;
-  }
-  public getCursorAction() {
+  };
+  public getCursorAction = () => {
     return this.cursorAction;
-  }
+  };
 
   public getSelectedBlueprint = (): BuildingBlueprint | null => {
     if (!this.selectedBlueprints) {
@@ -56,11 +66,11 @@ class UIManager {
     this.selectedArray = 0;
   };
 
-  private deselectBlueprint() {
+  private deselectBlueprint = () => {
     this.selectedBlueprints = undefined;
     this.selectedArray = 0;
     this.setCursorAction('panning');
-  }
+  };
 
   private handleMouseDown = (event: MouseEvent) => {
     if (event.buttons === 2) {
@@ -71,11 +81,7 @@ class UIManager {
       if (this.cursorAction === 'panning') {
         this.canvasRenderer.startPanning(event);
       } else if (this.cursorAction === 'erasing') {
-        this.canvasRenderer.startDragging(
-          event,
-          this.gridStateManager.getActiveGridState().getDesirabilityGrid(),
-          this.gridStateManager.getActiveGridState().getPlacedBuildings()
-        );
+        this.canvasRenderer.startDragging(event, this.renderGetters);
       } else {
         this.canvasRenderer.stopPanning();
 
@@ -85,12 +91,7 @@ class UIManager {
           if (blueprint) {
             this.canvasRenderer.stopPanning();
             if (this.gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              this.canvasRenderer.render(
-                this.gridStateManager
-                  .getActiveGridState()
-                  .getDesirabilityGrid(),
-                this.gridStateManager.getActiveGridState().getPlacedBuildings()
-              );
+              this.canvasRenderer.render(this.renderGetters);
             }
           }
           console.log(`Clicked tile: x=${tile.x}, y=${tile.y}`);
@@ -102,41 +103,24 @@ class UIManager {
   };
 
   private canvasSizeUpdated() {
-    this.canvasRenderer.updateCanvasSize(
-      this.gridStateManager.getActiveGridState().getDesirabilityGrid(),
-      this.gridStateManager.getActiveGridState().getPlacedBuildings()
-    );
+    this.canvasRenderer.updateCanvasSize(this.renderGetters);
   }
 
   private handleMouseMove = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
-      this.canvasRenderer.handlePanning(
-        event,
-        this.gridStateManager.getActiveGridState().getDesirabilityGrid(),
-        this.gridStateManager.getActiveGridState().getPlacedBuildings()
-      );
+      this.canvasRenderer.handlePanning(event, this.renderGetters);
     } else if (this.cursorAction === 'erasing') {
-      this.canvasRenderer.handleDragging(
-        event,
-        this.gridStateManager.getActiveGridState().getDesirabilityGrid(),
-        this.gridStateManager.getActiveGridState().getPlacedBuildings()
-      );
+      this.canvasRenderer.handleDragging(event, this.renderGetters);
     }
   };
 
   private handleMouseUp = () => {
     this.canvasRenderer.stopPanning();
     if (this.cursorAction === 'erasing') {
-      const erasedRect = this.canvasRenderer.stopDragging(
-        this.gridStateManager.getActiveGridState().getDesirabilityGrid(),
-        this.gridStateManager.getActiveGridState().getPlacedBuildings()
-      );
+      const erasedRect = this.canvasRenderer.stopDragging(this.renderGetters);
       if (erasedRect) {
         if (this.gridStateManager.eraseRect(erasedRect)) {
-          this.canvasRenderer.render(
-            this.gridStateManager.getActiveGridState().getDesirabilityGrid(),
-            this.gridStateManager.getActiveGridState().getPlacedBuildings()
-          );
+          this.canvasRenderer.render(this.renderGetters);
         }
       }
     }
