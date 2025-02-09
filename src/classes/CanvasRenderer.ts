@@ -1,9 +1,16 @@
 import RenderGetters from '../interfaces/RenderGetters';
+import {
+  desirabilityColor,
+  greenMidTransparency,
+  redHighTransparency,
+  redMidTransparency,
+  strongOutlineBlack,
+  weakOutlineBlack,
+} from '../utils/colors';
 import { gridSize, rotationAngle } from '../utils/constants';
 import {
   arePointsEqual,
   createRectangleFromPoints,
-  isPointInSet,
   Line,
   Point,
   PointSet,
@@ -177,6 +184,7 @@ class CanvasRenderer {
     this.isDragging = true;
     this.dragStartTile = thisTile;
     this.updateDragBox(thisTile, getters);
+    this.render(getters);
   }
 
   //This will explicitly only be called if we're not panning. Thus, we can make our logic per-tile.
@@ -283,6 +291,7 @@ class CanvasRenderer {
       for (let x = 0; x < gridSize; x++) {
         const thisPoint = { x, y };
         if (occupiedTiles.has(thisPoint)) continue;
+
         let desirabilityForThisTile = baseValues[y][x];
         for (const building of buildingsBeingAdded) {
           desirabilityForThisTile +=
@@ -305,29 +314,29 @@ class CanvasRenderer {
     for (const virtualBuilding of buildingsBeingAdded) {
       this.drawPointSetOutline(
         virtualBuilding.getTilesOccupied(),
-        'rgba(0,0,0,0.8)',
-        2
+        strongOutlineBlack,
+        3
       );
       console.log(virtualBuilding.getTilesOccupied());
       for (const tile of virtualBuilding.getTilesOccupied()) {
         if (getters.isTileOccupied(tile)) {
           this.drawRectangle(
             { origin: tile, height: 1, width: 1 },
-            'rgba(255, 0, 0, 0.2)',
-            null
+            undefined,
+            redMidTransparency
           );
         } else {
           this.drawRectangle(
             { origin: tile, height: 1, width: 1 },
-            'rgba(0, 255, 0, 0.2)',
-            null
+            undefined,
+            greenMidTransparency
           );
         }
       }
     }
 
     if (cursorAction === 'erasing' && this.isDragging) {
-      this.drawRectangle(this.dragBox, null, 'rgba(255, 0, 0, 0.6)');
+      this.drawRectangle(this.dragBox, redHighTransparency);
     }
 
     if (this.isGridRotated) {
@@ -364,18 +373,20 @@ class CanvasRenderer {
 
   private drawRectangle(
     rectInTiles: Rectangle,
-    color: null | string = '#f0f0f0',
-    borderColor: null | string = 'rgba(0,0,0,0.3)'
+    borderColor?: string,
+    fillColor?: string,
+    lineWidth: number = 2
   ) {
     const { origin, height, width } = this.rectangleToPx(rectInTiles);
 
-    if (color) {
-      this.ctx.fillStyle = color;
+    if (fillColor) {
+      this.ctx.fillStyle = fillColor;
       this.ctx.fillRect(origin.x, origin.y, width, height);
     }
 
     if (borderColor) {
       this.ctx.strokeStyle = borderColor;
+      this.ctx.lineWidth = lineWidth;
       this.ctx.strokeRect(origin.x, origin.y, width, height);
     }
   }
@@ -439,7 +450,9 @@ class CanvasRenderer {
 
   private drawBuilding(building: Building, isBeingDeleted = false) {
     const boundingBox = building.getRectangleInTiles();
-    this.drawRectangle(boundingBox, building.color);
+    if (building.color) {
+      this.drawRectangle(boundingBox, undefined, building.color);
+    }
     if (building.parent) {
       // Do not draw overlays for children
       return;
@@ -453,10 +466,17 @@ class CanvasRenderer {
       for (const tile of building.getTilesOccupied()) {
         this.drawRectangle(
           { origin: tile, height: 1, width: 1 },
-          'rgba(255, 0, 0, 0.2)',
-          null
+          undefined,
+          redMidTransparency
         );
       }
+    }
+    if (building.borderColor) {
+      this.drawPointSetOutline(
+        building.getTilesOccupied(),
+        building.borderColor,
+        2
+      );
     }
     if (building.label) {
       this.drawNonRotatedText(boundingBox, building.label);
@@ -465,15 +485,8 @@ class CanvasRenderer {
 
   private renderTile(desirabilityValue: number, origin: Point) {
     const boundingBox: Rectangle = { origin, height: 1, width: 1 };
-    let color;
-    if (desirabilityValue > 0) {
-      color = `rgba(0, 200, 0, ${Math.min(1, desirabilityValue / 10)})`;
-    } else if (desirabilityValue < 0) {
-      color = `rgba(200, 0, 0, ${Math.min(1, Math.abs(desirabilityValue) / 10)})`;
-    } else {
-      color = '#f0f0f0';
-    }
-    this.drawRectangle(boundingBox, color);
+    const fillColor = desirabilityColor(desirabilityValue);
+    this.drawRectangle(boundingBox, weakOutlineBlack, fillColor, 1);
     this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
   }
 

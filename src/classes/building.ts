@@ -12,12 +12,13 @@ import {
 import { getAllTiles, getBlueprint } from '../interfaces/BuildingBlueprint';
 import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
 import { DesireBox } from '../interfaces/DesireBox';
+import { strongOutlineBlack } from '../utils/colors';
 
 class Building {
   origin: Point;
   label?: string;
   color?: string;
-  borderColor?: string;
+  borderColor?: string = strongOutlineBlack;
   width: number;
   height: number;
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
@@ -30,7 +31,9 @@ class Building {
   constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
     this.origin = origin;
     this.color = blueprint.color;
-    this.borderColor = blueprint.borderColor;
+    if (blueprint.borderColor) {
+      this.borderColor = blueprint.borderColor;
+    }
     this.height = blueprint.height;
     this.width = blueprint.width;
     this.desireBox = blueprint.desireBox;

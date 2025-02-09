@@ -1,5 +1,5 @@
 import { DesireBox } from './DesireBox';
-import { addPoints, isPointInSet, Point, PointSet } from '../utils/geometry';
+import { addPoints, Point, PointSet } from '../utils/geometry';
 import { BUILDING_CATEGORIES } from './BuildingCategory';
 
 export interface BuildingBlueprint {
