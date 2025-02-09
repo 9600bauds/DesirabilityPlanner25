@@ -1,6 +1,11 @@
 import RenderGetters from '../interfaces/RenderGetters';
 import { gridSize, rotationAngle } from '../utils/constants';
-import { createRectangleFromPoints, Point, Rectangle } from '../utils/geometry';
+import {
+  arePointsEqual,
+  createRectangleFromPoints,
+  Point,
+  Rectangle,
+} from '../utils/geometry';
 import Building from './Building';
 
 interface CanvasSize {
@@ -20,6 +25,8 @@ class CanvasRenderer {
   private totalOffsetX = 0;
   private totalOffsetY = 0;
 
+  private lastMouseoverTile?: Point = { x: 0, y: 0 };
+
   // Panning variables
   private isPanning = false;
   private lastPanX = 0;
@@ -30,7 +37,6 @@ class CanvasRenderer {
   // Clickdrag variables
   private isDragging = false;
   private dragStartTile: Point = { x: 0, y: 0 };
-  private dragLastTile: Point = { x: 0, y: 0 };
   private dragBox: Rectangle = { origin: { x: 0, y: 0 }, height: 0, width: 0 };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -65,7 +71,7 @@ class CanvasRenderer {
     return { x, y };
   }
 
-  private pxToCoords(point: Point): Point | null {
+  private pxToCoords(point: Point): Point | undefined {
     const rect = this.canvas.getBoundingClientRect();
     let canvasX = point.x - rect.left - this.totalOffsetX;
     let canvasY = point.y - rect.top - this.totalOffsetY;
@@ -95,11 +101,11 @@ class CanvasRenderer {
     if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
       return { x, y };
     } else {
-      return null;
+      return undefined;
     }
   }
 
-  public getMouseCoords(event: MouseEvent): Point | null {
+  public getMouseCoords(event: MouseEvent): Point | undefined {
     return this.pxToCoords({
       x: event.clientX,
       y: event.clientY,
@@ -167,25 +173,43 @@ class CanvasRenderer {
     }
     this.isDragging = true;
     this.dragStartTile = thisTile;
-    this.updateDragPosition(thisTile, getters);
+    this.updateDragBox(thisTile, getters);
   }
 
-  public handleDragging(event: MouseEvent, getters: RenderGetters) {
-    if (!this.isDragging) return;
+  //This will explicitly only be called if we're not panning. Thus, we can make our logic per-tile.
+  public handleMouseMove(event: MouseEvent, getters: RenderGetters) {
+    const previousTile = this.lastMouseoverTile;
     const thisTile = this.getMouseCoords(event);
-    if (!thisTile || thisTile === this.dragLastTile) {
+    this.lastMouseoverTile = thisTile;
+
+    if (
+      !thisTile ||
+      (thisTile && previousTile && arePointsEqual(thisTile, previousTile))
+    ) {
       return;
     }
-    this.updateDragPosition(thisTile, getters);
+
+    const cursorAction = getters.getCursorAction();
+
+    if (this.isDragging) {
+      if (event.buttons !== 1) {
+        this.stopDragging(getters);
+      } else {
+        this.updateDragBox(thisTile, getters);
+      }
+      this.render(getters);
+    } else if (cursorAction == 'placing') {
+      this.render(getters);
+    }
   }
 
-  private updateDragPosition(newPos: Point, getters: RenderGetters) {
-    this.dragLastTile = newPos;
-    this.dragBox = createRectangleFromPoints(
-      this.dragStartTile,
-      this.dragLastTile
-    );
+  public handleMouseLeave(getters: RenderGetters) {
+    this.lastMouseoverTile = undefined;
     this.render(getters);
+  }
+
+  private updateDragBox(newPos: Point, getters: RenderGetters) {
+    this.dragBox = createRectangleFromPoints(this.dragStartTile, newPos);
   }
 
   public stopDragging(getters: RenderGetters) {
@@ -200,6 +224,26 @@ class CanvasRenderer {
     const { width, height } = this.currentSize;
     const baseValues = getters.getBaseValues();
     const placedBuildings = getters.getBuildings();
+    const cursorAction = getters.getCursorAction();
+    const selectedBlueprint = getters.getSelectedBlueprint();
+
+    const buildingsBeingRemoved: Set<Building> = new Set();
+    const buildingsBeingAdded: Set<Building> = new Set();
+
+    if (cursorAction === 'placing') {
+      if (this.lastMouseoverTile && selectedBlueprint)
+        buildingsBeingAdded.add(
+          new Building(this.lastMouseoverTile, selectedBlueprint)
+        );
+    } else if (cursorAction === 'erasing') {
+      if (this.isDragging) {
+        for (const building of placedBuildings) {
+          if (building.interceptsRectangle(this.dragBox)) {
+            buildingsBeingRemoved.add(building);
+          }
+        }
+      }
+    }
 
     // Clear canvas
     this.ctx.clearRect(0, 0, width, height);
@@ -215,7 +259,17 @@ class CanvasRenderer {
     // Render grid
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
-        this.renderTile(baseValues[y][x], { x, y });
+        const thisPoint = { x, y };
+        let desirabilityForThisTile = baseValues[y][x];
+        for (const building of buildingsBeingAdded) {
+          desirabilityForThisTile +=
+            building.recursiveDesirabilityEffect(thisPoint);
+        }
+        for (const building of buildingsBeingRemoved) {
+          desirabilityForThisTile -=
+            building.recursiveDesirabilityEffect(thisPoint);
+        }
+        this.renderTile(desirabilityForThisTile, { x, y });
       }
     }
 
@@ -225,7 +279,8 @@ class CanvasRenderer {
 
     // Render buildings
     for (const building of placedBuildings) {
-      this.drawBuilding(building);
+      const isBeingDeleted = buildingsBeingRemoved.has(building);
+      this.drawBuilding(building, isBeingDeleted);
     }
 
     if (this.isGridRotated) {
@@ -278,7 +333,7 @@ class CanvasRenderer {
     }
   }
 
-  private drawBuilding(building: Building) {
+  private drawBuilding(building: Building, isBeingDeleted = false) {
     const boundingBox = building.getRectangleInTiles();
     this.drawRectangle(boundingBox, building.color);
     if (building.parent) {
@@ -290,7 +345,7 @@ class CanvasRenderer {
         this.drawBuilding(child);
       }
     }
-    if (this.isDragging && building.interceptsRectangle(this.dragBox)) {
+    if (isBeingDeleted) {
       for (const tile of building.getTilesOccupied()) {
         this.drawRectangle(
           { origin: tile, height: 1, width: 1 },

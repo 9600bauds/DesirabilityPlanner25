@@ -32,6 +32,7 @@ class UIManager {
 
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
+    canvas.addEventListener('mouseleave', this.handleMouseLeave);
     canvas.addEventListener('mouseup', this.handleMouseUp);
 
     const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
@@ -109,9 +110,13 @@ class UIManager {
   private handleMouseMove = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
       this.canvasRenderer.handlePanning(event, this.renderGetters);
-    } else if (this.cursorAction === 'erasing') {
-      this.canvasRenderer.handleDragging(event, this.renderGetters);
+    } else {
+      this.canvasRenderer.handleMouseMove(event, this.renderGetters);
     }
+  };
+
+  private handleMouseLeave = () => {
+    this.canvasRenderer.handleMouseLeave(this.renderGetters);
   };
 
   private handleMouseUp = () => {
