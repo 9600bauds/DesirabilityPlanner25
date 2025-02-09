@@ -231,10 +231,13 @@ class CanvasRenderer {
     const buildingsBeingAdded: Set<Building> = new Set();
 
     if (cursorAction === 'placing') {
-      if (this.lastMouseoverTile && selectedBlueprint)
-        buildingsBeingAdded.add(
-          new Building(this.lastMouseoverTile, selectedBlueprint)
+      if (this.lastMouseoverTile && selectedBlueprint) {
+        const virtualBuilding = new Building(
+          this.lastMouseoverTile,
+          selectedBlueprint
         );
+        buildingsBeingAdded.add(virtualBuilding);
+      }
     } else if (cursorAction === 'erasing') {
       if (this.isDragging) {
         for (const building of placedBuildings) {

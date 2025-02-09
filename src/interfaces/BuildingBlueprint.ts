@@ -1,5 +1,5 @@
 import { DesireBox } from './DesireBox';
-import { Point } from '../utils/geometry';
+import { addPoints, Point } from '../utils/geometry';
 import { BUILDING_CATEGORIES } from './BuildingCategory';
 
 export interface BuildingBlueprint {
@@ -27,6 +27,25 @@ export function getBlueprint(
     throw new Error(`Could not find building of key: ${key}`);
   }
   return BUILDING_BLUEPRINTS[key];
+}
+
+export function getAllTiles(origin: Point, bp: BuildingBlueprint): Set<Point> {
+  const tiles = new Set<Point>();
+  for (let x = origin.x; x < origin.x + bp.width; x++) {
+    for (let y = origin.y; y < origin.y + bp.height; y++) {
+      tiles.add({ x, y });
+    }
+  }
+  if (bp.children) {
+    for (const child of bp.children) {
+      const childBlueprint = getBlueprint(child.childKey);
+      const childOrigin = addPoints(origin, child.relativeOrigin);
+      for (const point of getAllTiles(childOrigin, childBlueprint)) {
+        tiles.add(point);
+      }
+    }
+  }
+  return tiles;
 }
 
 export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {

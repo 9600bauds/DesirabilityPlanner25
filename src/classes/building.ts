@@ -2,12 +2,13 @@
 
 import {
   addPoints,
+  arePointsEqual,
   chebyshevDistance,
   Point,
   Rectangle,
   rectangleInterceptsSetOfPoints,
 } from '../utils/geometry';
-import { getBlueprint } from '../interfaces/BuildingBlueprint';
+import { getAllTiles, getBlueprint } from '../interfaces/BuildingBlueprint';
 import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
 import { DesireBox } from '../interfaces/DesireBox';
 
@@ -22,6 +23,7 @@ class Building {
   employeesRequired: number = 0;
   desireBox?: DesireBox;
   children?: Building[];
+  blueprint: BuildingBlueprint;
   parent?: Building;
 
   constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
@@ -31,6 +33,7 @@ class Building {
     this.height = blueprint.height;
     this.width = blueprint.width;
     this.desireBox = blueprint.desireBox;
+    this.blueprint = blueprint;
     if (parent) {
       this.parent = parent;
       if (!parent.children) {
@@ -61,21 +64,18 @@ class Building {
     return { origin: this.origin, width: this.width, height: this.height };
   }
 
-  public getTilesOccupied(): Set<Point> {
-    const tilesOccupied = new Set<Point>();
-    for (let x = this.origin.x; x < this.origin.x + this.width; x++) {
-      for (let y = this.origin.y; y < this.origin.y + this.height; y++) {
-        tilesOccupied.add({ x, y });
+  public getTilesOccupied = (): Set<Point> => {
+    return getAllTiles(this.origin, this.blueprint);
+  };
+
+  public interceptsPoint(point: Point) {
+    const tiles = this.getTilesOccupied();
+    for (const tile of tiles) {
+      if (arePointsEqual(tile, point)) {
+        return true;
       }
     }
-    if (this.children) {
-      for (const child of this.children) {
-        for (const point of child.getTilesOccupied()) {
-          tilesOccupied.add(point);
-        }
-      }
-    }
-    return tilesOccupied;
+    return false;
   }
 
   public interceptsRectangle(rect: Rectangle): boolean {

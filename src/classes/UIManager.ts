@@ -70,18 +70,24 @@ class UIManager {
   private deselectBlueprint = () => {
     this.selectedBlueprints = undefined;
     this.selectedArray = 0;
-    this.setCursorAction('panning');
   };
 
   private handleMouseDown = (event: MouseEvent) => {
-    if (event.buttons === 2) {
+    if (event.button === 2) {
       //Right click
-      this.deselectBlueprint();
-    } else if (event.buttons === 1) {
+      if (this.getCursorAction() === 'placing') {
+        this.setCursorAction('panning');
+        this.deselectBlueprint();
+        this.canvasRenderer.render(this.renderGetters);
+      } else if (this.getCursorAction() === 'erasing') {
+        this.setCursorAction('panning');
+        this.canvasRenderer.stopDragging(this.renderGetters);
+      }
+    } else if (event.button === 0) {
       //Left click
-      if (this.cursorAction === 'panning') {
+      if (this.getCursorAction() === 'panning') {
         this.canvasRenderer.startPanning(event);
-      } else if (this.cursorAction === 'erasing') {
+      } else if (this.getCursorAction() === 'erasing') {
         this.canvasRenderer.startDragging(event, this.renderGetters);
       } else {
         this.canvasRenderer.stopPanning();
@@ -116,16 +122,22 @@ class UIManager {
   };
 
   private handleMouseLeave = () => {
-    this.canvasRenderer.handleMouseLeave(this.renderGetters);
+    if (this.cursorAction === 'panning') {
+      this.canvasRenderer.stopPanning();
+    } else {
+      this.canvasRenderer.handleMouseLeave(this.renderGetters);
+    }
   };
 
-  private handleMouseUp = () => {
-    this.canvasRenderer.stopPanning();
-    if (this.cursorAction === 'erasing') {
-      const erasedRect = this.canvasRenderer.stopDragging(this.renderGetters);
-      if (erasedRect) {
-        if (this.gridStateManager.eraseRect(erasedRect)) {
-          this.canvasRenderer.render(this.renderGetters);
+  private handleMouseUp = (event: MouseEvent) => {
+    if (event.button === 0) {
+      this.canvasRenderer.stopPanning();
+      if (this.cursorAction === 'erasing') {
+        const erasedRect = this.canvasRenderer.stopDragging(this.renderGetters);
+        if (erasedRect) {
+          if (this.gridStateManager.eraseRect(erasedRect)) {
+            this.canvasRenderer.render(this.renderGetters);
+          }
         }
       }
     }
