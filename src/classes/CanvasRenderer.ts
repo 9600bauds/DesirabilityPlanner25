@@ -261,17 +261,17 @@ class CanvasRenderer {
       }
     }
     for (const building of placedBuildings) {
-      for (const tile of building.getTilesOccupied()) {
+      for (const tile of building.tilesOccupied) {
         occupiedTiles.add(tile);
       }
     }
     for (const building of buildingsBeingAdded) {
-      for (const tile of building.getTilesOccupied()) {
+      for (const tile of building.tilesOccupied) {
         occupiedTiles.add(tile);
       }
     }
     /*for (const building of buildingsBeingRemoved) {
-      for (const tile of building.getTilesOccupied()) {
+      for (const tile of building.tilesOccupied) {
         occupiedTiles.remove(tile);
       }
     }*/
@@ -317,13 +317,13 @@ class CanvasRenderer {
 
     for (const virtualBuilding of buildingsBeingAdded) {
       this.drawPointSetOutline(
-        virtualBuilding.getTilesOccupied(),
+        virtualBuilding.tilesOccupied,
         strongOutlineBlack,
         3
       );
       const blockedTiles = new PointSet();
       const openTiles = new PointSet();
-      for (const tile of virtualBuilding.getTilesOccupied()) {
+      for (const tile of virtualBuilding.tilesOccupied) {
         if (getters.isTileOccupied(tile)) {
           blockedTiles.add(tile);
         } else {
@@ -478,7 +478,7 @@ class CanvasRenderer {
       }
     }
     if (overlayColor) {
-      for (const tile of building.getTilesOccupied()) {
+      for (const tile of building.tilesOccupied) {
         this.drawRectangle(
           { origin: tile, height: 1, width: 1 },
           undefined,
@@ -487,11 +487,7 @@ class CanvasRenderer {
       }
     }
     if (building.borderColor) {
-      this.drawPointSetOutline(
-        building.getTilesOccupied(),
-        building.borderColor,
-        1
-      );
+      this.drawPointSetOutline(building.tilesOccupied, building.borderColor, 1);
     }
     if (building.label) {
       this.drawNonRotatedText(boundingBox, building.label);

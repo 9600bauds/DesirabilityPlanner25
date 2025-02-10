@@ -24,8 +24,8 @@ class Building {
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
   desireBox?: DesireBox;
+  tilesOccupied: PointSet;
   children?: Building[];
-  blueprint: BuildingBlueprint;
   parent?: Building;
 
   constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
@@ -37,7 +37,6 @@ class Building {
     this.height = blueprint.height;
     this.width = blueprint.width;
     this.desireBox = blueprint.desireBox;
-    this.blueprint = blueprint;
     if (parent) {
       this.parent = parent;
       if (!parent.children) {
@@ -61,19 +60,15 @@ class Building {
         const _child = new Building(childOrigin, childBlueprint, this);
       }
     }
+    this.tilesOccupied = getAllTiles(origin, blueprint);
   }
 
   public getRectangleInTiles(): Rectangle {
     return { origin: this.origin, width: this.width, height: this.height };
   }
 
-  public getTilesOccupied = (): PointSet => {
-    return getAllTiles(this.origin, this.blueprint);
-  };
-
   public interceptsPoint(point: Point) {
-    const tiles = this.getTilesOccupied();
-    for (const tile of tiles) {
+    for (const tile of this.tilesOccupied) {
       if (arePointsEqual(tile, point)) {
         return true;
       }
@@ -82,7 +77,7 @@ class Building {
   }
 
   public interceptsRectangle(rect: Rectangle): boolean {
-    return rectangleInterceptsSetOfPoints(rect, this.getTilesOccupied());
+    return rectangleInterceptsSetOfPoints(rect, this.tilesOccupied);
   }
 
   public recursiveDesirabilityEffect(point: Point): number {
