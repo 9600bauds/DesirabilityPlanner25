@@ -2,7 +2,7 @@ export function desirabilityColor(value: number): string {
   value = Math.max(-10, Math.min(value, 50));
 
   const white = { r: 255, g: 255, b: 255 };
-  const darkRed = { r: 160, g: 0, b: 0 };
+  const darkRed = { r: 180, g: 0, b: 0 };
   const goldenYellow = { r: 255, g: 215, b: 0 };
 
   if (value === 0) return '#FFFFFF';
@@ -48,3 +48,4 @@ export const greenLowTransparency = 'rgba(0, 255, 0, 0.2)';
 export const greenMidTransparency = 'rgba(0, 255, 0, 0.4)';
 export const weakOutlineBlack = 'rgba(0,0,0,0.2)';
 export const strongOutlineBlack = 'rgba(0,0,0,0.8)';
+export const pureBlack = 'rgba(0,0,0,1)';

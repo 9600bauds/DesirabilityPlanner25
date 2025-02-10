@@ -16,13 +16,13 @@ import { strongOutlineBlack } from '../utils/colors';
 
 class Building {
   origin: Point;
-  label?: string;
-  color?: string;
-  borderColor?: string = strongOutlineBlack;
   width: number;
   height: number;
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
+  label?: string;
+  fillColor?: string;
+  borderColor?: string = strongOutlineBlack;
   desireBox?: DesireBox;
   tilesOccupied: PointSet;
   children?: Building[];
@@ -30,7 +30,7 @@ class Building {
 
   constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
     this.origin = origin;
-    this.color = blueprint.color;
+    this.fillColor = blueprint.fillColor;
     if (blueprint.borderColor) {
       this.borderColor = blueprint.borderColor;
     }

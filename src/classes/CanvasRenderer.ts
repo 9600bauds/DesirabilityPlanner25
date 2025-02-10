@@ -3,6 +3,7 @@ import {
   desirabilityColor,
   greenLowTransparency,
   greenMidTransparency,
+  pureBlack,
   redHighTransparency,
   redMidTransparency,
   strongOutlineBlack,
@@ -362,7 +363,7 @@ class CanvasRenderer {
   private drawNonRotatedText(
     textBoxInTiles: Rectangle,
     text: string,
-    color: string = '#000000',
+    color: string = pureBlack,
     fontSize: number = this.tileSize / 3
   ) {
     const { origin, height, width } = this.rectangleToPx(textBoxInTiles);
@@ -408,7 +409,7 @@ class CanvasRenderer {
 
   private drawPointSetOutline(
     points: PointSet,
-    color: string = 'rgba(0,0,0,0.8)',
+    color: string,
     lineWidth: number = 2
   ) {
     if (points.size === 0) return;
@@ -465,8 +466,8 @@ class CanvasRenderer {
 
   private drawBuilding(building: Building, overlayColor?: string) {
     const boundingBox = building.getRectangleInTiles();
-    if (building.color) {
-      this.drawRectangle(boundingBox, undefined, building.color);
+    if (building.fillColor) {
+      this.drawRectangle(boundingBox, undefined, building.fillColor);
     }
     if (building.parent) {
       // Do not draw overlays for children

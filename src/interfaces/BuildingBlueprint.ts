@@ -4,7 +4,7 @@ import { BUILDING_CATEGORIES } from './BuildingCategory';
 
 export interface BuildingBlueprint {
   label?: string;
-  color?: string;
+  fillColor?: string;
   borderColor?: string;
   width: number;
   height: number;
@@ -726,7 +726,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
   },
   'Storage Yard': {
     label: 'Storage Yard',
-    color: '#F5E2B4',
+    fillColor: '#F5E2B4',
     height: 3,
     width: 3,
     cost: [14, 56, 70, 84, 105],
@@ -738,7 +738,7 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'STORAGE',
   },
   'Storage Yard Hut': {
-    color: '#F8C1B5',
+    fillColor: '#F8C1B5',
     height: 1,
     width: 1,
     desireBox: { baseDesirability: -5, stepDist: 2, stepVal: 2, maxRange: 3 },
