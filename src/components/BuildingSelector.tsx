@@ -1,10 +1,8 @@
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
-import {
-  BUILDING_BLUEPRINTS,
-  BuildingBlueprint,
-} from '../interfaces/BuildingBlueprint';
+import { ALL_BLUEPRINTS } from '../utils/ALL_BLUEPRINTS';
 import { BUILDING_CATEGORIES } from '../interfaces/BuildingCategory';
+import BuildingBlueprint from '../types/BuildingBlueprint';
 
 interface BuildingSelectorProps {
   setSelectedBlueprints: (blueprints: BuildingBlueprint[]) => void;
@@ -17,7 +15,7 @@ const BuildingSelector = ({ setSelectedBlueprints }: BuildingSelectorProps) => {
   const getOptionArraysForCategory = (category: string): menuOptionMap => {
     const options: menuOptionMap = new Map<string, BuildingBlueprint[]>();
 
-    const blueprintsInThisCategory = Object.entries(BUILDING_BLUEPRINTS).filter(
+    const blueprintsInThisCategory = Object.entries(ALL_BLUEPRINTS).filter(
       ([_, blueprint]) => blueprint.category === category
     );
     for (const [menuName, blueprint] of blueprintsInThisCategory) {

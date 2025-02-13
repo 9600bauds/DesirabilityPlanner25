@@ -1,7 +1,7 @@
 import { Point } from '../utils/geometry';
 import Building from './Building';
 import { gridSize } from '../utils/constants';
-import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
+import BuildingBlueprint, { createBuilding } from '../types/BuildingBlueprint';
 
 class GridState {
   private desirabilityGrid: number[][];
@@ -44,7 +44,7 @@ class GridState {
     position: Point,
     blueprint: BuildingBlueprint
   ): Building {
-    const newBuilding = new Building(position, blueprint);
+    const newBuilding = createBuilding(position, blueprint);
 
     this.placedBuildings.add(newBuilding);
     this.updateDesirabilityGrid();

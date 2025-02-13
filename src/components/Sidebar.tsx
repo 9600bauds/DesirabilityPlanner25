@@ -1,10 +1,7 @@
 // src/components/Sidebar.tsx
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
-import {
-  BUILDING_BLUEPRINTS,
-  BuildingBlueprint,
-} from '../interfaces/BuildingBlueprint';
+import BuildingBlueprint from '../types/BuildingBlueprint';
 
 interface SidebarProps {
   onRotateClick: () => void;

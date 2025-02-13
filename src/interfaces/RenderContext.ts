@@ -1,9 +1,9 @@
 import Building from '../classes/Building';
 import { CursorAction } from '../classes/UIManager';
+import BuildingBlueprint from '../types/BuildingBlueprint';
 import { Point } from '../utils/geometry';
-import { BuildingBlueprint } from './BuildingBlueprint';
 
-interface RenderGetters {
+interface RenderContext {
   getBaseValues: () => number[][];
   getBuildings: () => Set<Building>;
   getCursorAction: () => CursorAction;
@@ -11,4 +11,4 @@ interface RenderGetters {
   isTileOccupied: (tile: Point) => boolean;
 }
 
-export default RenderGetters;
+export default RenderContext;

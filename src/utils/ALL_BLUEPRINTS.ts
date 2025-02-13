@@ -1,55 +1,15 @@
-import { DesireBox } from './DesireBox';
-import { addPoints, Point, PointSet } from '../utils/geometry';
-import { BUILDING_CATEGORIES } from './BuildingCategory';
-
-export interface BuildingBlueprint {
-  label?: string;
-  fillColor?: string;
-  borderColor?: string;
-  width: number;
-  height: number;
-  cost?: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
-  employeesRequired?: number;
-  desireBox?: DesireBox;
-  children?: ChildBlueprint[];
-  category?: keyof typeof BUILDING_CATEGORIES;
-}
-
-export interface ChildBlueprint {
-  childKey: keyof typeof BUILDING_BLUEPRINTS;
-  relativeOrigin: Point;
-}
+import BuildingBlueprint from '../types/BuildingBlueprint';
 
 export function getBlueprint(
-  key: keyof typeof BUILDING_BLUEPRINTS //keyof doesn't actually really DO anything if the record keys are of type string, go TS!
+  key: keyof typeof ALL_BLUEPRINTS //keyof doesn't actually really DO anything if the record keys are of type string, go TS!
 ): BuildingBlueprint {
-  if (!(key in BUILDING_BLUEPRINTS)) {
+  if (!(key in ALL_BLUEPRINTS)) {
     throw new Error(`Could not find building of key: ${key}`);
   }
-  return BUILDING_BLUEPRINTS[key];
+  return ALL_BLUEPRINTS[key];
 }
 
-export function getAllTiles(origin: Point, bp: BuildingBlueprint): PointSet {
-  const tiles = new PointSet();
-  for (let x = origin.x; x < origin.x + bp.width; x++) {
-    for (let y = origin.y; y < origin.y + bp.height; y++) {
-      const thisTile: Point = { x, y };
-      tiles.add(thisTile);
-    }
-  }
-  if (bp.children) {
-    for (const child of bp.children) {
-      const childBlueprint = getBlueprint(child.childKey);
-      const childOrigin = addPoints(origin, child.relativeOrigin);
-      for (const point of getAllTiles(childOrigin, childBlueprint)) {
-        tiles.add(point);
-      }
-    }
-  }
-  return tiles;
-}
-
-export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
+export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
   Academy: {
     label: 'Academy',
     height: 4,
@@ -787,6 +747,16 @@ export const BUILDING_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     height: 4,
     width: 4,
     desireBox: { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
+  },
+  'Crude Hut_1x1': {
+    label: 'Crude Hut',
+    height: 1,
+    width: 1,
+    cost: [2, 8, 10, 12, 15],
+    desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 2 },
+    desirabilityToEvolve: -98,
+    desirabilityToDevolve: -99,
+    category: 'HOUSE',
   },
 } as const;
 

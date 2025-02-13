@@ -9,10 +9,11 @@ import {
   Rectangle,
   rectangleInterceptsSetOfPoints,
 } from '../utils/geometry';
-import { getAllTiles, getBlueprint } from '../interfaces/BuildingBlueprint';
-import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
+import { getAllTiles } from '../interfaces/getAllTiles';
+import { getBlueprint } from '../utils/ALL_BLUEPRINTS';
 import { DesireBox } from '../interfaces/DesireBox';
 import { strongOutlineBlack } from '../utils/colors';
+import BuildingBlueprint, { createBuilding } from '../types/BuildingBlueprint';
 
 class Building {
   origin: Point;
@@ -57,7 +58,7 @@ class Building {
       for (const blueprintChild of blueprint.children) {
         const childOrigin = addPoints(origin, blueprintChild.relativeOrigin);
         const childBlueprint = getBlueprint(blueprintChild.childKey);
-        const _child = new Building(childOrigin, childBlueprint, this);
+        const _child = createBuilding(childOrigin, childBlueprint, this);
       }
     }
     this.tilesOccupied = getAllTiles(origin, blueprint);

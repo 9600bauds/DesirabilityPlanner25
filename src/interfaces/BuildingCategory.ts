@@ -5,6 +5,11 @@ export interface BuildingCategory {
 }
 
 export const BUILDING_CATEGORIES: Record<string, BuildingCategory> = {
+  HOUSE: {
+    displayName: 'Housing',
+    symbol: '🏠',
+    baseColor: '#FFD700',
+  },
   FOOD: {
     displayName: 'Food and Farming',
     symbol: '🐐',

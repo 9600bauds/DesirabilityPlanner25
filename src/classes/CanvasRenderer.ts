@@ -1,4 +1,5 @@
-import RenderGetters from '../interfaces/RenderGetters';
+import RenderContext from '../interfaces/RenderContext';
+import { createBuilding } from '../types/BuildingBlueprint';
 import {
   desirabilityColor,
   greenLowTransparency,
@@ -58,7 +59,7 @@ class CanvasRenderer {
     this.ctx = ctx;
   }
 
-  public updateCanvasSize(getters: RenderGetters) {
+  public updateCanvasSize(context: RenderContext) {
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;
     const pixelRatio = window.devicePixelRatio || 1;
@@ -74,7 +75,7 @@ class CanvasRenderer {
 
     this.ctx.scale(pixelRatio, pixelRatio);
     this.updateTotalOffsets();
-    this.render(getters);
+    this.render(context);
   }
 
   private coordsToPx(point: Point): Point {
@@ -146,7 +147,7 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
   }
 
-  public handlePanning(event: MouseEvent, getters: RenderGetters) {
+  public handlePanning(event: MouseEvent, context: RenderContext) {
     if (!this.isPanning) return;
 
     let dragX = event.clientX - this.lastPanX;
@@ -171,26 +172,26 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
 
     this.updateTotalOffsets();
-    this.render(getters);
+    this.render(context);
   }
 
   public stopPanning() {
     this.isPanning = false;
   }
 
-  public startDragging(event: MouseEvent, getters: RenderGetters) {
+  public startDragging(event: MouseEvent, context: RenderContext) {
     const thisTile = this.getMouseCoords(event);
     if (!thisTile) {
       return;
     }
     this.isDragging = true;
     this.dragStartTile = thisTile;
-    this.updateDragBox(thisTile, getters);
-    this.render(getters);
+    this.updateDragBox(thisTile);
+    this.render(context);
   }
 
   //This will explicitly only be called if we're not panning. Thus, we can make our logic per-tile.
-  public handleMouseMove(event: MouseEvent, getters: RenderGetters) {
+  public handleMouseMove(event: MouseEvent, context: RenderContext) {
     const previousTile = this.lastMouseoverTile;
     const thisTile = this.getMouseCoords(event);
     this.lastMouseoverTile = thisTile;
@@ -202,43 +203,43 @@ class CanvasRenderer {
       return;
     }
 
-    const cursorAction = getters.getCursorAction();
+    const cursorAction = context.getCursorAction();
 
     if (this.isDragging) {
       if (event.buttons !== 1) {
-        this.stopDragging(getters);
+        this.stopDragging(context);
       } else {
-        this.updateDragBox(thisTile, getters);
+        this.updateDragBox(thisTile);
       }
-      this.render(getters);
+      this.render(context);
     } else if (cursorAction == 'placing') {
-      this.render(getters);
+      this.render(context);
     }
   }
 
-  public handleMouseLeave(getters: RenderGetters) {
+  public handleMouseLeave(context: RenderContext) {
     this.lastMouseoverTile = undefined;
-    this.render(getters);
+    this.render(context);
   }
 
-  private updateDragBox(newPos: Point, getters: RenderGetters) {
+  private updateDragBox(newPos: Point) {
     this.dragBox = createRectangleFromPoints(this.dragStartTile, newPos);
   }
 
-  public stopDragging(getters: RenderGetters) {
+  public stopDragging(context: RenderContext) {
     if (!this.isDragging) return;
     this.isDragging = false;
-    this.render(getters);
+    this.render(context);
     return this.dragBox;
   }
 
-  public render(getters: RenderGetters) {
+  public render(context: RenderContext) {
     console.log('Rerendering grid...');
     const { width, height } = this.currentSize;
-    const baseValues = getters.getBaseValues();
-    const placedBuildings = getters.getBuildings();
-    const cursorAction = getters.getCursorAction();
-    const selectedBlueprint = getters.getSelectedBlueprint();
+    const baseValues = context.getBaseValues();
+    const placedBuildings = context.getBuildings();
+    const cursorAction = context.getCursorAction();
+    const selectedBlueprint = context.getSelectedBlueprint();
 
     const buildingsBeingRemoved: Set<Building> = new Set();
     const buildingsBeingAdded: Set<Building> = new Set();
@@ -246,7 +247,7 @@ class CanvasRenderer {
 
     if (cursorAction === 'placing') {
       if (this.lastMouseoverTile && selectedBlueprint) {
-        const virtualBuilding = new Building(
+        const virtualBuilding = createBuilding(
           this.lastMouseoverTile,
           selectedBlueprint
         );
@@ -325,7 +326,7 @@ class CanvasRenderer {
       const blockedTiles = new PointSet();
       const openTiles = new PointSet();
       for (const tile of virtualBuilding.tilesOccupied) {
-        if (getters.isTileOccupied(tile)) {
+        if (context.isTileOccupied(tile)) {
           blockedTiles.add(tile);
         } else {
           openTiles.add(tile);
@@ -502,23 +503,23 @@ class CanvasRenderer {
     this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
   }
 
-  public toggleGridRotation(getters: RenderGetters): void {
+  public toggleGridRotation(context: RenderContext): void {
     this.isGridRotated = !this.isGridRotated;
-    this.render(getters);
+    this.render(context);
   }
 
-  public zoomIn(getters: RenderGetters): void {
+  public zoomIn(context: RenderContext): void {
     this.tileSize += 5;
     this.updateTotalOffsets();
-    this.render(getters);
+    this.render(context);
   }
 
-  public zoomOut(getters: RenderGetters): void {
+  public zoomOut(context: RenderContext): void {
     if (this.tileSize > 5) {
       this.tileSize -= 5;
     }
     this.updateTotalOffsets();
-    this.render(getters);
+    this.render(context);
   }
 }
 

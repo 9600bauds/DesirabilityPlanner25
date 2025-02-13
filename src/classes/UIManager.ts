@@ -1,5 +1,5 @@
-import { BuildingBlueprint } from '../interfaces/BuildingBlueprint';
-import RenderGetters from '../interfaces/RenderGetters';
+import RenderContext from '../interfaces/RenderContext';
+import BuildingBlueprint from '../types/BuildingBlueprint';
 import CanvasRenderer from './CanvasRenderer';
 import GridStateManager from './GridStateManager';
 
@@ -13,7 +13,7 @@ class UIManager {
   private canvasRenderer: CanvasRenderer;
   private gridStateManager: GridStateManager;
 
-  public renderGetters: RenderGetters;
+  public renderState: RenderContext;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -23,7 +23,7 @@ class UIManager {
     this.canvasRenderer = canvasRenderer;
     this.gridStateManager = gridStateManager;
 
-    this.renderGetters = {
+    this.renderState = {
       getBaseValues: gridStateManager.getBaseValues,
       getBuildings: gridStateManager.getBuildings,
       getCursorAction: this.getCursorAction,
@@ -79,17 +79,17 @@ class UIManager {
       if (this.getCursorAction() === 'placing') {
         this.setCursorAction('panning');
         this.deselectBlueprint();
-        this.canvasRenderer.render(this.renderGetters);
+        this.canvasRenderer.render(this.renderState);
       } else if (this.getCursorAction() === 'erasing') {
         this.setCursorAction('panning');
-        this.canvasRenderer.stopDragging(this.renderGetters);
+        this.canvasRenderer.stopDragging(this.renderState);
       }
     } else if (event.button === 0) {
       //Left click
       if (this.getCursorAction() === 'panning') {
         this.canvasRenderer.startPanning(event);
       } else if (this.getCursorAction() === 'erasing') {
-        this.canvasRenderer.startDragging(event, this.renderGetters);
+        this.canvasRenderer.startDragging(event, this.renderState);
       } else {
         this.canvasRenderer.stopPanning();
 
@@ -99,7 +99,7 @@ class UIManager {
           if (blueprint) {
             this.canvasRenderer.stopPanning();
             if (this.gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              this.canvasRenderer.render(this.renderGetters);
+              this.canvasRenderer.render(this.renderState);
             }
           }
         }
@@ -108,14 +108,14 @@ class UIManager {
   };
 
   private canvasSizeUpdated() {
-    this.canvasRenderer.updateCanvasSize(this.renderGetters);
+    this.canvasRenderer.updateCanvasSize(this.renderState);
   }
 
   private handleMouseMove = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
-      this.canvasRenderer.handlePanning(event, this.renderGetters);
+      this.canvasRenderer.handlePanning(event, this.renderState);
     } else {
-      this.canvasRenderer.handleMouseMove(event, this.renderGetters);
+      this.canvasRenderer.handleMouseMove(event, this.renderState);
     }
   };
 
@@ -123,7 +123,7 @@ class UIManager {
     if (this.cursorAction === 'panning') {
       this.canvasRenderer.stopPanning();
     } else {
-      this.canvasRenderer.handleMouseLeave(this.renderGetters);
+      this.canvasRenderer.handleMouseLeave(this.renderState);
     }
   };
 
@@ -131,10 +131,10 @@ class UIManager {
     if (event.button === 0) {
       this.canvasRenderer.stopPanning();
       if (this.cursorAction === 'erasing') {
-        const erasedRect = this.canvasRenderer.stopDragging(this.renderGetters);
+        const erasedRect = this.canvasRenderer.stopDragging(this.renderState);
         if (erasedRect) {
           if (this.gridStateManager.eraseRect(erasedRect)) {
-            this.canvasRenderer.render(this.renderGetters);
+            this.canvasRenderer.render(this.renderState);
           }
         }
       }
@@ -151,7 +151,7 @@ class UIManager {
     if (this.selectedBlueprints && this.selectedBlueprints.length > 0) {
       this.selectedArray =
         (this.selectedArray + 1) % this.selectedBlueprints.length;
-      this.canvasRenderer.render(this.renderGetters);
+      this.canvasRenderer.render(this.renderState);
     }
   };
 }

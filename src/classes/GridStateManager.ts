@@ -1,7 +1,5 @@
-import {
-  BuildingBlueprint,
-  getAllTiles,
-} from '../interfaces/BuildingBlueprint';
+import { getAllTiles } from '../interfaces/getAllTiles';
+import BuildingBlueprint from '../types/BuildingBlueprint';
 import { Point, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 
