@@ -10,7 +10,7 @@ import {
   strongOutlineBlack,
   weakOutlineBlack,
 } from '../utils/colors';
-import { gridSize, rotationAngle } from '../utils/constants';
+import { canvasTilePx, gridSize, rotationAngle } from '../utils/constants';
 import {
   arePointsEqual,
   createRectangleFromPoints,
@@ -33,10 +33,7 @@ class CanvasRenderer {
   private currentSize: CanvasSize = { width: 0, height: 0, pixelRatio: 1 };
 
   private isGridRotated = false;
-  private tileSize = 45;
-
-  private totalOffsetX = 0;
-  private totalOffsetY = 0;
+  private zoomLevel = 1.0;
 
   private lastMouseoverTile?: Point = { x: 0, y: 0 };
 
@@ -54,11 +51,69 @@ class CanvasRenderer {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) throw new Error('Could not get canvas context!');
     this.ctx = ctx;
+
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = 'high';
   }
 
+  /*
+   * Coordinate transformations
+   */
+  private coordsToPx(point: Point): Point {
+    const x = point.x * canvasTilePx;
+    const y = point.y * canvasTilePx;
+    return { x, y };
+  }
+
+  private pxToCoords(point: Point): Point | undefined {
+    // Convert screen coordinates to canvas coordinates
+    const rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+
+    const canvasX = (point.x - rect.left) * scaleX;
+    const canvasY = (point.y - rect.top) * scaleY;
+
+    // Get the inverse of the current transform
+    const transform = this.ctx.getTransform();
+    const inverseTransform = transform.inverse();
+
+    // Transform the point
+    const transformedPoint = new DOMPoint(canvasX, canvasY).matrixTransform(
+      inverseTransform
+    );
+
+    // Convert to grid coordinates
+    const x = Math.floor(transformedPoint.x / canvasTilePx);
+    const y = Math.floor(transformedPoint.y / canvasTilePx);
+
+    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+      return { x, y };
+    }
+    return undefined;
+  }
+
+  public getMouseCoords(event: MouseEvent): Point | undefined {
+    return this.pxToCoords({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  }
+
+  private rectangleToPx(rectangle: Rectangle): Rectangle {
+    const origin = this.coordsToPx(rectangle.origin);
+    const width = rectangle.width * canvasTilePx;
+    const height = rectangle.height * canvasTilePx;
+
+    return { origin, width, height };
+  }
+
+  /*
+   * Transformations
+   */
   public updateCanvasSize(context: RenderContext) {
     const displayWidth = this.canvas.clientWidth;
     const displayHeight = this.canvas.clientHeight;
@@ -73,73 +128,60 @@ class CanvasRenderer {
       pixelRatio,
     };
 
-    this.ctx.scale(pixelRatio, pixelRatio);
-    this.updateTotalOffsets();
+    this.updateTransform();
     this.render(context);
   }
 
-  private coordsToPx(point: Point): Point {
-    const x = this.totalOffsetX + point.x * this.tileSize;
-    const y = this.totalOffsetY + point.y * this.tileSize;
-    return { x, y };
+  public toggleGridRotation(context: RenderContext): void {
+    this.isGridRotated = !this.isGridRotated;
+    this.updateTransform();
+    this.render(context);
   }
 
-  private pxToCoords(point: Point): Point | undefined {
-    const rect = this.canvas.getBoundingClientRect();
-    let canvasX = point.x - rect.left - this.totalOffsetX;
-    let canvasY = point.y - rect.top - this.totalOffsetY;
+  public zoomIn(context: RenderContext): void {
+    this.zoomLevel *= 1.2;
+    this.updateTransform();
+    this.render(context);
+  }
 
-    // Apply pixel ratio inverse to mouse coordinates //Seems to cause bugs on other monitors?
-    //canvasX *= this.currentSize.pixelRatio;
-    //canvasY *= this.currentSize.pixelRatio;s
+  public zoomOut(context: RenderContext): void {
+    this.zoomLevel /= 1.2;
+    this.updateTransform();
+    this.render(context);
+  }
 
+  private updateTransform() {
+    // Reset transform
+    this.ctx.setTransform(
+      this.currentSize.pixelRatio,
+      0,
+      0,
+      this.currentSize.pixelRatio,
+      0,
+      0
+    );
+
+    // Apply panning
+    const centerX = this.currentSize.width / 2;
+    const centerY = this.currentSize.height / 2;
+    this.ctx.translate(centerX + this.panOffsetX, centerY + this.panOffsetY);
+
+    // Zoom
+    this.ctx.scale(this.zoomLevel, this.zoomLevel);
+
+    // Rotation
     if (this.isGridRotated) {
-      const gridSizePixels = gridSize * this.tileSize;
-      const centerX = gridSizePixels / 2 - this.panOffsetX;
-      const centerY = gridSizePixels / 2 - this.panOffsetY;
-
-      const cosAngle = Math.cos(rotationAngle);
-      const sinAngle = Math.sin(rotationAngle);
-
-      const relativeX = canvasX - centerX;
-      const relativeY = canvasY - centerY;
-
-      canvasX = relativeX * cosAngle + relativeY * sinAngle + centerX;
-      canvasY = -relativeX * sinAngle + relativeY * cosAngle + centerY;
+      this.ctx.rotate(rotationAngle);
     }
 
-    const x = Math.floor(canvasX / this.tileSize);
-    const y = Math.floor(canvasY / this.tileSize);
-
-    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-      return { x, y };
-    } else {
-      return undefined;
-    }
+    // Center the grid
+    const gridPixelSize = gridSize * canvasTilePx;
+    this.ctx.translate(-gridPixelSize / 2, -gridPixelSize / 2);
   }
 
-  public getMouseCoords(event: MouseEvent): Point | undefined {
-    return this.pxToCoords({
-      x: event.clientX,
-      y: event.clientY,
-    });
-  }
-
-  private rectangleToPx(rectangle: Rectangle): Rectangle {
-    const origin = this.coordsToPx(rectangle.origin);
-    const width = rectangle.width * this.tileSize;
-    const height = rectangle.height * this.tileSize;
-
-    return { origin, width, height };
-  }
-
-  private updateTotalOffsets() {
-    this.totalOffsetX =
-      (this.currentSize.width - gridSize * this.tileSize) / 2 + this.panOffsetX;
-    this.totalOffsetY =
-      (this.currentSize.height - gridSize * this.tileSize) / 2 +
-      this.panOffsetY;
-  }
+  /*
+   * Mouse movements
+   */
 
   public startPanning(event: MouseEvent) {
     this.isPanning = true;
@@ -150,20 +192,8 @@ class CanvasRenderer {
   public handlePanning(event: MouseEvent, context: RenderContext) {
     if (!this.isPanning) return;
 
-    let dragX = event.clientX - this.lastPanX;
-    let dragY = event.clientY - this.lastPanY;
-
-    if (this.isGridRotated) {
-      const cosAngle = Math.cos(rotationAngle);
-      const sinAngle = Math.sin(rotationAngle);
-
-      // Apply inverse rotation to the drag vector
-      const rotatedDragX = dragX * cosAngle + dragY * sinAngle;
-      const rotatedDragY = -dragX * sinAngle + dragY * cosAngle;
-
-      dragX = rotatedDragX;
-      dragY = rotatedDragY;
-    }
+    const dragX = event.clientX - this.lastPanX;
+    const dragY = event.clientY - this.lastPanY;
 
     this.panOffsetX += dragX;
     this.panOffsetY += dragY;
@@ -171,7 +201,7 @@ class CanvasRenderer {
     this.lastPanX = event.clientX;
     this.lastPanY = event.clientY;
 
-    this.updateTotalOffsets();
+    this.updateTransform();
     this.render(context);
   }
 
@@ -233,139 +263,22 @@ class CanvasRenderer {
     return this.dragBox;
   }
 
-  public render(context: RenderContext) {
-    console.log('Rerendering grid...');
-    const { width, height } = this.currentSize;
-    const baseValues = context.getBaseValues();
-    const placedBuildings = context.getBuildings();
-    const cursorAction = context.getCursorAction();
-    const selectedBlueprint = context.getSelectedBlueprint();
-
-    const buildingsBeingRemoved: Set<Building> = new Set();
-    const buildingsBeingAdded: Set<Building> = new Set();
-    const occupiedTiles: PointSet = new PointSet();
-
-    if (cursorAction === 'placing') {
-      if (this.lastMouseoverTile && selectedBlueprint) {
-        const virtualBuilding = createBuilding(
-          this.lastMouseoverTile,
-          selectedBlueprint
-        );
-        buildingsBeingAdded.add(virtualBuilding);
-      }
-    } else if (cursorAction === 'erasing') {
-      if (this.isDragging) {
-        for (const building of placedBuildings) {
-          if (building.interceptsRectangle(this.dragBox)) {
-            buildingsBeingRemoved.add(building);
-          }
-        }
-      }
-    }
-    for (const building of placedBuildings) {
-      for (const tile of building.tilesOccupied) {
-        occupiedTiles.add(tile);
-      }
-    }
-    for (const building of buildingsBeingAdded) {
-      for (const tile of building.tilesOccupied) {
-        occupiedTiles.add(tile);
-      }
-    }
-    /*for (const building of buildingsBeingRemoved) {
-      for (const tile of building.tilesOccupied) {
-        occupiedTiles.remove(tile);
-      }
-    }*/
-
-    // Clear canvas
-    this.ctx.clearRect(0, 0, width, height);
-
-    // Handle rotation
-    if (this.isGridRotated) {
-      this.ctx.save();
-      this.ctx.translate(width / 2, height / 2);
-      this.ctx.rotate(rotationAngle);
-      this.ctx.translate(-width / 2, -height / 2);
-    }
-
-    // Render grid
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        const thisPoint = { x, y };
-        if (occupiedTiles.has(thisPoint)) continue;
-
-        let desirabilityForThisTile = baseValues[y][x];
-        for (const building of buildingsBeingAdded) {
-          desirabilityForThisTile +=
-            building.recursiveDesirabilityEffect(thisPoint);
-        }
-        for (const building of buildingsBeingRemoved) {
-          desirabilityForThisTile -=
-            building.recursiveDesirabilityEffect(thisPoint);
-        }
-        this.renderTile(desirabilityForThisTile, { x, y });
-      }
-    }
-
-    // Render buildings
-    for (const building of placedBuildings) {
-      const isBeingDeleted = buildingsBeingRemoved.has(building);
-      this.drawBuilding(
-        building,
-        isBeingDeleted ? redMidTransparency : undefined
-      );
-    }
-
-    for (const virtualBuilding of buildingsBeingAdded) {
-      this.drawPointSetOutline(
-        virtualBuilding.tilesOccupied,
-        strongOutlineBlack,
-        3
-      );
-      const blockedTiles = new PointSet();
-      const openTiles = new PointSet();
-      for (const tile of virtualBuilding.tilesOccupied) {
-        if (context.isTileOccupied(tile)) {
-          blockedTiles.add(tile);
-        } else {
-          openTiles.add(tile);
-        }
-      }
-      if (blockedTiles.size) {
-        for (const tile of blockedTiles) {
-          this.drawRectangle(
-            { origin: tile, height: 1, width: 1 },
-            undefined,
-            redMidTransparency
-          );
-        }
-        for (const tile of openTiles) {
-          this.drawRectangle(
-            { origin: tile, height: 1, width: 1 },
-            undefined,
-            greenMidTransparency
-          );
-        }
-      } else {
-        this.drawBuilding(virtualBuilding, greenLowTransparency);
-      }
-    }
-
-    if (cursorAction === 'erasing' && this.isDragging) {
-      this.drawRectangle(this.dragBox, redHighTransparency);
-    }
-
-    if (this.isGridRotated) {
-      this.ctx.restore();
-    }
+  /*
+   * Rendering
+   */
+  private clearCanvas() {
+    const originalTransform = this.ctx.getTransform();
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.fillStyle = 'white';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.setTransform(originalTransform);
   }
 
   private drawNonRotatedText(
     textBoxInTiles: Rectangle,
     text: string,
     color: string = pureBlack,
-    fontSize: number = this.tileSize / 3
+    fontSize: number = canvasTilePx / 3
   ) {
     const { origin, height, width } = this.rectangleToPx(textBoxInTiles);
     // Text rendering with rotation handling
@@ -496,30 +409,126 @@ class CanvasRenderer {
     }
   }
 
-  private renderTile(desirabilityValue: number, origin: Point) {
+  private drawTile(desirabilityValue: number, origin: Point) {
     const boundingBox: Rectangle = { origin, height: 1, width: 1 };
     const fillColor = desirabilityColor(desirabilityValue);
     this.drawRectangle(boundingBox, weakOutlineBlack, fillColor, 1);
     this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
   }
 
-  public toggleGridRotation(context: RenderContext): void {
-    this.isGridRotated = !this.isGridRotated;
-    this.render(context);
-  }
+  public render(context: RenderContext) {
+    console.log('Rerendering grid...');
 
-  public zoomIn(context: RenderContext): void {
-    this.tileSize += 5;
-    this.updateTotalOffsets();
-    this.render(context);
-  }
+    const baseValues = context.getBaseValues();
+    const placedBuildings = context.getBuildings();
+    const cursorAction = context.getCursorAction();
+    const selectedBlueprint = context.getSelectedBlueprint();
 
-  public zoomOut(context: RenderContext): void {
-    if (this.tileSize > 5) {
-      this.tileSize -= 5;
+    const buildingsBeingRemoved: Set<Building> = new Set();
+    const buildingsBeingAdded: Set<Building> = new Set();
+    const occupiedTiles: PointSet = new PointSet();
+
+    if (cursorAction === 'placing') {
+      if (this.lastMouseoverTile && selectedBlueprint) {
+        const virtualBuilding = createBuilding(
+          this.lastMouseoverTile,
+          selectedBlueprint
+        );
+        buildingsBeingAdded.add(virtualBuilding);
+      }
+    } else if (cursorAction === 'erasing') {
+      if (this.isDragging) {
+        for (const building of placedBuildings) {
+          if (building.interceptsRectangle(this.dragBox)) {
+            buildingsBeingRemoved.add(building);
+          }
+        }
+      }
     }
-    this.updateTotalOffsets();
-    this.render(context);
+    for (const building of placedBuildings) {
+      for (const tile of building.tilesOccupied) {
+        occupiedTiles.add(tile);
+      }
+    }
+    for (const building of buildingsBeingAdded) {
+      for (const tile of building.tilesOccupied) {
+        occupiedTiles.add(tile);
+      }
+    }
+    /*for (const building of buildingsBeingRemoved) {
+      for (const tile of building.tilesOccupied) {
+        occupiedTiles.remove(tile);
+      }
+    }*/
+
+    this.clearCanvas();
+
+    // Render grid
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const thisPoint = { x, y };
+        if (occupiedTiles.has(thisPoint)) continue;
+
+        let desirabilityForThisTile = baseValues[y][x];
+        for (const building of buildingsBeingAdded) {
+          desirabilityForThisTile +=
+            building.recursiveDesirabilityEffect(thisPoint);
+        }
+        for (const building of buildingsBeingRemoved) {
+          desirabilityForThisTile -=
+            building.recursiveDesirabilityEffect(thisPoint);
+        }
+        this.drawTile(desirabilityForThisTile, { x, y });
+      }
+    }
+
+    // Render buildings
+    for (const building of placedBuildings) {
+      const isBeingDeleted = buildingsBeingRemoved.has(building);
+      this.drawBuilding(
+        building,
+        isBeingDeleted ? redMidTransparency : undefined
+      );
+    }
+
+    for (const virtualBuilding of buildingsBeingAdded) {
+      this.drawPointSetOutline(
+        virtualBuilding.tilesOccupied,
+        strongOutlineBlack,
+        3
+      );
+      const blockedTiles = new PointSet();
+      const openTiles = new PointSet();
+      for (const tile of virtualBuilding.tilesOccupied) {
+        if (context.isTileOccupied(tile)) {
+          blockedTiles.add(tile);
+        } else {
+          openTiles.add(tile);
+        }
+      }
+      if (blockedTiles.size) {
+        for (const tile of blockedTiles) {
+          this.drawRectangle(
+            { origin: tile, height: 1, width: 1 },
+            undefined,
+            redMidTransparency
+          );
+        }
+        for (const tile of openTiles) {
+          this.drawRectangle(
+            { origin: tile, height: 1, width: 1 },
+            undefined,
+            greenMidTransparency
+          );
+        }
+      } else {
+        this.drawBuilding(virtualBuilding, greenLowTransparency);
+      }
+    }
+
+    if (cursorAction === 'erasing' && this.isDragging) {
+      this.drawRectangle(this.dragBox, redHighTransparency);
+    }
   }
 }
 
