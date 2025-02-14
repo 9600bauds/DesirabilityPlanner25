@@ -1,14 +1,6 @@
 // src/building.ts
 
-import {
-  addPoints,
-  arePointsEqual,
-  chebyshevDistance,
-  Point,
-  PointSet,
-  Rectangle,
-  rectangleInterceptsSetOfPoints,
-} from '../utils/geometry';
+import { chebyshevDistance, Tile, Rectangle, TileSet } from '../utils/geometry';
 import { getAllTiles } from '../interfaces/getAllTiles';
 import { getBlueprint } from '../utils/ALL_BLUEPRINTS';
 import { DesireBox } from '../interfaces/DesireBox';
@@ -17,21 +9,25 @@ import { BUILDING_CATEGORIES } from '../interfaces/BuildingCategory';
 import colors from '../utils/colors';
 
 class Building {
-  origin: Point;
+  origin: Tile;
   width: number;
   height: number;
+  rect: Rectangle;
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
   label?: string;
   fillColor?: string = colors.backgroundWhite;
   borderColor?: string = colors.strongOutlineBlack;
   desireBox?: DesireBox;
-  tilesOccupied: PointSet;
+  tilesOccupied: TileSet;
   children?: Building[];
   parent?: Building;
 
-  constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
+  constructor(origin: Tile, blueprint: BuildingBlueprint, parent?: Building) {
     this.origin = origin;
+    this.height = blueprint.height;
+    this.width = blueprint.width;
+    this.rect = new Rectangle(this.origin, this.width, this.height);
     if (blueprint.borderColor) {
       this.borderColor = blueprint.borderColor;
     }
@@ -43,8 +39,6 @@ class Building {
       const category = BUILDING_CATEGORIES[blueprint.category];
       if (category) this.fillColor = category.baseColor;
     }
-    this.height = blueprint.height;
-    this.width = blueprint.width;
     this.desireBox = blueprint.desireBox;
     if (parent) {
       this.parent = parent;
@@ -64,7 +58,7 @@ class Building {
     }
     if (blueprint.children) {
       for (const blueprintChild of blueprint.children) {
-        const childOrigin = addPoints(origin, blueprintChild.relativeOrigin);
+        const childOrigin = origin.add(blueprintChild.relativeOrigin);
         const childBlueprint = getBlueprint(blueprintChild.childKey);
         const _child = createBuilding(childOrigin, childBlueprint, this);
       }
@@ -72,13 +66,9 @@ class Building {
     this.tilesOccupied = getAllTiles(origin, blueprint);
   }
 
-  public getRectangleInTiles(): Rectangle {
-    return { origin: this.origin, width: this.width, height: this.height };
-  }
-
-  public interceptsPoint(point: Point) {
-    for (const tile of this.tilesOccupied) {
-      if (arePointsEqual(tile, point)) {
+  public interceptsTile(t2: Tile) {
+    for (const t1 of this.tilesOccupied) {
+      if (t1.equals(t2)) {
         return true;
       }
     }
@@ -86,32 +76,27 @@ class Building {
   }
 
   public interceptsRectangle(rect: Rectangle): boolean {
-    return rectangleInterceptsSetOfPoints(rect, this.tilesOccupied);
+    return rect.interceptsTiles(this.tilesOccupied);
   }
 
-  public recursiveDesirabilityEffect(point: Point): number {
-    let desirabilityEffect = this.selfDesirabilityEffect(point);
+  public recursiveDesirabilityEffect(tile: Tile): number {
+    let desirabilityEffect = this.selfDesirabilityEffect(tile);
 
     if (this.children) {
       for (const child of this.children) {
-        desirabilityEffect += child.recursiveDesirabilityEffect(point);
+        desirabilityEffect += child.recursiveDesirabilityEffect(tile);
       }
     }
 
     return desirabilityEffect;
   }
 
-  public selfDesirabilityEffect(point: Point): number {
+  public selfDesirabilityEffect(tile: Tile): number {
     if (!this.desireBox) return 0;
 
     let desirabilityEffect = 0;
 
-    const distFromBuilding = chebyshevDistance(
-      point,
-      this.origin,
-      this.height,
-      this.width
-    );
+    const distFromBuilding = chebyshevDistance(tile, this.rect);
 
     if (distFromBuilding <= 0 || distFromBuilding > this.desireBox.maxRange) {
       return 0; // We don't affect tiles inside us because reasons

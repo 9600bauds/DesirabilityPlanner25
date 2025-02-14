@@ -2,14 +2,7 @@ import RenderContext from '../interfaces/RenderContext';
 import { createBuilding } from '../types/BuildingBlueprint';
 import colors, { desirabilityColor } from '../utils/colors';
 import { canvasTilePx, gridSize, rotationAngle } from '../utils/constants';
-import {
-  arePointsEqual,
-  createRectangleFromPoints,
-  Line,
-  Point,
-  PointSet,
-  Rectangle,
-} from '../utils/geometry';
+import { Line, Tile, Rectangle, TileSet } from '../utils/geometry';
 import Building from './Building';
 
 interface CanvasSize {
@@ -26,7 +19,7 @@ class CanvasRenderer {
   private isGridRotated = false;
   private zoomLevel = 1.0;
 
-  private lastMouseoverTile?: Point = { x: 0, y: 0 };
+  private lastMouseoverTile?: Tile;
 
   // Panning variables
   private isPanning = false;
@@ -37,8 +30,8 @@ class CanvasRenderer {
 
   // Clickdrag variables
   private isDragging = false;
-  private dragStartTile: Point = { x: 0, y: 0 };
-  private dragBox: Rectangle = { origin: { x: 0, y: 0 }, height: 0, width: 0 };
+  private dragStartTile?: Tile;
+  private dragBox?: Rectangle;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -53,13 +46,13 @@ class CanvasRenderer {
   /*
    * Coordinate transformations
    */
-  private coordsToPx(point: Point): Point {
-    const x = point.x * canvasTilePx;
-    const y = point.y * canvasTilePx;
-    return { x, y };
+  private tileToPoint(tile: Tile): DOMPoint {
+    const x = tile.x * canvasTilePx;
+    const y = tile.y * canvasTilePx;
+    return new DOMPoint(x, y);
   }
 
-  private pxToCoords(point: Point): Point | undefined {
+  private pointToTile(point: DOMPoint): Tile | undefined {
     // Convert screen coordinates to canvas coordinates
     const rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width;
@@ -82,24 +75,21 @@ class CanvasRenderer {
     const y = Math.floor(transformedPoint.y / canvasTilePx);
 
     if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
-      return { x, y };
+      return new Tile(x, y);
     }
     return undefined;
   }
 
-  public getMouseCoords(event: MouseEvent): Point | undefined {
-    return this.pxToCoords({
-      x: event.clientX,
-      y: event.clientY,
-    });
+  public getMouseCoords(event: MouseEvent): Tile | undefined {
+    return this.pointToTile(new DOMPoint(event.clientX, event.clientY));
   }
 
-  private rectangleToPx(rectangle: Rectangle): Rectangle {
-    const origin = this.coordsToPx(rectangle.origin);
+  private rectangleToPx(rectangle: Rectangle): DOMRect {
+    const origin = this.tileToPoint(rectangle.origin);
     const width = rectangle.width * canvasTilePx;
     const height = rectangle.height * canvasTilePx;
 
-    return { origin, width, height };
+    return new DOMRect(origin.x, origin.y, width, height);
   }
 
   /*
@@ -123,7 +113,7 @@ class CanvasRenderer {
     this.render(context);
   }
 
-  private rotateAroundPoint(p: Point, angle: number) {
+  private rotateAroundPoint(p: DOMPoint, angle: number) {
     this.ctx.translate(p.x, p.y);
     this.ctx.rotate(angle);
     this.ctx.translate(-p.x, -p.y);
@@ -225,7 +215,7 @@ class CanvasRenderer {
 
     if (
       !thisTile ||
-      (thisTile && previousTile && arePointsEqual(thisTile, previousTile))
+      (thisTile && previousTile && thisTile.equals(previousTile))
     ) {
       return;
     }
@@ -249,8 +239,9 @@ class CanvasRenderer {
     this.render(context);
   }
 
-  private updateDragBox(newPos: Point) {
-    this.dragBox = createRectangleFromPoints(this.dragStartTile, newPos);
+  private updateDragBox(newPos: Tile) {
+    if (this.dragStartTile)
+      this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
   }
 
   public stopDragging(context: RenderContext) {
@@ -314,14 +305,15 @@ class CanvasRenderer {
     this.ctx.font = `${fontSize}px monospace`;
 
     const {
-      origin,
+      x,
+      y,
       height: textBoxHeight,
       width: textBoxWidth,
     } = this.rectangleToPx(textBoxInTiles);
-    const textBoxCenterPx: Point = {
-      x: origin.x + textBoxWidth / 2,
-      y: origin.y + textBoxHeight / 2,
-    };
+    const textBoxCenterPx = new DOMPoint(
+      x + textBoxWidth / 2,
+      y + textBoxHeight / 2
+    );
     const maxWidth = textBoxWidth - padding * 2;
     const maxHeight = textBoxHeight - padding * 2;
 
@@ -370,58 +362,62 @@ class CanvasRenderer {
     fillColor?: string,
     lineWidth: number = 2
   ) {
-    const { origin, height, width } = this.rectangleToPx(rectInTiles);
+    const { x, y, height, width } = this.rectangleToPx(rectInTiles);
 
     if (fillColor) {
       this.ctx.fillStyle = fillColor;
-      this.ctx.fillRect(origin.x, origin.y, width, height);
+      this.ctx.fillRect(x, y, width, height);
     }
 
     if (borderColor) {
       this.ctx.strokeStyle = borderColor;
       this.ctx.lineWidth = lineWidth;
-      this.ctx.strokeRect(origin.x, origin.y, width, height);
+      this.ctx.strokeRect(x, y, width, height);
     }
   }
 
-  private drawPointSetOutline(
-    points: PointSet,
-    color: string,
-    lineWidth: number = 2
-  ) {
-    if (points.size === 0) return;
+  private drawOutline(tiles: TileSet, color: string, lineWidth: number = 2) {
+    if (tiles.size === 0) return;
 
     const edges: Line[] = [];
 
-    for (const point of points) {
+    for (const tile of tiles) {
       // Check all 4 sides of this tile to see if there's any neighboring tiles there
       // Right edge
-      if (!points.has({ x: point.x + 1, y: point.y })) {
-        edges.push({
-          p1: { x: point.x + 1, y: point.y },
-          p2: { x: point.x + 1, y: point.y + 1 },
-        });
+      if (!tiles.has(new Tile(tile.x + 1, tile.y))) {
+        edges.push(
+          new Line(
+            this.tileToPoint(new Tile(tile.x + 1, tile.y)),
+            this.tileToPoint(new Tile(tile.x + 1, tile.y + 1))
+          )
+        );
       }
       // Left edge
-      if (!points.has({ x: point.x - 1, y: point.y })) {
-        edges.push({
-          p1: { x: point.x, y: point.y },
-          p2: { x: point.x, y: point.y + 1 },
-        });
+      if (!tiles.has(new Tile(tile.x - 1, tile.y))) {
+        edges.push(
+          new Line(
+            this.tileToPoint(new Tile(tile.x, tile.y)),
+            this.tileToPoint(new Tile(tile.x, tile.y + 1))
+          )
+        );
       }
       // Bottom edge
-      if (!points.has({ x: point.x, y: point.y + 1 })) {
-        edges.push({
-          p1: { x: point.x, y: point.y + 1 },
-          p2: { x: point.x + 1, y: point.y + 1 },
-        });
+      if (!tiles.has(new Tile(tile.x, tile.y + 1))) {
+        edges.push(
+          new Line(
+            this.tileToPoint(new Tile(tile.x, tile.y + 1)),
+            this.tileToPoint(new Tile(tile.x + 1, tile.y + 1))
+          )
+        );
       }
       // Top edge
-      if (!points.has({ x: point.x, y: point.y - 1 })) {
-        edges.push({
-          p1: { x: point.x, y: point.y },
-          p2: { x: point.x + 1, y: point.y },
-        });
+      if (!tiles.has(new Tile(tile.x, tile.y - 1))) {
+        edges.push(
+          new Line(
+            this.tileToPoint(new Tile(tile.x, tile.y)),
+            this.tileToPoint(new Tile(tile.x + 1, tile.y))
+          )
+        );
       }
     }
 
@@ -431,10 +427,8 @@ class CanvasRenderer {
     this.ctx.beginPath();
 
     for (const edge of edges) {
-      const p1Px = this.coordsToPx(edge.p1);
-      const p2Px = this.coordsToPx(edge.p2);
-      this.ctx.moveTo(p1Px.x, p1Px.y);
-      this.ctx.lineTo(p2Px.x, p2Px.y);
+      this.ctx.moveTo(edge.p1.x, edge.p1.y);
+      this.ctx.lineTo(edge.p2.x, edge.p2.y);
     }
 
     this.ctx.stroke();
@@ -442,9 +436,8 @@ class CanvasRenderer {
   }
 
   private drawBuilding(building: Building, overlayColor?: string) {
-    const boundingBox = building.getRectangleInTiles();
     if (building.fillColor) {
-      this.drawRectangle(boundingBox, undefined, building.fillColor);
+      this.drawRectangle(building.rect, undefined, building.fillColor);
     }
     if (building.parent) {
       // Do not draw overlays for children
@@ -456,11 +449,11 @@ class CanvasRenderer {
       }
     }
     if (building.borderColor) {
-      this.drawPointSetOutline(building.tilesOccupied, building.borderColor, 2);
+      this.drawOutline(building.tilesOccupied, building.borderColor, 2);
     }
     if (building.label) {
       this.drawNonRotatedText(
-        boundingBox,
+        building.rect,
         building.label,
         colors.pureBlack,
         colors.outlineWhite
@@ -468,17 +461,13 @@ class CanvasRenderer {
     }
     if (overlayColor) {
       for (const tile of building.tilesOccupied) {
-        this.drawRectangle(
-          { origin: tile, height: 1, width: 1 },
-          undefined,
-          overlayColor
-        );
+        this.drawRectangle(new Rectangle(tile, 1, 1), undefined, overlayColor);
       }
     }
   }
 
-  private drawTile(desirabilityValue: number, origin: Point) {
-    const boundingBox: Rectangle = { origin, height: 1, width: 1 };
+  private drawTile(desirabilityValue: number, origin: Tile) {
+    const boundingBox = new Rectangle(origin, 1, 1);
     const fillColor = desirabilityColor(desirabilityValue);
     this.drawRectangle(boundingBox, colors.weakOutlineBlack, fillColor, 1);
     this.drawNonRotatedText(
@@ -498,7 +487,7 @@ class CanvasRenderer {
 
     const buildingsBeingRemoved: Set<Building> = new Set();
     const buildingsBeingAdded: Set<Building> = new Set();
-    const occupiedTiles: PointSet = new PointSet();
+    const occupiedTiles: TileSet = new TileSet();
 
     if (cursorAction === 'placing') {
       if (this.lastMouseoverTile && selectedBlueprint) {
@@ -511,7 +500,7 @@ class CanvasRenderer {
     } else if (cursorAction === 'erasing') {
       if (this.isDragging) {
         for (const building of placedBuildings) {
-          if (building.interceptsRectangle(this.dragBox)) {
+          if (this.dragBox && building.interceptsRectangle(this.dragBox)) {
             buildingsBeingRemoved.add(building);
           }
         }
@@ -538,19 +527,17 @@ class CanvasRenderer {
     // Render grid
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
-        const thisPoint = { x, y };
-        if (occupiedTiles.has(thisPoint)) continue;
+        const tile = new Tile(x, y);
+        if (occupiedTiles.has(tile)) continue;
 
         let desirabilityForThisTile = baseValues[y][x];
         for (const building of buildingsBeingAdded) {
-          desirabilityForThisTile +=
-            building.recursiveDesirabilityEffect(thisPoint);
+          desirabilityForThisTile += building.recursiveDesirabilityEffect(tile);
         }
         for (const building of buildingsBeingRemoved) {
-          desirabilityForThisTile -=
-            building.recursiveDesirabilityEffect(thisPoint);
+          desirabilityForThisTile -= building.recursiveDesirabilityEffect(tile);
         }
-        this.drawTile(desirabilityForThisTile, { x, y });
+        this.drawTile(desirabilityForThisTile, tile);
       }
     }
 
@@ -564,13 +551,13 @@ class CanvasRenderer {
     }
 
     for (const virtualBuilding of buildingsBeingAdded) {
-      this.drawPointSetOutline(
+      this.drawOutline(
         virtualBuilding.tilesOccupied,
         colors.strongOutlineBlack,
         3
       );
-      const blockedTiles = new PointSet();
-      const openTiles = new PointSet();
+      const blockedTiles = new TileSet();
+      const openTiles = new TileSet();
       for (const tile of virtualBuilding.tilesOccupied) {
         if (context.isTileOccupied(tile)) {
           blockedTiles.add(tile);
@@ -578,17 +565,17 @@ class CanvasRenderer {
           openTiles.add(tile);
         }
       }
-      if (blockedTiles.size) {
+      if (blockedTiles.size > 0) {
         for (const tile of blockedTiles) {
           this.drawRectangle(
-            { origin: tile, height: 1, width: 1 },
+            new Rectangle(tile, 1, 1),
             undefined,
             colors.redMidTransparency
           );
         }
         for (const tile of openTiles) {
           this.drawRectangle(
-            { origin: tile, height: 1, width: 1 },
+            new Rectangle(tile, 1, 1),
             undefined,
             colors.greenMidTransparency
           );
@@ -598,7 +585,7 @@ class CanvasRenderer {
       }
     }
 
-    if (cursorAction === 'erasing' && this.isDragging) {
+    if (cursorAction === 'erasing' && this.isDragging && this.dragBox) {
       this.drawRectangle(this.dragBox, colors.redHighTransparency);
     }
   }

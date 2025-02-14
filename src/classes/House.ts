@@ -1,12 +1,12 @@
 import { HouseBlueprint } from '../interfaces/HouseBlueprint';
-import { Point } from '../utils/geometry';
+import { Tile } from '../utils/geometry';
 import Building from './Building';
 
 class House extends Building {
   desirabilityToEvolve: number;
   desirabilityToDevolve: number;
 
-  constructor(origin: Point, blueprint: HouseBlueprint, parent?: Building) {
+  constructor(origin: Tile, blueprint: HouseBlueprint, parent?: Building) {
     super(origin, blueprint, parent);
 
     this.desirabilityToEvolve = blueprint.desirabilityToEvolve;

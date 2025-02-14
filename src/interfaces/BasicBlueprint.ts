@@ -1,5 +1,5 @@
 import { DesireBox } from './DesireBox';
-import { Point } from '../utils/geometry';
+import { Tile } from '../utils/geometry';
 import { BUILDING_CATEGORIES } from './BuildingCategory';
 import { ALL_BLUEPRINTS } from '../utils/ALL_BLUEPRINTS';
 
@@ -18,5 +18,5 @@ export interface BasicBlueprint {
 
 export interface ChildBlueprint {
   childKey: keyof typeof ALL_BLUEPRINTS;
-  relativeOrigin: Point;
+  relativeOrigin: Tile;
 }

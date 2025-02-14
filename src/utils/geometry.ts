@@ -1,51 +1,62 @@
-export interface Point {
-  x: number;
-  y: number;
-}
+export class Tile {
+  public x: number;
+  public y: number;
 
-export function arePointsEqual(p1: Point, p2: Point): boolean {
-  return p1.x === p2.x && p1.y === p2.y;
-}
-
-export class PointSet {
-  private points: Point[] = [];
-
-  has(point: Point): boolean {
-    for (const existingPoint of this.points) {
-      if (arePointsEqual(point, existingPoint)) {
-        return true;
-      }
-    }
-    return false;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
   }
 
-  add(point: Point): void {
-    if (this.has(point)) return;
-    this.points.push(point);
+  toString(): string {
+    return 'tile:{ x: ' + this.x + ', y: ' + this.y + ' }';
   }
 
-  remove(point: Point): boolean {
-    for (let i = 0; i < this.points.length; i++) {
-      if (arePointsEqual(point, this.points[i])) {
-        this.points.splice(i, 1); // Remove the point at index i
-        return true; // Point was found and removed
-      }
+  valueOf(): string {
+    return `${this.x},${this.y}`;
+  }
+
+  hashCode(): number {
+    return this.x * 31 + this.y;
+  }
+
+  equals(other: Tile): boolean {
+    return this.x === other.x && this.y === other.y;
+  }
+
+  add(other: Tile): Tile {
+    return new Tile(this.x + other.x, this.y + other.y);
+  }
+}
+
+// It's genuinely insane that I need to have a wrapper class for this. Why, JS, why?
+export class TileSet {
+  private items: Tile[] = [];
+
+  add(tile: Tile): void {
+    if (!this.has(tile)) {
+      this.items.push(tile);
     }
-    return false; // Point not found
+  }
+
+  has(tile: Tile): boolean {
+    return this.items.some((item) => item.equals(tile));
   }
 
   get size(): number {
-    return this.points.length;
+    return this.items.length;
   }
 
-  [Symbol.iterator](): Iterator<Point> {
-    let index = 0;
-    const points = this.points;
+  values(): Tile[] {
+    return [...this.items];
+  }
 
+  [Symbol.iterator](): Iterator<Tile> {
+    let index = 0;
+    const items = this.items;
     return {
-      next(): IteratorResult<Point> {
-        if (index < points.length) {
-          return { value: points[index++], done: false };
+      next(): IteratorResult<Tile> {
+        if (index < items.length) {
+          return { value: items[index++], done: false };
         } else {
           return { value: undefined, done: true };
         }
@@ -54,74 +65,82 @@ export class PointSet {
   }
 }
 
-export interface Line {
-  p1: Point;
-  p2: Point;
+export class Line {
+  public p1: DOMPoint;
+  public p2: DOMPoint;
+
+  constructor(p1: DOMPoint, p2: DOMPoint) {
+    this.p1 = p1;
+    this.p2 = p2;
+  }
 }
 
-export interface Rectangle {
-  origin: Point;
+export class Rectangle {
+  public origin: Tile;
   //Note that for all rectangle math, height and width are effectively +1:
   //A rectangle that starts at y=0 and ends at y=0 is considered to have a height of 1.
-  height: number;
-  width: number;
-}
+  public height: number;
+  public width: number;
 
-export function createRectangleFromPoints(p1: Point, p2: Point): Rectangle {
-  const originX = Math.min(p1.x, p2.x);
-  const originY = Math.min(p1.y, p2.y);
-  const width = Math.abs(p1.x - p2.x) + 1;
-  const height = Math.abs(p1.y - p2.y) + 1;
-
-  return {
-    origin: { x: originX, y: originY },
-    width: width,
-    height: height,
-  };
-}
-
-export function rectangleInterceptsPoint(p: Point, r: Rectangle): boolean {
-  const isInsideHorizontal = p.x >= r.origin.x && p.x < r.origin.x + r.width;
-  const isInsideVertical = p.y >= r.origin.y && p.y < r.origin.y + r.height;
-
-  return isInsideHorizontal && isInsideVertical;
-}
-
-export function rectangleInterceptsSetOfPoints(
-  rect: Rectangle,
-  points: PointSet
-) {
-  for (const point of points) {
-    if (rectangleInterceptsPoint(point, rect)) {
-      return true;
-    }
+  constructor(origin: Tile, height: number, width: number) {
+    this.origin = origin;
+    this.height = height;
+    this.width = width;
   }
-  return false;
+
+  toString(): string {
+    return (
+      'rect: {origin:' +
+      this.origin +
+      ', h:' +
+      this.height +
+      ', w: ' +
+      this.width +
+      '}'
+    );
+  }
+
+  public static fromTiles(t1: Tile, t2: Tile) {
+    const originX = Math.min(t1.x, t2.x);
+    const originY = Math.min(t1.y, t2.y);
+    const width = Math.abs(t1.x - t2.x) + 1;
+    const height = Math.abs(t1.y - t2.y) + 1;
+
+    return new Rectangle(new Tile(originX, originY), height, width);
+  }
+
+  public interceptsTile(t: Tile): boolean {
+    const isInsideHorizontal =
+      t.x >= this.origin.x && t.x < this.origin.x + this.width;
+    const isInsideVertical =
+      t.y >= this.origin.y && t.y < this.origin.y + this.height;
+
+    return isInsideHorizontal && isInsideVertical;
+  }
+  public interceptsTiles(tiles: TileSet) {
+    for (const tile of tiles) {
+      if (this.interceptsTile(tile)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
-export function addPoints(a: Point, b: Point): Point {
-  return { x: a.x + b.x, y: a.y + b.y };
-}
-
-export function chebyshevDistance(
-  tilePoint: Point,
-  rectOrigin: Point,
-  rectHeight: number,
-  rectWidth: number
-): number {
+export function chebyshevDistance(tile: Tile, rect: Rectangle): number {
   let distanceX = 0;
   let distanceY = 0;
 
-  if (tilePoint.x < rectOrigin.x) {
-    distanceX = rectOrigin.x - tilePoint.x;
-  } else if (tilePoint.x >= rectOrigin.x + rectWidth) {
-    distanceX = tilePoint.x - (rectOrigin.x + rectWidth - 1);
+  if (tile.x < rect.origin.x) {
+    distanceX = rect.origin.x - tile.x;
+  } else if (tile.x >= rect.origin.x + rect.width) {
+    distanceX = tile.x - (rect.origin.x + rect.width - 1);
   }
 
-  if (tilePoint.y < rectOrigin.y) {
-    distanceY = rectOrigin.y - tilePoint.y;
-  } else if (tilePoint.y >= rectOrigin.y + rectHeight) {
-    distanceY = tilePoint.y - (rectOrigin.y + rectHeight - 1);
+  if (tile.y < rect.origin.y) {
+    distanceY = rect.origin.y - tile.y;
+  } else if (tile.y >= rect.origin.y + rect.height) {
+    distanceY = tile.y - (rect.origin.y + rect.height - 1);
   }
 
   return Math.max(distanceX, distanceY);

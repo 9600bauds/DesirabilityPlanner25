@@ -1,4 +1,4 @@
-import { Point } from '../utils/geometry';
+import { Tile } from '../utils/geometry';
 import Building from './Building';
 import { gridSize } from '../utils/constants';
 import BuildingBlueprint, { createBuilding } from '../types/BuildingBlueprint';
@@ -29,21 +29,17 @@ class GridState {
 
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
-        const tilePoint: Point = { x, y };
+        const tile = new Tile(x, y);
         let totalDesirabilityEffect = 0;
         for (const building of this.getPlacedBuildings()) {
-          totalDesirabilityEffect +=
-            building.recursiveDesirabilityEffect(tilePoint);
+          totalDesirabilityEffect += building.recursiveDesirabilityEffect(tile);
         }
         this.desirabilityGrid[y][x] += totalDesirabilityEffect;
       }
     }
   }
 
-  public placeBuilding(
-    position: Point,
-    blueprint: BuildingBlueprint
-  ): Building {
+  public placeBuilding(position: Tile, blueprint: BuildingBlueprint): Building {
     const newBuilding = createBuilding(position, blueprint);
 
     this.placedBuildings.add(newBuilding);

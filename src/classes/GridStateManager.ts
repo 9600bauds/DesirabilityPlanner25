@@ -1,6 +1,6 @@
 import { getAllTiles } from '../interfaces/getAllTiles';
 import BuildingBlueprint from '../types/BuildingBlueprint';
-import { Point, Rectangle } from '../utils/geometry';
+import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 
 class GridStateManager {
@@ -18,14 +18,14 @@ class GridStateManager {
     return this.getActiveGridState().getPlacedBuildings();
   };
 
-  public isTileOccupied = (tile: Point) => {
+  public isTileOccupied = (tile: Tile) => {
     for (const building of this.activeGridState.getPlacedBuildings()) {
-      if (building.interceptsPoint(tile)) return true;
+      if (building.interceptsTile(tile)) return true;
     }
     return false;
   };
 
-  public canPlaceBuilding = (position: Point, blueprint: BuildingBlueprint) => {
+  public canPlaceBuilding = (position: Tile, blueprint: BuildingBlueprint) => {
     const buildingTiles = getAllTiles(position, blueprint);
     for (const tile of buildingTiles) {
       if (this.isTileOccupied(tile)) {
@@ -35,7 +35,7 @@ class GridStateManager {
     return true;
   };
 
-  public tryPlaceBuilding(position: Point, blueprint: BuildingBlueprint) {
+  public tryPlaceBuilding(position: Tile, blueprint: BuildingBlueprint) {
     if (!this.canPlaceBuilding(position, blueprint)) {
       return false;
     }
