@@ -8,56 +8,56 @@ export const BUILDING_CATEGORIES: Record<string, BuildingCategory> = {
   HOUSE: {
     displayName: 'Housing',
     symbol: '🏠',
-    baseColor: '#FFD700',
+    baseColor: 'rgb(84, 194, 51)',
   },
   BEAUTY: {
     displayName: 'Beautification',
     symbol: '🌼',
-    baseColor: '#FFD700',
+    baseColor: 'rgb(225, 215, 0)',
   },
   FOOD: {
     displayName: 'Food and Farming',
     symbol: '🐐',
-    baseColor: '#FFD700',
+    baseColor: 'rgb(173, 65, 33)',
   },
   FUN: {
     displayName: 'Entertainment',
     symbol: '🎶',
-    baseColor: '#87CEEB',
+    baseColor: 'rgb(224, 142, 187)',
   },
   HEALTH: {
     displayName: 'Health and Sanitation',
     symbol: '⛲',
-    baseColor: '#8FBC8F',
+    baseColor: 'rgb(32, 68, 146)',
   },
   INDUSTRY: {
     displayName: 'Industrial Buildings',
     symbol: '🧱',
-    baseColor: '#B22222',
+    baseColor: 'rgb(189, 97, 57)',
   },
   RELIGION: {
     displayName: 'Religion',
     symbol: '👁️',
-    baseColor: '#EEE8AA',
+    baseColor: 'rgb(149, 44, 170)',
   },
   GOVT: {
     displayName: 'Municipal Buildings',
     symbol: '🏛️',
-    baseColor: '#A9A9A9',
+    baseColor: 'rgb(209, 209, 209)',
   },
   STORAGE: {
     displayName: 'Storage and Distribution',
     symbol: '🏺',
-    baseColor: '#E2725B',
+    baseColor: 'rgb(245, 226, 180)',
   },
   EDUCATION: {
     displayName: 'Education',
     symbol: '🪶',
-    baseColor: '#F5F5DC',
+    baseColor: 'rgb(2, 92, 14)',
   },
   MILITARY: {
     displayName: 'Military Structures',
     symbol: '⛵',
-    baseColor: '#A0522D',
+    baseColor: 'rgb(126, 13, 13)',
   },
 };

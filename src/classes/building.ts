@@ -12,8 +12,9 @@ import {
 import { getAllTiles } from '../interfaces/getAllTiles';
 import { getBlueprint } from '../utils/ALL_BLUEPRINTS';
 import { DesireBox } from '../interfaces/DesireBox';
-import { strongOutlineBlack } from '../utils/colors';
 import BuildingBlueprint, { createBuilding } from '../types/BuildingBlueprint';
+import { BUILDING_CATEGORIES } from '../interfaces/BuildingCategory';
+import colors from '../utils/colors';
 
 class Building {
   origin: Point;
@@ -22,8 +23,8 @@ class Building {
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
   label?: string;
-  fillColor?: string;
-  borderColor?: string = strongOutlineBlack;
+  fillColor?: string = colors.backgroundWhite;
+  borderColor?: string = colors.strongOutlineBlack;
   desireBox?: DesireBox;
   tilesOccupied: PointSet;
   children?: Building[];
@@ -31,9 +32,16 @@ class Building {
 
   constructor(origin: Point, blueprint: BuildingBlueprint, parent?: Building) {
     this.origin = origin;
-    this.fillColor = blueprint.fillColor;
     if (blueprint.borderColor) {
       this.borderColor = blueprint.borderColor;
+    }
+    if (blueprint.fillColor) {
+      this.fillColor = blueprint.fillColor;
+    } else if (parent) {
+      this.fillColor = parent.fillColor;
+    } else if (blueprint.category) {
+      const category = BUILDING_CATEGORIES[blueprint.category];
+      if (category) this.fillColor = category.baseColor;
     }
     this.height = blueprint.height;
     this.width = blueprint.width;

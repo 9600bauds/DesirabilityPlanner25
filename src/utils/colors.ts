@@ -41,12 +41,25 @@ export function rgbToHex(r: number, g: number, b: number): string {
   );
 }
 
-export const backgroundWhite = 'rgba(255,255,255,1)';
-export const redLowTransparency = 'rgba(255, 0, 0, 0.2)';
-export const redMidTransparency = 'rgba(255, 0, 0, 0.4)';
-export const redHighTransparency = 'rgba(255, 0, 0, 1)';
-export const greenLowTransparency = 'rgba(0, 255, 0, 0.2)';
-export const greenMidTransparency = 'rgba(0, 255, 0, 0.4)';
-export const weakOutlineBlack = 'rgba(0,0,0,0.2)';
-export const strongOutlineBlack = 'rgba(0,0,0,0.8)';
-export const pureBlack = 'rgba(0,0,0,1)';
+const backgroundWhite = 'rgba(255,255,255,1)';
+const outlineWhite = 'rgba(255,255,255,1)';
+const redLowTransparency = 'rgba(255, 0, 0, 0.2)';
+const redMidTransparency = 'rgba(255, 0, 0, 0.4)';
+const redHighTransparency = 'rgba(255, 0, 0, 1)';
+const greenLowTransparency = 'rgba(0, 255, 0, 0.2)';
+const greenMidTransparency = 'rgba(0, 255, 0, 0.4)';
+const weakOutlineBlack = 'rgba(0,0,0,0.2)';
+const strongOutlineBlack = 'rgba(0,0,0,0.8)';
+const pureBlack = 'rgba(0,0,0,1)';
+export default {
+  backgroundWhite,
+  outlineWhite,
+  redLowTransparency,
+  redMidTransparency,
+  redHighTransparency,
+  greenLowTransparency,
+  greenMidTransparency,
+  weakOutlineBlack,
+  strongOutlineBlack,
+  pureBlack,
+};

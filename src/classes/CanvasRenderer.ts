@@ -1,15 +1,6 @@
 import RenderContext from '../interfaces/RenderContext';
 import { createBuilding } from '../types/BuildingBlueprint';
-import {
-  desirabilityColor,
-  greenLowTransparency,
-  greenMidTransparency,
-  pureBlack,
-  redHighTransparency,
-  redMidTransparency,
-  strongOutlineBlack,
-  weakOutlineBlack,
-} from '../utils/colors';
+import colors, { desirabilityColor } from '../utils/colors';
 import { canvasTilePx, gridSize, rotationAngle } from '../utils/constants';
 import {
   arePointsEqual,
@@ -283,7 +274,8 @@ class CanvasRenderer {
   private drawNonRotatedText(
     textBoxInTiles: Rectangle,
     text: string,
-    color: string = pureBlack,
+    fillColor: string = colors.pureBlack,
+    strokeColor: string | undefined = undefined,
     fontSize: number = canvasTilePx / 3,
     padding: number = 2 //In pixels
   ) {
@@ -313,7 +305,10 @@ class CanvasRenderer {
       return lines;
     };
 
-    this.ctx.fillStyle = color;
+    this.ctx.fillStyle = fillColor;
+    if (strokeColor) this.ctx.strokeStyle = strokeColor;
+    this.ctx.lineWidth = 4;
+    this.ctx.lineJoin = 'round';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.font = `${fontSize}px monospace`;
@@ -358,6 +353,8 @@ class CanvasRenderer {
     // Draw the text lines
     const startY = textBoxCenterPx.y - ((lines.length - 1) * lineHeight) / 2;
     lines.forEach((line, i) => {
+      if (strokeColor)
+        this.ctx.strokeText(line, textBoxCenterPx.x, startY + i * lineHeight);
       this.ctx.fillText(line, textBoxCenterPx.x, startY + i * lineHeight);
     });
 
@@ -458,6 +455,17 @@ class CanvasRenderer {
         this.drawBuilding(child);
       }
     }
+    if (building.borderColor) {
+      this.drawPointSetOutline(building.tilesOccupied, building.borderColor, 2);
+    }
+    if (building.label) {
+      this.drawNonRotatedText(
+        boundingBox,
+        building.label,
+        colors.pureBlack,
+        colors.outlineWhite
+      );
+    }
     if (overlayColor) {
       for (const tile of building.tilesOccupied) {
         this.drawRectangle(
@@ -467,19 +475,17 @@ class CanvasRenderer {
         );
       }
     }
-    if (building.borderColor) {
-      this.drawPointSetOutline(building.tilesOccupied, building.borderColor, 1);
-    }
-    if (building.label) {
-      this.drawNonRotatedText(boundingBox, building.label);
-    }
   }
 
   private drawTile(desirabilityValue: number, origin: Point) {
     const boundingBox: Rectangle = { origin, height: 1, width: 1 };
     const fillColor = desirabilityColor(desirabilityValue);
-    this.drawRectangle(boundingBox, weakOutlineBlack, fillColor, 1);
-    this.drawNonRotatedText(boundingBox, desirabilityValue.toString());
+    this.drawRectangle(boundingBox, colors.weakOutlineBlack, fillColor, 1);
+    this.drawNonRotatedText(
+      boundingBox,
+      desirabilityValue.toString(),
+      colors.strongOutlineBlack
+    );
   }
 
   public render(context: RenderContext) {
@@ -553,14 +559,14 @@ class CanvasRenderer {
       const isBeingDeleted = buildingsBeingRemoved.has(building);
       this.drawBuilding(
         building,
-        isBeingDeleted ? redMidTransparency : undefined
+        isBeingDeleted ? colors.redMidTransparency : undefined
       );
     }
 
     for (const virtualBuilding of buildingsBeingAdded) {
       this.drawPointSetOutline(
         virtualBuilding.tilesOccupied,
-        strongOutlineBlack,
+        colors.strongOutlineBlack,
         3
       );
       const blockedTiles = new PointSet();
@@ -577,23 +583,23 @@ class CanvasRenderer {
           this.drawRectangle(
             { origin: tile, height: 1, width: 1 },
             undefined,
-            redMidTransparency
+            colors.redMidTransparency
           );
         }
         for (const tile of openTiles) {
           this.drawRectangle(
             { origin: tile, height: 1, width: 1 },
             undefined,
-            greenMidTransparency
+            colors.greenMidTransparency
           );
         }
       } else {
-        this.drawBuilding(virtualBuilding, greenLowTransparency);
+        this.drawBuilding(virtualBuilding, colors.greenLowTransparency);
       }
     }
 
     if (cursorAction === 'erasing' && this.isDragging) {
-      this.drawRectangle(this.dragBox, redHighTransparency);
+      this.drawRectangle(this.dragBox, colors.redHighTransparency);
     }
   }
 }

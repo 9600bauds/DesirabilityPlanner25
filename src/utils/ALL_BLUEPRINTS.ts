@@ -155,7 +155,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'RELIGION',
   },
   Firehouse: {
-    label: 'Firehouse',
+    label: 'Fire House',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -362,7 +362,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'INDUSTRY',
   },
   'Palace, Village': {
-    label: 'Palace, Village',
+    label: 'Village Palace',
     height: 4,
     width: 4,
     cost: [180, 720, 900, 1080, 1350],
@@ -371,7 +371,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'GOVT',
   },
   'Palace, Town': {
-    label: 'Palace, Town',
+    label: 'Town Palace',
     height: 5,
     width: 5,
     cost: [200, 800, 1000, 1200, 1500],
@@ -380,7 +380,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'GOVT',
   },
   'Palace, City': {
-    label: 'Palace, City',
+    label: 'City Palace',
     height: 6,
     width: 6,
     cost: [240, 950, 1200, 1440, 1800],
@@ -541,7 +541,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'RELIGION',
   },
   'Statue, Small': {
-    label: 'Statue, Small',
+    label: 'Statue',
     height: 1,
     width: 1,
     cost: [3, 10, 12, 14, 18],
@@ -550,7 +550,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'BEAUTY',
   },
   'Statue, Medium': {
-    label: 'Statue, Medium',
+    label: 'Statue',
     height: 2,
     width: 2,
     cost: [12, 48, 60, 72, 90],
@@ -559,7 +559,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     category: 'BEAUTY',
   },
   'Statue, Large': {
-    label: 'Statue, Large',
+    label: 'Statue',
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
