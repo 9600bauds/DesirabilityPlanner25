@@ -132,6 +132,12 @@ class CanvasRenderer {
     this.render(context);
   }
 
+  private rotateAroundPoint(p: Point, angle: number) {
+    this.ctx.translate(p.x, p.y);
+    this.ctx.rotate(angle);
+    this.ctx.translate(-p.x, -p.y);
+  }
+
   public toggleGridRotation(context: RenderContext): void {
     this.isGridRotated = !this.isGridRotated;
     this.updateTransform();
@@ -278,26 +284,86 @@ class CanvasRenderer {
     textBoxInTiles: Rectangle,
     text: string,
     color: string = pureBlack,
-    fontSize: number = canvasTilePx / 3
+    fontSize: number = canvasTilePx / 3,
+    padding: number = 2 //In pixels
   ) {
-    const { origin, height, width } = this.rectangleToPx(textBoxInTiles);
-    // Text rendering with rotation handling
-    if (this.isGridRotated) {
-      this.ctx.save();
-      this.ctx.translate(origin.x + width / 2, origin.y + height / 2);
-      this.ctx.rotate(-rotationAngle);
-      this.ctx.translate(-(origin.x + width / 2), -(origin.y + height / 2));
-    }
+    const splitTextToLines = () => {
+      let lines: string[] = [];
+
+      const lineWidth = this.ctx.measureText(text).width;
+      if (lineWidth > maxWidth && words.length > 1) {
+        let currentLine = words[0];
+
+        for (let i = 1; i < words.length; i++) {
+          const word = words[i];
+          const testLine = currentLine + ' ' + word;
+          const testLineWidth = this.ctx.measureText(testLine).width;
+
+          if (testLineWidth <= maxWidth) {
+            currentLine = testLine;
+          } else {
+            lines.push(currentLine);
+            currentLine = word;
+          }
+        }
+        lines.push(currentLine);
+      } else {
+        lines = [text];
+      }
+      return lines;
+    };
 
     this.ctx.fillStyle = color;
-    this.ctx.font = `${fontSize}px monospace`;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillText(text, origin.x + width / 2, origin.y + height / 2);
+    this.ctx.font = `${fontSize}px monospace`;
 
-    // Restore context if rotated
+    const {
+      origin,
+      height: textBoxHeight,
+      width: textBoxWidth,
+    } = this.rectangleToPx(textBoxInTiles);
+    const textBoxCenterPx: Point = {
+      x: origin.x + textBoxWidth / 2,
+      y: origin.y + textBoxHeight / 2,
+    };
+    const maxWidth = textBoxWidth - padding * 2;
+    const maxHeight = textBoxHeight - padding * 2;
+
     if (this.isGridRotated) {
-      this.ctx.restore();
+      //Ideally, we'd draw text rotated the other way.
+      //But I don't know how to do that so we'll rotate the canvas instead, draw the text, and rotate the canvas back.
+      this.rotateAroundPoint(textBoxCenterPx, -rotationAngle);
+    }
+
+    // Split text into lines if needed
+    const words = text.split(' ');
+    const lines: string[] = splitTextToLines();
+
+    let lineHeight = fontSize * 1.2;
+    let totalTextHeight = lineHeight * lines.length;
+
+    // If text is too big, scale it down
+    while (
+      fontSize > 8 && // Don't go smaller than 8px
+      (totalTextHeight > maxHeight ||
+        lines.some((line) => this.ctx.measureText(line).width > maxWidth))
+    ) {
+      fontSize *= 0.9;
+      lineHeight = fontSize * 1.2;
+      totalTextHeight = lineHeight * lines.length;
+      this.ctx.font = `${fontSize}px monospace`;
+    }
+
+    // Draw the text lines
+    const startY = textBoxCenterPx.y - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((line, i) => {
+      this.ctx.fillText(line, textBoxCenterPx.x, startY + i * lineHeight);
+    });
+
+    if (this.isGridRotated) {
+      //Here's the counterrotation
+      this.rotateAroundPoint(textBoxCenterPx, rotationAngle);
     }
   }
 
