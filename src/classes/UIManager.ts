@@ -90,19 +90,6 @@ class UIManager {
         this.canvasRenderer.startPanning(event);
       } else if (this.getCursorAction() === 'erasing') {
         this.canvasRenderer.startDragging(event, this.renderState);
-      } else {
-        this.canvasRenderer.stopPanning();
-
-        const tile = this.canvasRenderer.getMouseCoords(event);
-        if (tile) {
-          const blueprint = this.getSelectedBlueprint();
-          if (blueprint) {
-            this.canvasRenderer.stopPanning();
-            if (this.gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              this.canvasRenderer.render(this.renderState);
-            }
-          }
-        }
       }
     }
   };
@@ -129,12 +116,25 @@ class UIManager {
 
   private handleMouseUp = (event: MouseEvent) => {
     if (event.button === 0) {
+      //Left click
       this.canvasRenderer.stopPanning();
       if (this.cursorAction === 'erasing') {
         const erasedRect = this.canvasRenderer.stopDragging(this.renderState);
         if (erasedRect) {
           if (this.gridStateManager.eraseRect(erasedRect)) {
             this.canvasRenderer.render(this.renderState);
+          }
+        }
+      } else if (this.cursorAction === 'placing') {
+        this.canvasRenderer.stopPanning();
+        const tile = this.canvasRenderer.getMouseCoords(event);
+        if (tile) {
+          const blueprint = this.getSelectedBlueprint();
+          if (blueprint) {
+            this.canvasRenderer.stopPanning();
+            if (this.gridStateManager.tryPlaceBuilding(tile, blueprint)) {
+              this.canvasRenderer.render(this.renderState);
+            }
           }
         }
       }
