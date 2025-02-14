@@ -10,6 +10,11 @@ export const BUILDING_CATEGORIES: Record<string, BuildingCategory> = {
     symbol: '🏠',
     baseColor: '#FFD700',
   },
+  BEAUTY: {
+    displayName: 'Beautification',
+    symbol: '🌼',
+    baseColor: '#FFD700',
+  },
   FOOD: {
     displayName: 'Food and Farming',
     symbol: '🐐',
