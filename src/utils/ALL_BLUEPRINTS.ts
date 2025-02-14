@@ -753,22 +753,8 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
   Houses begin here
 
   */
-  'Crude Hut_1x1': {
-    label: 'Crude Hut 1x1',
-    height: 1,
-    width: 1,
-    desireBox: {
-      baseDesirability: -2,
-      stepDist: 1,
-      stepVal: 1,
-      maxRange: 2,
-    },
-    desirabilityToEvolve: -98,
-    desirabilityToDevolve: -99,
-    category: 'HOUSE',
-  },
   'Crude Hut_2x2': {
-    label: 'Crude Hut 2x2',
+    label: 'Crude Hut',
     height: 2,
     width: 2,
     desireBox: {
@@ -781,8 +767,8 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: -99,
     category: 'HOUSE',
   },
-  'Sturdy Hut_1x1': {
-    label: 'Sturdy Hut 1x1',
+  'Crude Hut_1x1': {
+    label: 'Crude Hut',
     height: 1,
     width: 1,
     desireBox: {
@@ -791,12 +777,12 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
       stepVal: 1,
       maxRange: 2,
     },
-    desirabilityToEvolve: -10,
-    desirabilityToDevolve: -12,
+    desirabilityToEvolve: -98,
+    desirabilityToDevolve: -99,
     category: 'HOUSE',
   },
   'Sturdy Hut_2x2': {
-    label: 'Sturdy Hut 2x2',
+    label: 'Sturdy Hut',
     height: 2,
     width: 2,
     desireBox: {
@@ -809,8 +795,8 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: -12,
     category: 'HOUSE',
   },
-  'Meager Shanty_1x1': {
-    label: 'Meager Shanty 1x1',
+  'Sturdy Hut_1x1': {
+    label: 'Sturdy Hut',
     height: 1,
     width: 1,
     desireBox: {
@@ -819,12 +805,12 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
       stepVal: 1,
       maxRange: 2,
     },
-    desirabilityToEvolve: -5,
-    desirabilityToDevolve: -7,
+    desirabilityToEvolve: -10,
+    desirabilityToDevolve: -12,
     category: 'HOUSE',
   },
   'Meager Shanty_2x2': {
-    label: 'Meager Shanty 2x2',
+    label: 'Meager Shanty',
     height: 2,
     width: 2,
     desireBox: {
@@ -837,8 +823,8 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: -7,
     category: 'HOUSE',
   },
-  'Common Shanty_1x1': {
-    label: 'Common Shanty 1x1',
+  'Meager Shanty_1x1': {
+    label: 'Meager Shanty',
     height: 1,
     width: 1,
     desireBox: {
@@ -847,12 +833,12 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
       stepVal: 1,
       maxRange: 2,
     },
-    desirabilityToEvolve: 0,
-    desirabilityToDevolve: -2,
+    desirabilityToEvolve: -5,
+    desirabilityToDevolve: -7,
     category: 'HOUSE',
   },
   'Common Shanty_2x2': {
-    label: 'Common Shanty 2x2',
+    label: 'Common Shanty',
     height: 2,
     width: 2,
     desireBox: {
@@ -865,8 +851,8 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: -2,
     category: 'HOUSE',
   },
-  'Rough Cottage_1x1': {
-    label: 'Rough Cottage 1x1',
+  'Common Shanty_1x1': {
+    label: 'Common Shanty',
     height: 1,
     width: 1,
     desireBox: {
@@ -875,12 +861,12 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
       stepVal: 1,
       maxRange: 2,
     },
-    desirabilityToEvolve: 4,
-    desirabilityToDevolve: 2,
+    desirabilityToEvolve: 0,
+    desirabilityToDevolve: -2,
     category: 'HOUSE',
   },
   'Rough Cottage_2x2': {
-    label: 'Rough Cottage 2x2',
+    label: 'Rough Cottage',
     height: 2,
     width: 2,
     desireBox: {
@@ -893,8 +879,9 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: 2,
     category: 'HOUSE',
   },
-  'Ordinary Cottage_1x1': {
-    label: 'Ordinary Cottage 1x1',
+
+  'Rough Cottage_1x1': {
+    label: 'Rough Cottage',
     height: 1,
     width: 1,
     desireBox: {
@@ -903,12 +890,12 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
       stepVal: 1,
       maxRange: 2,
     },
-    desirabilityToEvolve: 9,
-    desirabilityToDevolve: 7,
+    desirabilityToEvolve: 4,
+    desirabilityToDevolve: 2,
     category: 'HOUSE',
   },
   'Ordinary Cottage_2x2': {
-    label: 'Ordinary Cottage 2x2',
+    label: 'Ordinary Cottage',
     height: 2,
     width: 2,
     desireBox: {
@@ -921,22 +908,23 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: 7,
     category: 'HOUSE',
   },
-  'Modest Homestead_1x1': {
-    label: 'Modest Homestead 1x1',
+
+  'Ordinary Cottage_1x1': {
+    label: 'Ordinary Cottage',
     height: 1,
     width: 1,
     desireBox: {
-      baseDesirability: -1,
+      baseDesirability: -2,
       stepDist: 1,
       stepVal: 1,
-      maxRange: 1,
+      maxRange: 2,
     },
-    desirabilityToEvolve: 13,
-    desirabilityToDevolve: 11,
+    desirabilityToEvolve: 9,
+    desirabilityToDevolve: 7,
     category: 'HOUSE',
   },
   'Modest Homestead_2x2': {
-    label: 'Modest Homestead 2x2',
+    label: 'Modest Homestead',
     height: 2,
     width: 2,
     desireBox: {
@@ -949,8 +937,9 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: 11,
     category: 'HOUSE',
   },
-  'Spacious Homestead_1x1': {
-    label: 'Spacious Homestead 1x1',
+
+  'Modest Homestead_1x1': {
+    label: 'Modest Homestead',
     height: 1,
     width: 1,
     desireBox: {
@@ -959,12 +948,12 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
       stepVal: 1,
       maxRange: 1,
     },
-    desirabilityToEvolve: 17,
-    desirabilityToDevolve: 15,
+    desirabilityToEvolve: 13,
+    desirabilityToDevolve: 11,
     category: 'HOUSE',
   },
   'Spacious Homestead_2x2': {
-    label: 'Spacious Homestead 2x2',
+    label: 'Spacious Homestead',
     height: 2,
     width: 2,
     desireBox: {
@@ -977,34 +966,49 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: 15,
     category: 'HOUSE',
   },
-  'Modest Apartment_1x1': {
-    label: 'Modest Apartment 1x1',
+
+  'Spacious Homestead_1x1': {
+    label: 'Spacious Homestead',
     height: 1,
     width: 1,
-    desirabilityToEvolve: 21,
-    desirabilityToDevolve: 19,
+    desireBox: {
+      baseDesirability: -1,
+      stepDist: 1,
+      stepVal: 1,
+      maxRange: 1,
+    },
+    desirabilityToEvolve: 17,
+    desirabilityToDevolve: 15,
     category: 'HOUSE',
   },
   'Modest Apartment_2x2': {
-    label: 'Modest Apartment 2x2',
+    label: 'Modest Apartment',
     height: 2,
     width: 2,
     desirabilityToEvolve: 21,
     desirabilityToDevolve: 19,
     category: 'HOUSE',
   },
-  'Spacious Apartment_1x1': {
-    label: 'Spacious Apartment 1x1',
+  'Modest Apartment_1x1': {
+    label: 'Modest Apartment',
     height: 1,
     width: 1,
+    desirabilityToEvolve: 21,
+    desirabilityToDevolve: 19,
+    category: 'HOUSE',
+  },
+  'Spacious Apartment_2x2': {
+    label: 'Spacious Apartment',
+    height: 2,
+    width: 2,
     desirabilityToEvolve: 26,
     desirabilityToDevolve: 23,
     category: 'HOUSE',
   },
-  'Spacious Apartment_2x2': {
-    label: 'Spacious Apartment 2x2',
-    height: 2,
-    width: 2,
+  'Spacious Apartment_1x1': {
+    label: 'Spacious Apartment',
+    height: 1,
+    width: 1,
     desirabilityToEvolve: 26,
     desirabilityToDevolve: 23,
     category: 'HOUSE',
