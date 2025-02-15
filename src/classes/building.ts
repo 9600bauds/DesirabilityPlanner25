@@ -27,7 +27,7 @@ class Building {
     this.origin = origin;
     this.height = blueprint.height;
     this.width = blueprint.width;
-    this.rect = new Rectangle(this.origin, this.width, this.height);
+    this.rect = new Rectangle(this.origin, this.height, this.width);
     if (blueprint.borderColor) {
       this.borderColor = blueprint.borderColor;
     }

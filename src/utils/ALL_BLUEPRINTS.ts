@@ -1,4 +1,5 @@
 import BuildingBlueprint from '../types/BuildingBlueprint';
+import { Tile } from './geometry';
 
 export function getBlueprint(
   key: keyof typeof ALL_BLUEPRINTS //keyof doesn't actually really DO anything if the record keys are of type string, go TS!
@@ -702,7 +703,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     employeesRequired: 6,
     //No desirebox of its own!
     children: [
-      { childKey: 'Storage Yard Hut', relativeOrigin: { x: 0, y: 0 } },
+      { childKey: 'Storage Yard Hut', relativeOrigin: new Tile(0, 0) },
     ],
     category: 'STORAGE',
   },
@@ -719,9 +720,9 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [400, 1600, 2000, 2400, 3000],
     employeesRequired: 50,
     children: [
-      { childKey: 'Temple Complex Altar', relativeOrigin: { x: 0, y: 2 } },
-      { childKey: 'Temple Complex Altar', relativeOrigin: { x: 3, y: 2 } },
-      { childKey: 'Temple Complex Altar', relativeOrigin: { x: 6, y: 2 } },
+      { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(6, 2) },
     ],
     category: 'RELIGION',
   },
@@ -732,9 +733,9 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     cost: [400, 1600, 2000, 2400, 3000],
     employeesRequired: 50,
     children: [
-      { childKey: 'Temple Complex Altar', relativeOrigin: { x: 2, y: 0 } },
-      { childKey: 'Temple Complex Altar', relativeOrigin: { x: 2, y: 3 } },
-      { childKey: 'Temple Complex Altar', relativeOrigin: { x: 2, y: 6 } },
+      { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(2, 6) },
     ],
     category: 'RELIGION',
   },
@@ -749,7 +750,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     width: 3,
     cost: [200, 800, 1000, 1200, 1500],
     desireBox: { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
-    children: [{ childKey: 'Fort Yard', relativeOrigin: { x: 3, y: -1 } }],
+    children: [{ childKey: 'Fort Yard', relativeOrigin: new Tile(3, -1) }],
     category: 'MILITARY',
   },
   'Fort Yard': {
