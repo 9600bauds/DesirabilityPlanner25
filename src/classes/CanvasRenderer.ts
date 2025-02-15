@@ -12,8 +12,11 @@ interface CanvasSize {
 }
 
 class CanvasRenderer {
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  private bufferCanvas: HTMLCanvasElement;
+  private bufferCtx: CanvasRenderingContext2D;
+  private displayCanvas: HTMLCanvasElement;
+  private displayCtx: CanvasRenderingContext2D;
+
   private currentSize: CanvasSize = { width: 0, height: 0, pixelRatio: 1 };
 
   private transparentBuildings = false;
@@ -35,13 +38,22 @@ class CanvasRenderer {
   private dragBox?: Rectangle;
 
   constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    if (!ctx) throw new Error('Could not get canvas context!');
-    this.ctx = ctx;
+    //Create the display context
+    this.displayCanvas = canvas;
+    const displayCtx = this.displayCanvas.getContext('2d', { alpha: false });
+    if (!displayCtx) throw new Error('Could not get canvas context!');
+    displayCtx.imageSmoothingEnabled = true;
+    displayCtx.imageSmoothingQuality = 'high';
+    this.displayCtx = displayCtx;
 
-    this.ctx.imageSmoothingEnabled = true;
-    this.ctx.imageSmoothingQuality = 'high';
+    // Create buffer canvas and context
+    this.bufferCanvas = document.createElement('canvas');
+    //Buffer canvas is always fullsize
+    this.bufferCanvas.width = gridSize * canvasTilePx;
+    this.bufferCanvas.height = gridSize * canvasTilePx;
+    const bufferCtx = this.bufferCanvas.getContext('2d', { alpha: false });
+    if (!bufferCtx) throw new Error('Could not get buffer context!');
+    this.bufferCtx = bufferCtx;
   }
 
   /*
@@ -54,16 +66,16 @@ class CanvasRenderer {
   }
 
   private pointToTile(point: DOMPoint): Tile | undefined {
-    // Convert screen coordinates to canvas coordinates
-    const rect = this.canvas.getBoundingClientRect();
-    const scaleX = this.canvas.width / rect.width;
-    const scaleY = this.canvas.height / rect.height;
+    // Convert display coordinates to absolute canvas coordinates
+    const rect = this.displayCanvas.getBoundingClientRect();
+    const scaleX = this.displayCanvas.width / rect.width;
+    const scaleY = this.displayCanvas.height / rect.height;
 
     const canvasX = (point.x - rect.left) * scaleX;
     const canvasY = (point.y - rect.top) * scaleY;
 
     // Get the inverse of the current transform
-    const transform = this.ctx.getTransform();
+    const transform = this.displayCtx.getTransform();
     const inverseTransform = transform.inverse();
 
     // Transform the point
@@ -85,7 +97,7 @@ class CanvasRenderer {
     return this.pointToTile(new DOMPoint(event.clientX, event.clientY));
   }
 
-  private rectangleToPx(rectangle: Rectangle): DOMRect {
+  private rectangleToDOMRect(rectangle: Rectangle): DOMRect {
     const origin = this.tileToPoint(rectangle.origin);
     const width = rectangle.width * canvasTilePx;
     const height = rectangle.height * canvasTilePx;
@@ -96,13 +108,13 @@ class CanvasRenderer {
   /*
    * Transformations
    */
-  public updateCanvasSize(context: RenderContext) {
-    const displayWidth = this.canvas.clientWidth;
-    const displayHeight = this.canvas.clientHeight;
+  public updateCanvasSize() {
+    const displayWidth = this.displayCanvas.clientWidth;
+    const displayHeight = this.displayCanvas.clientHeight;
     const pixelRatio = window.devicePixelRatio || 1;
 
-    this.canvas.width = displayWidth * pixelRatio;
-    this.canvas.height = displayHeight * pixelRatio;
+    this.displayCanvas.width = displayWidth * pixelRatio;
+    this.displayCanvas.height = displayHeight * pixelRatio;
 
     this.currentSize = {
       width: displayWidth,
@@ -111,19 +123,17 @@ class CanvasRenderer {
     };
 
     this.updateTransform();
-    this.render(context);
   }
 
   private rotateAroundPoint(p: DOMPoint, angle: number) {
-    this.ctx.translate(p.x, p.y);
-    this.ctx.rotate(angle);
-    this.ctx.translate(-p.x, -p.y);
+    this.bufferCtx.translate(p.x, p.y);
+    this.bufferCtx.rotate(angle);
+    this.bufferCtx.translate(-p.x, -p.y);
   }
 
   public toggleGridRotation(context: RenderContext): void {
     this.isGridRotated = !this.isGridRotated;
-    this.updateTransform();
-    this.render(context);
+    this.render(context); //We need to rerender the main canvas for this because of the text
   }
 
   public toggleBuildingTransparency(context: RenderContext): void {
@@ -131,21 +141,19 @@ class CanvasRenderer {
     this.render(context);
   }
 
-  public zoomIn(context: RenderContext): void {
+  public zoomIn(): void {
     this.zoomLevel *= 1.2;
     this.updateTransform();
-    this.render(context);
   }
 
-  public zoomOut(context: RenderContext): void {
+  public zoomOut(): void {
     this.zoomLevel /= 1.2;
     this.updateTransform();
-    this.render(context);
   }
 
   private updateTransform() {
     // Reset transform
-    this.ctx.setTransform(
+    this.displayCtx.setTransform(
       this.currentSize.pixelRatio,
       0,
       0,
@@ -157,19 +165,29 @@ class CanvasRenderer {
     // Apply panning
     const centerX = this.currentSize.width / 2;
     const centerY = this.currentSize.height / 2;
-    this.ctx.translate(centerX + this.panOffsetX, centerY + this.panOffsetY);
+    this.displayCtx.translate(
+      centerX + this.panOffsetX,
+      centerY + this.panOffsetY
+    );
 
     // Zoom
-    this.ctx.scale(this.zoomLevel, this.zoomLevel);
+    this.displayCtx.scale(this.zoomLevel, this.zoomLevel);
 
     // Rotation
     if (this.isGridRotated) {
-      this.ctx.rotate(rotationAngle);
+      this.displayCtx.rotate(rotationAngle);
     }
 
     // Center the grid
     const gridPixelSize = gridSize * canvasTilePx;
-    this.ctx.translate(-gridPixelSize / 2, -gridPixelSize / 2);
+    this.displayCtx.translate(-gridPixelSize / 2, -gridPixelSize / 2);
+
+    this.updateDisplay();
+  }
+
+  private updateDisplay() {
+    this.clearDisplay();
+    this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
   }
 
   /*
@@ -182,7 +200,7 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
   }
 
-  public handlePanning(event: MouseEvent, context: RenderContext) {
+  public handlePanning(event: MouseEvent) {
     if (!this.isPanning) return;
 
     const dragX = event.clientX - this.lastPanX;
@@ -195,7 +213,6 @@ class CanvasRenderer {
     this.lastPanY = event.clientY;
 
     this.updateTransform();
-    this.render(context);
   }
 
   public stopPanning() {
@@ -260,12 +277,27 @@ class CanvasRenderer {
   /*
    * Rendering
    */
-  private clearCanvas() {
-    const originalTransform = this.ctx.getTransform();
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.setTransform(originalTransform);
+  private clearDisplay() {
+    const originalTransform = this.displayCtx.getTransform();
+    this.displayCtx.setTransform(1, 0, 0, 1, 0, 0);
+    this.displayCtx.fillStyle = 'white';
+    this.displayCtx.fillRect(
+      0,
+      0,
+      this.displayCanvas.width,
+      this.displayCanvas.height
+    );
+    this.displayCtx.setTransform(originalTransform);
+  }
+
+  private clearBuffer() {
+    this.bufferCtx.fillStyle = 'white';
+    this.bufferCtx.fillRect(
+      0,
+      0,
+      this.bufferCanvas.width,
+      this.bufferCanvas.height
+    );
   }
 
   private drawNonRotatedText(
@@ -279,14 +311,14 @@ class CanvasRenderer {
     const splitTextToLines = () => {
       let lines: string[] = [];
 
-      const lineWidth = this.ctx.measureText(text).width;
+      const lineWidth = this.bufferCtx.measureText(text).width;
       if (lineWidth > maxWidth && words.length > 1) {
         let currentLine = words[0];
 
         for (let i = 1; i < words.length; i++) {
           const word = words[i];
           const testLine = currentLine + ' ' + word;
-          const testLineWidth = this.ctx.measureText(testLine).width;
+          const testLineWidth = this.bufferCtx.measureText(testLine).width;
 
           if (testLineWidth <= maxWidth) {
             currentLine = testLine;
@@ -302,20 +334,20 @@ class CanvasRenderer {
       return lines;
     };
 
-    this.ctx.fillStyle = fillColor;
-    if (strokeColor) this.ctx.strokeStyle = strokeColor;
-    this.ctx.lineWidth = 4;
-    this.ctx.lineJoin = 'round';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.font = `${fontSize}px monospace`;
+    this.bufferCtx.fillStyle = fillColor;
+    if (strokeColor) this.bufferCtx.strokeStyle = strokeColor;
+    this.bufferCtx.lineWidth = 4;
+    this.bufferCtx.lineJoin = 'round';
+    this.bufferCtx.textAlign = 'center';
+    this.bufferCtx.textBaseline = 'middle';
+    this.bufferCtx.font = `${fontSize}px monospace`;
 
     const {
       x,
       y,
       height: textBoxHeight,
       width: textBoxWidth,
-    } = this.rectangleToPx(textBoxInTiles);
+    } = this.rectangleToDOMRect(textBoxInTiles);
     const textBoxCenterPx = new DOMPoint(
       x + textBoxWidth / 2,
       y + textBoxHeight / 2
@@ -340,20 +372,24 @@ class CanvasRenderer {
     while (
       fontSize > 8 && // Don't go smaller than 8px
       (totalTextHeight > maxHeight ||
-        lines.some((line) => this.ctx.measureText(line).width > maxWidth))
+        lines.some((line) => this.bufferCtx.measureText(line).width > maxWidth))
     ) {
       fontSize *= 0.9;
       lineHeight = fontSize * 1.2;
       totalTextHeight = lineHeight * lines.length;
-      this.ctx.font = `${fontSize}px monospace`;
+      this.bufferCtx.font = `${fontSize}px monospace`;
     }
 
     // Draw the text lines
     const startY = textBoxCenterPx.y - ((lines.length - 1) * lineHeight) / 2;
     lines.forEach((line, i) => {
       if (strokeColor)
-        this.ctx.strokeText(line, textBoxCenterPx.x, startY + i * lineHeight);
-      this.ctx.fillText(line, textBoxCenterPx.x, startY + i * lineHeight);
+        this.bufferCtx.strokeText(
+          line,
+          textBoxCenterPx.x,
+          startY + i * lineHeight
+        );
+      this.bufferCtx.fillText(line, textBoxCenterPx.x, startY + i * lineHeight);
     });
 
     if (this.isGridRotated) {
@@ -368,17 +404,17 @@ class CanvasRenderer {
     fillColor?: string,
     lineWidth: number = 2
   ) {
-    const { x, y, height, width } = this.rectangleToPx(rectInTiles);
+    const { x, y, height, width } = this.rectangleToDOMRect(rectInTiles);
 
     if (fillColor) {
-      this.ctx.fillStyle = fillColor;
-      this.ctx.fillRect(x, y, width, height);
+      this.bufferCtx.fillStyle = fillColor;
+      this.bufferCtx.fillRect(x, y, width, height);
     }
 
     if (borderColor) {
-      this.ctx.strokeStyle = borderColor;
-      this.ctx.lineWidth = lineWidth;
-      this.ctx.strokeRect(x, y, width, height);
+      this.bufferCtx.strokeStyle = borderColor;
+      this.bufferCtx.lineWidth = lineWidth;
+      this.bufferCtx.strokeRect(x, y, width, height);
     }
   }
 
@@ -427,18 +463,18 @@ class CanvasRenderer {
       }
     }
 
-    this.ctx.save();
-    this.ctx.strokeStyle = color;
-    this.ctx.lineWidth = lineWidth;
-    this.ctx.beginPath();
+    this.bufferCtx.save();
+    this.bufferCtx.strokeStyle = color;
+    this.bufferCtx.lineWidth = lineWidth;
+    this.bufferCtx.beginPath();
 
     for (const edge of edges) {
-      this.ctx.moveTo(edge.p1.x, edge.p1.y);
-      this.ctx.lineTo(edge.p2.x, edge.p2.y);
+      this.bufferCtx.moveTo(edge.p1.x, edge.p1.y);
+      this.bufferCtx.lineTo(edge.p2.x, edge.p2.y);
     }
 
-    this.ctx.stroke();
-    this.ctx.restore();
+    this.bufferCtx.stroke();
+    this.bufferCtx.restore();
   }
 
   private drawBuilding(
@@ -489,6 +525,7 @@ class CanvasRenderer {
 
   public render(context: RenderContext) {
     console.log('Rerendering grid...');
+    this.clearBuffer();
 
     const baseValues = context.getBaseValues();
     const placedBuildings = context.getBuildings();
@@ -515,8 +552,6 @@ class CanvasRenderer {
         }
       }
     }
-
-    this.clearCanvas();
 
     // Render grid
     for (let y = 0; y < gridSize; y++) {
@@ -585,6 +620,8 @@ class CanvasRenderer {
     if (cursorAction === 'erasing' && this.isDragging && this.dragBox) {
       this.drawRectangle(this.dragBox, colors.redHighTransparency);
     }
+
+    this.updateDisplay();
   }
 }
 

@@ -31,6 +31,9 @@ class UIManager {
       isTileOccupied: gridStateManager.isTileOccupied,
     };
 
+    //Do the initial render here since the canvas renderer can't do it until it has the context
+    this.canvasRenderer.render(this.renderContext);
+
     canvas.addEventListener('mousedown', this.handleMouseDown);
     canvas.addEventListener('mousemove', this.handleMouseMove);
     canvas.addEventListener('mouseleave', this.handleMouseLeave);
@@ -96,12 +99,12 @@ class UIManager {
   };
 
   private canvasSizeUpdated() {
-    this.canvasRenderer.updateCanvasSize(this.renderContext);
+    this.canvasRenderer.updateCanvasSize();
   }
 
   private handleMouseMove = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
-      this.canvasRenderer.handlePanning(event, this.renderContext);
+      this.canvasRenderer.handlePanning(event);
     } else {
       this.canvasRenderer.handleMouseMove(event, this.renderContext);
     }
