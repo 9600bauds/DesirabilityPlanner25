@@ -16,6 +16,7 @@ class CanvasRenderer {
   private ctx: CanvasRenderingContext2D;
   private currentSize: CanvasSize = { width: 0, height: 0, pixelRatio: 1 };
 
+  private transparentBuildings = false;
   private isGridRotated = false;
   private zoomLevel = 1.0;
 
@@ -122,6 +123,11 @@ class CanvasRenderer {
   public toggleGridRotation(context: RenderContext): void {
     this.isGridRotated = !this.isGridRotated;
     this.updateTransform();
+    this.render(context);
+  }
+
+  public toggleBuildingTransparency(context: RenderContext): void {
+    this.transparentBuildings = !this.transparentBuildings;
     this.render(context);
   }
 
@@ -435,8 +441,12 @@ class CanvasRenderer {
     this.ctx.restore();
   }
 
-  private drawBuilding(building: Building, overlayColor?: string) {
-    if (building.fillColor) {
+  private drawBuilding(
+    building: Building,
+    transparent: boolean = false,
+    overlayColor?: string
+  ) {
+    if (!transparent && building.fillColor) {
       this.drawRectangle(building.rect, undefined, building.fillColor);
     }
     if (building.parent) {
@@ -445,13 +455,13 @@ class CanvasRenderer {
     }
     if (building.children) {
       for (const child of building.children) {
-        this.drawBuilding(child);
+        this.drawBuilding(child, transparent, overlayColor);
       }
     }
     if (building.borderColor) {
       this.drawOutline(building.tilesOccupied, building.borderColor, 2);
     }
-    if (building.label) {
+    if (!transparent && building.label) {
       this.drawNonRotatedText(
         building.rect,
         building.label,
@@ -487,7 +497,6 @@ class CanvasRenderer {
 
     const buildingsBeingRemoved: Set<Building> = new Set();
     const buildingsBeingAdded: Set<Building> = new Set();
-    const occupiedTiles: TileSet = new TileSet();
 
     if (cursorAction === 'placing') {
       if (this.lastMouseoverTile && selectedBlueprint) {
@@ -506,21 +515,6 @@ class CanvasRenderer {
         }
       }
     }
-    for (const building of placedBuildings) {
-      for (const tile of building.tilesOccupied) {
-        occupiedTiles.add(tile);
-      }
-    }
-    for (const building of buildingsBeingAdded) {
-      for (const tile of building.tilesOccupied) {
-        occupiedTiles.add(tile);
-      }
-    }
-    /*for (const building of buildingsBeingRemoved) {
-      for (const tile of building.tilesOccupied) {
-        occupiedTiles.remove(tile);
-      }
-    }*/
 
     this.clearCanvas();
 
@@ -528,8 +522,6 @@ class CanvasRenderer {
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const tile = new Tile(x, y);
-        if (occupiedTiles.has(tile)) continue;
-
         let desirabilityForThisTile = baseValues[y][x];
         for (const building of buildingsBeingAdded) {
           desirabilityForThisTile += building.recursiveDesirabilityEffect(tile);
@@ -546,6 +538,7 @@ class CanvasRenderer {
       const isBeingDeleted = buildingsBeingRemoved.has(building);
       this.drawBuilding(
         building,
+        this.transparentBuildings,
         isBeingDeleted ? colors.redMidTransparency : undefined
       );
     }
@@ -581,7 +574,11 @@ class CanvasRenderer {
           );
         }
       } else {
-        this.drawBuilding(virtualBuilding, colors.greenLowTransparency);
+        this.drawBuilding(
+          virtualBuilding,
+          this.transparentBuildings,
+          colors.greenLowTransparency
+        );
       }
     }
 

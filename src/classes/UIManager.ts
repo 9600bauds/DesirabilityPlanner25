@@ -13,7 +13,7 @@ class UIManager {
   private canvasRenderer: CanvasRenderer;
   private gridStateManager: GridStateManager;
 
-  public renderState: RenderContext;
+  public renderContext: RenderContext;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -23,7 +23,7 @@ class UIManager {
     this.canvasRenderer = canvasRenderer;
     this.gridStateManager = gridStateManager;
 
-    this.renderState = {
+    this.renderContext = {
       getBaseValues: gridStateManager.getBaseValues,
       getBuildings: gridStateManager.getBuildings,
       getCursorAction: this.getCursorAction,
@@ -45,6 +45,7 @@ class UIManager {
     });
 
     document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keyup', this.handleKeyUp);
   }
 
   public setCursorAction = (action: CursorAction) => {
@@ -79,30 +80,30 @@ class UIManager {
       if (this.getCursorAction() === 'placing') {
         this.setCursorAction('panning');
         this.deselectBlueprint();
-        this.canvasRenderer.render(this.renderState);
+        this.canvasRenderer.render(this.renderContext);
       } else if (this.getCursorAction() === 'erasing') {
         this.setCursorAction('panning');
-        this.canvasRenderer.stopDragging(this.renderState);
+        this.canvasRenderer.stopDragging(this.renderContext);
       }
     } else if (event.button === 0) {
       //Left click
       if (this.getCursorAction() === 'panning') {
         this.canvasRenderer.startPanning(event);
       } else if (this.getCursorAction() === 'erasing') {
-        this.canvasRenderer.startDragging(event, this.renderState);
+        this.canvasRenderer.startDragging(event, this.renderContext);
       }
     }
   };
 
   private canvasSizeUpdated() {
-    this.canvasRenderer.updateCanvasSize(this.renderState);
+    this.canvasRenderer.updateCanvasSize(this.renderContext);
   }
 
   private handleMouseMove = (event: MouseEvent) => {
     if (this.cursorAction === 'panning') {
-      this.canvasRenderer.handlePanning(event, this.renderState);
+      this.canvasRenderer.handlePanning(event, this.renderContext);
     } else {
-      this.canvasRenderer.handleMouseMove(event, this.renderState);
+      this.canvasRenderer.handleMouseMove(event, this.renderContext);
     }
   };
 
@@ -110,7 +111,7 @@ class UIManager {
     if (this.cursorAction === 'panning') {
       this.canvasRenderer.stopPanning();
     } else {
-      this.canvasRenderer.handleMouseLeave(this.renderState);
+      this.canvasRenderer.handleMouseLeave(this.renderContext);
     }
   };
 
@@ -119,10 +120,10 @@ class UIManager {
       //Left click
       this.canvasRenderer.stopPanning();
       if (this.cursorAction === 'erasing') {
-        const erasedRect = this.canvasRenderer.stopDragging(this.renderState);
+        const erasedRect = this.canvasRenderer.stopDragging(this.renderContext);
         if (erasedRect) {
           if (this.gridStateManager.eraseRect(erasedRect)) {
-            this.canvasRenderer.render(this.renderState);
+            this.canvasRenderer.render(this.renderContext);
           }
         }
       } else if (this.cursorAction === 'placing') {
@@ -133,7 +134,7 @@ class UIManager {
           if (blueprint) {
             this.canvasRenderer.stopPanning();
             if (this.gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              this.canvasRenderer.render(this.renderState);
+              this.canvasRenderer.render(this.renderContext);
             }
           }
         }
@@ -144,6 +145,14 @@ class UIManager {
   private handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'r' || event.key === 'R') {
       this.rotateSelectedBlueprint();
+    } else if (event.key === 'Control' && !event.repeat) {
+      this.canvasRenderer.toggleBuildingTransparency(this.renderContext);
+    }
+  };
+
+  private handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Control') {
+      this.canvasRenderer.toggleBuildingTransparency(this.renderContext);
     }
   };
 
@@ -151,7 +160,7 @@ class UIManager {
     if (this.selectedBlueprints && this.selectedBlueprints.length > 0) {
       this.selectedArray =
         (this.selectedArray + 1) % this.selectedBlueprints.length;
-      this.canvasRenderer.render(this.renderState);
+      this.canvasRenderer.render(this.renderContext);
     }
   };
 }

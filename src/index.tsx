@@ -26,12 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
     reactRoot.render(
       <Sidebar
         onRotateClick={() =>
-          canvasRenderer.toggleGridRotation(uiManager.renderState)
+          canvasRenderer.toggleGridRotation(uiManager.renderContext)
         }
         onPanClick={() => uiManager.setCursorAction('panning')}
         onEraserClick={() => uiManager.setCursorAction('erasing')}
-        onZoomInClick={() => canvasRenderer.zoomIn(uiManager.renderState)}
-        onZoomOutClick={() => canvasRenderer.zoomOut(uiManager.renderState)}
+        onZoomInClick={() => canvasRenderer.zoomIn(uiManager.renderContext)}
+        onZoomOutClick={() => canvasRenderer.zoomOut(uiManager.renderContext)}
         setSelectedBlueprints={uiManager.setSelectedBlueprints}
       />
     );
