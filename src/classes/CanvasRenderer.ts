@@ -42,8 +42,6 @@ class CanvasRenderer {
     this.displayCanvas = canvas;
     const displayCtx = this.displayCanvas.getContext('2d', { alpha: false });
     if (!displayCtx) throw new Error('Could not get canvas context!');
-    displayCtx.imageSmoothingEnabled = true;
-    displayCtx.imageSmoothingQuality = 'high';
     this.displayCtx = displayCtx;
 
     // Create buffer canvas and context
@@ -138,6 +136,14 @@ class CanvasRenderer {
 
   public toggleBuildingTransparency(context: RenderContext): void {
     this.transparentBuildings = !this.transparentBuildings;
+    this.render(context);
+  }
+
+  public setBuildingTransparency(
+    newSetting: boolean,
+    context: RenderContext
+  ): void {
+    this.transparentBuildings = newSetting;
     this.render(context);
   }
 

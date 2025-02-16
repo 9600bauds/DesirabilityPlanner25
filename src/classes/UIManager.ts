@@ -149,13 +149,13 @@ class UIManager {
     if (event.key === 'r' || event.key === 'R') {
       this.rotateSelectedBlueprint();
     } else if (event.key === 'Control' && !event.repeat) {
-      this.canvasRenderer.toggleBuildingTransparency(this.renderContext);
+      this.canvasRenderer.setBuildingTransparency(true, this.renderContext);
     }
   };
 
   private handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === 'Control') {
-      this.canvasRenderer.toggleBuildingTransparency(this.renderContext);
+      this.canvasRenderer.setBuildingTransparency(false, this.renderContext);
     }
   };
 
