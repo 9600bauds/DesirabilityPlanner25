@@ -314,7 +314,8 @@ class CanvasRenderer {
     fontSize: number = canvasTilePx / 3,
     padding: number = 2 //In pixels
   ) {
-    const splitTextToLines = () => {
+    const splitTextToLines = (text: string) => {
+      const words = text.split(' ');
       let lines: string[] = [];
 
       const lineWidth = this.bufferCtx.measureText(text).width;
@@ -368,8 +369,7 @@ class CanvasRenderer {
     }
 
     // Split text into lines if needed
-    const words = text.split(' ');
-    const lines: string[] = splitTextToLines();
+    const lines: string[] = splitTextToLines(text);
 
     let lineHeight = fontSize * 1.2;
     let totalTextHeight = lineHeight * lines.length;
@@ -563,13 +563,7 @@ class CanvasRenderer {
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const tile = new Tile(x, y);
-        let desirabilityForThisTile = baseValues[y][x];
-        for (const building of buildingsBeingAdded) {
-          desirabilityForThisTile += building.recursiveDesirabilityEffect(tile);
-        }
-        for (const building of buildingsBeingRemoved) {
-          desirabilityForThisTile -= building.recursiveDesirabilityEffect(tile);
-        }
+        const desirabilityForThisTile = getAdjustedDesirability(tile);
         this.drawTile(desirabilityForThisTile, tile);
       }
     }
@@ -628,6 +622,16 @@ class CanvasRenderer {
     }
 
     this.updateDisplay();
+    function getAdjustedDesirability(tile: Tile) {
+      let desirabilityForThisTile = baseValues[tile.x][tile.y];
+      for (const building of buildingsBeingAdded) {
+        desirabilityForThisTile += building.recursiveDesirabilityEffect(tile);
+      }
+      for (const building of buildingsBeingRemoved) {
+        desirabilityForThisTile -= building.recursiveDesirabilityEffect(tile);
+      }
+      return desirabilityForThisTile;
+    }
   }
 }
 

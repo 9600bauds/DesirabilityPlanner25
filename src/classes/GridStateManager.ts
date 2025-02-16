@@ -19,10 +19,17 @@ class GridStateManager {
   };
 
   public isTileOccupied = (tile: Tile) => {
-    for (const building of this.activeGridState.getPlacedBuildings()) {
-      if (building.interceptsTile(tile)) return true;
+    if (this.getInterceptingBuilding(tile)) {
+      return true;
     }
     return false;
+  };
+
+  public getInterceptingBuilding = (tile: Tile) => {
+    for (const building of this.activeGridState.getPlacedBuildings()) {
+      if (building.interceptsTile(tile)) return building;
+    }
+    return undefined;
   };
 
   public canPlaceBuilding = (position: Tile, blueprint: BuildingBlueprint) => {
