@@ -32,7 +32,7 @@ class GridState {
         const tile = new Tile(x, y);
         let totalDesirabilityEffect = 0;
         for (const building of this.getPlacedBuildings()) {
-          totalDesirabilityEffect += building.recursiveDesirabilityEffect(tile);
+          totalDesirabilityEffect += building.getDesirabilityEffect(tile);
         }
         this.desirabilityGrid[x][y] += totalDesirabilityEffect;
       }

@@ -19,12 +19,26 @@ export class Tile {
     return this.x * 31 + this.y;
   }
 
+  toKey(): string {
+    return `${this.x},${this.y}`;
+  }
+
+  //I once again have to do hackiness because JS cannot into custom classes as keys for sets/maps.
+  static fromKey(key: string): Tile {
+    const [x, y] = key.split(',').map(Number);
+    return new Tile(x, y);
+  }
+
   equals(other: Tile): boolean {
     return this.x === other.x && this.y === other.y;
   }
 
   add(other: Tile): Tile {
     return new Tile(this.x + other.x, this.y + other.y);
+  }
+
+  substract(other: Tile): Tile {
+    return new Tile(this.x - other.x, this.y - other.y);
   }
 }
 

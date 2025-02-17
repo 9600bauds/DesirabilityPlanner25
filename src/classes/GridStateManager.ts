@@ -1,5 +1,4 @@
 import BuildingBlueprint from '../types/BuildingBlueprint';
-import NewBlueprint from '../types/NewBlueprint';
 import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 

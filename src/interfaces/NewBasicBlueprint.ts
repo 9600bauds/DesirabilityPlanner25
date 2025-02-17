@@ -1,4 +1,4 @@
-import { DesireBox } from './DesireBox';
+import { NewDesireBox } from './NewDesireBox';
 import { Tile } from '../utils/geometry';
 import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
 import { CATEGORIES } from '../data/CATEGORIES';
@@ -11,7 +11,7 @@ export interface NewBasicBlueprint {
   height: number;
   cost?: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired?: number;
-  desireBox?: DesireBox;
+  desireBox?: NewDesireBox;
   children?: ChildBlueprint[];
   category?: keyof typeof CATEGORIES;
 }

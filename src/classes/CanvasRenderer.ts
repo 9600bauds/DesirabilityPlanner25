@@ -645,10 +645,10 @@ class CanvasRenderer {
     function getAdjustedDesirability(tile: Tile) {
       let desirabilityForThisTile = baseValues[tile.x][tile.y];
       for (const building of buildingsBeingAdded) {
-        desirabilityForThisTile += building.recursiveDesirabilityEffect(tile);
+        desirabilityForThisTile += building.getDesirabilityEffect(tile);
       }
       for (const building of buildingsBeingRemoved) {
-        desirabilityForThisTile -= building.recursiveDesirabilityEffect(tile);
+        desirabilityForThisTile -= building.getDesirabilityEffect(tile);
       }
       return desirabilityForThisTile;
     }

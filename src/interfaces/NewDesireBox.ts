@@ -1,4 +1,4 @@
-export interface DesireBox {
+export interface NewDesireBox {
   baseDesirability: number;
   stepVal: number;
   stepDist: number;
