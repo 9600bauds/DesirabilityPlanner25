@@ -33,12 +33,12 @@ class GridStateManager {
   };
 
   public canPlaceBuilding = (position: Tile, blueprint: BuildingBlueprint) => {
-    /*const buildingTiles = getAllTiles(position, blueprint);
-    for (const tile of buildingTiles) {
+    const tilesToCheck = blueprint.tilesOccupied.offsetSet(position);
+    for (const tile of tilesToCheck) {
       if (this.isTileOccupied(tile)) {
         return false;
       }
-    }*/
+    }
     return true;
   };
 
