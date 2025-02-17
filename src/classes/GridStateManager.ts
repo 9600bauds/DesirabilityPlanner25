@@ -1,5 +1,5 @@
-import { getAllTiles } from '../interfaces/getAllTiles';
 import BuildingBlueprint from '../types/BuildingBlueprint';
+import NewBlueprint from '../types/NewBlueprint';
 import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 
@@ -33,12 +33,12 @@ class GridStateManager {
   };
 
   public canPlaceBuilding = (position: Tile, blueprint: BuildingBlueprint) => {
-    const buildingTiles = getAllTiles(position, blueprint);
+    /*const buildingTiles = getAllTiles(position, blueprint);
     for (const tile of buildingTiles) {
       if (this.isTileOccupied(tile)) {
         return false;
       }
-    }
+    }*/
     return true;
   };
 

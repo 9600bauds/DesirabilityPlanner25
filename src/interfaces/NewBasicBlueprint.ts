@@ -1,9 +1,9 @@
 import { DesireBox } from './DesireBox';
 import { Tile } from '../utils/geometry';
-import { BUILDING_CATEGORIES } from './BuildingCategory';
-import { ALL_BLUEPRINTS } from '../utils/ALL_BLUEPRINTS';
+import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
+import { CATEGORIES } from '../data/CATEGORIES';
 
-export interface BasicBlueprint {
+export interface NewBasicBlueprint {
   label?: string;
   fillColor?: string;
   borderColor?: string;
@@ -13,10 +13,10 @@ export interface BasicBlueprint {
   employeesRequired?: number;
   desireBox?: DesireBox;
   children?: ChildBlueprint[];
-  category?: keyof typeof BUILDING_CATEGORIES;
+  category?: keyof typeof CATEGORIES;
 }
 
 export interface ChildBlueprint {
-  childKey: keyof typeof ALL_BLUEPRINTS;
+  childKey: keyof typeof NEW_BLUEPRINTS;
   relativeOrigin: Tile;
 }

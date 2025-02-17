@@ -63,6 +63,14 @@ export class TileSet {
       },
     };
   }
+
+  offsetSet(offset: Tile): TileSet {
+    const newSet = new TileSet();
+    for (const tile of this.items) {
+      newSet.add(tile.add(offset));
+    }
+    return newSet;
+  }
 }
 
 export class Line {

@@ -1,16 +1,27 @@
+import BasicBlueprint from '../classes/BasicBlueprint';
+import HouseBlueprint from '../classes/HouseBlueprint';
 import BuildingBlueprint from '../types/BuildingBlueprint';
-import { Tile } from './geometry';
+import NewBlueprint from '../types/NewBlueprint';
+import { Tile } from '../utils/geometry';
 
-export function getBlueprint(
-  key: keyof typeof ALL_BLUEPRINTS //keyof doesn't actually really DO anything if the record keys are of type string, go TS!
-): BuildingBlueprint {
-  if (!(key in ALL_BLUEPRINTS)) {
-    throw new Error(`Could not find building of key: ${key}`);
+export function instantiateBlueprints() {
+  for (const [key, newBpData] of Object.entries(NEW_BLUEPRINTS)) {
+    let createdBlueprint: BuildingBlueprint;
+    if (
+      'desirabilityToEvolve' in newBpData ||
+      'desirabilityToDevolve' in newBpData
+    ) {
+      createdBlueprint = new HouseBlueprint(newBpData);
+    } else {
+      createdBlueprint = new BasicBlueprint(newBpData);
+    }
+    BLUEPRINTS[key] = createdBlueprint;
   }
-  return ALL_BLUEPRINTS[key];
 }
 
-export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
+export const BLUEPRINTS: Record<string, BuildingBlueprint> = {};
+
+export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
   Academy: {
     label: 'Academy',
     height: 4,
@@ -1151,7 +1162,7 @@ export const ALL_BLUEPRINTS: Record<string, BuildingBlueprint> = {
     desirabilityToDevolve: 87,
     category: 'HOUSE',
   },
-} as const;
+};
 
 /*
 'Bandstand': {

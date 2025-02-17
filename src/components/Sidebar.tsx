@@ -1,7 +1,7 @@
 // src/components/Sidebar.tsx
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
-import BuildingBlueprint from '../types/BuildingBlueprint';
+import Subcategory from '../interfaces/Subcategory';
 
 interface SidebarProps {
   onRotateClick: () => void;
@@ -9,7 +9,7 @@ interface SidebarProps {
   onEraserClick: () => void;
   onZoomInClick: () => void;
   onZoomOutClick: () => void;
-  setSelectedBlueprints: (blueprints: BuildingBlueprint[]) => void;
+  setSelectedSubcategory: (subcat: Subcategory) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -18,7 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onEraserClick,
   onZoomInClick,
   onZoomOutClick,
-  setSelectedBlueprints,
+  setSelectedSubcategory,
 }) => {
   return (
     <div
@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         <i className="material-icons">zoom_out</i>
       </button>
-      <BuildingSelector setSelectedBlueprints={setSelectedBlueprints} />
+      <BuildingSelector setSelectedSubcategory={setSelectedSubcategory} />
     </div>
   );
 };

@@ -1,9 +1,8 @@
 import RenderContext from '../interfaces/RenderContext';
-import { createBuilding } from '../types/BuildingBlueprint';
 import colors, { desirabilityColor } from '../utils/colors';
 import { canvasTilePx, gridSize, rotationAngle } from '../utils/constants';
 import { Line, Tile, Rectangle, TileSet } from '../utils/geometry';
-import Building from './Building';
+import PlacedBuilding from './PlacedBuilding';
 
 interface CanvasSize {
   width: number;
@@ -484,35 +483,44 @@ class CanvasRenderer {
   }
 
   private drawBuilding(
-    building: Building,
+    building: PlacedBuilding,
     transparent: boolean = false,
     overlayColor?: string
   ) {
-    if (!transparent && building.fillColor) {
-      this.drawRectangle(building.rect, undefined, building.fillColor);
+    if (!transparent && building.blueprint.fillColor) {
+      this.drawRectangle(
+        building.rect,
+        undefined,
+        building.blueprint.fillColor
+      );
     }
-    if (building.parent) {
+    /*if (building.parent) {
       // Do not draw overlays for children
       return;
     }
     if (building.children) {
       for (const child of building.children) {
-        this.drawBuilding(child, transparent, overlayColor);
+        this.drawBuilding(child, transparent, overlayColor, bestDesirability);
       }
+    }*/
+    if (building.blueprint.borderColor) {
+      this.drawOutline(
+        building.offsetTilesOccupied,
+        building.blueprint.borderColor,
+        2
+      );
     }
-    if (building.borderColor) {
-      this.drawOutline(building.tilesOccupied, building.borderColor, 2);
-    }
-    if (!transparent && building.label) {
+    const label = building.blueprint.label;
+    if (!transparent && label) {
       this.drawNonRotatedText(
         building.rect,
-        building.label,
+        label,
         colors.pureBlack,
         colors.outlineWhite
       );
     }
     if (overlayColor) {
-      for (const tile of building.tilesOccupied) {
+      for (const tile of building.offsetTilesOccupied) {
         this.drawRectangle(new Rectangle(tile, 1, 1), undefined, overlayColor);
       }
     }
@@ -538,12 +546,12 @@ class CanvasRenderer {
     const cursorAction = context.getCursorAction();
     const selectedBlueprint = context.getSelectedBlueprint();
 
-    const buildingsBeingRemoved: Set<Building> = new Set();
-    const buildingsBeingAdded: Set<Building> = new Set();
+    const buildingsBeingRemoved: Set<PlacedBuilding> = new Set();
+    const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
 
     if (cursorAction === 'placing') {
       if (this.lastMouseoverTile && selectedBlueprint) {
-        const virtualBuilding = createBuilding(
+        const virtualBuilding = new PlacedBuilding(
           this.lastMouseoverTile,
           selectedBlueprint
         );
@@ -580,13 +588,13 @@ class CanvasRenderer {
 
     for (const virtualBuilding of buildingsBeingAdded) {
       this.drawOutline(
-        virtualBuilding.tilesOccupied,
+        virtualBuilding.offsetTilesOccupied,
         colors.strongOutlineBlack,
         3
       );
       const blockedTiles = new TileSet();
       const openTiles = new TileSet();
-      for (const tile of virtualBuilding.tilesOccupied) {
+      for (const tile of virtualBuilding.offsetTilesOccupied) {
         if (context.isTileOccupied(tile)) {
           blockedTiles.add(tile);
         } else {
@@ -622,6 +630,18 @@ class CanvasRenderer {
     }
 
     this.updateDisplay();
+
+    /*function bestDesirabilityForBuilding(building: Building) {
+      let bestDesirability = Number.MIN_SAFE_INTEGER;
+      for (const tile of building.offsetTilesOccupied) {
+        bestDesirability = Math.max(
+          bestDesirability,
+          getAdjustedDesirability(tile)
+        );
+      }
+      return bestDesirability;
+    }*/
+
     function getAdjustedDesirability(tile: Tile) {
       let desirabilityForThisTile = baseValues[tile.x][tile.y];
       for (const building of buildingsBeingAdded) {

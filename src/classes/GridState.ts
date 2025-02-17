@@ -1,11 +1,11 @@
 import { Tile } from '../utils/geometry';
-import Building from './Building';
+import PlacedBuilding from './PlacedBuilding';
 import { gridSize } from '../utils/constants';
-import BuildingBlueprint, { createBuilding } from '../types/BuildingBlueprint';
+import BuildingBlueprint from '../types/BuildingBlueprint';
 
 class GridState {
   private desirabilityGrid: number[][];
-  private placedBuildings: Set<Building>;
+  private placedBuildings: Set<PlacedBuilding>;
 
   constructor() {
     this.desirabilityGrid = Array.from({ length: gridSize }, () =>
@@ -39,14 +39,17 @@ class GridState {
     }
   }
 
-  public placeBuilding(position: Tile, blueprint: BuildingBlueprint): Building {
-    const newBuilding = createBuilding(position, blueprint);
+  public placeBuilding(
+    position: Tile,
+    blueprint: BuildingBlueprint
+  ): PlacedBuilding {
+    const newBuilding = new PlacedBuilding(position, blueprint);
 
     this.placedBuildings.add(newBuilding);
     this.updateDesirabilityGrid();
     return newBuilding;
   }
-  public removeBuilding(building: Building): void {
+  public removeBuilding(building: PlacedBuilding): void {
     this.placedBuildings.delete(building);
     this.updateDesirabilityGrid();
   }

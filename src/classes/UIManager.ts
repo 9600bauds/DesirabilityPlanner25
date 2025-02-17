@@ -1,4 +1,5 @@
 import RenderContext from '../interfaces/RenderContext';
+import Subcategory from '../interfaces/Subcategory';
 import BuildingBlueprint from '../types/BuildingBlueprint';
 import CanvasRenderer from './CanvasRenderer';
 import GridStateManager from './GridStateManager';
@@ -7,7 +8,7 @@ export type CursorAction = 'placing' | 'panning' | 'erasing';
 
 class UIManager {
   private cursorAction: CursorAction = 'panning';
-  private selectedBlueprints?: BuildingBlueprint[];
+  private selectedSubcategory?: Subcategory;
   private selectedArray: number = 0;
 
   private canvasRenderer: CanvasRenderer;
@@ -59,21 +60,21 @@ class UIManager {
   };
 
   public getSelectedBlueprint = (): BuildingBlueprint | null => {
-    if (!this.selectedBlueprints) {
+    if (!this.selectedSubcategory) {
       return null;
     }
-    return this.selectedBlueprints[this.selectedArray];
+    return this.selectedSubcategory.blueprints[this.selectedArray];
   };
 
-  public setSelectedBlueprints = (blueprints: BuildingBlueprint[]) => {
-    this.deselectBlueprint();
+  public setSelectedSubcategory = (subcat: Subcategory) => {
+    this.deselectSubcategory();
     this.setCursorAction('placing');
-    this.selectedBlueprints = blueprints;
+    this.selectedSubcategory = subcat;
     this.selectedArray = 0;
   };
 
-  private deselectBlueprint = () => {
-    this.selectedBlueprints = undefined;
+  private deselectSubcategory = () => {
+    this.selectedSubcategory = undefined;
     this.selectedArray = 0;
   };
 
@@ -82,7 +83,7 @@ class UIManager {
       //Right click
       if (this.getCursorAction() === 'placing') {
         this.setCursorAction('panning');
-        this.deselectBlueprint();
+        this.deselectSubcategory();
         this.canvasRenderer.render(this.renderContext);
       } else if (this.getCursorAction() === 'erasing') {
         this.setCursorAction('panning');
@@ -160,9 +161,12 @@ class UIManager {
   };
 
   private rotateSelectedBlueprint = () => {
-    if (this.selectedBlueprints && this.selectedBlueprints.length > 0) {
+    if (
+      this.selectedSubcategory &&
+      this.selectedSubcategory.blueprints.length > 0
+    ) {
       this.selectedArray =
-        (this.selectedArray + 1) % this.selectedBlueprints.length;
+        (this.selectedArray + 1) % this.selectedSubcategory.blueprints.length;
       this.canvasRenderer.render(this.renderContext);
     }
   };

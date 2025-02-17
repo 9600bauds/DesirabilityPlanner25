@@ -1,5 +1,9 @@
-import NewBlueprint from '../types/NewBlueprint';
-import { Tile, TileSet } from '../utils/geometry';
+import { NewBasicBlueprint } from '../interfaces/NewBasicBlueprint';
+import { NewHouseBlueprint } from '../interfaces/NewHouseBlueprint';
+
+type NewBlueprint = NewBasicBlueprint | NewHouseBlueprint;
+
+export default NewBlueprint;
 
 /*export function getAllTiles(origin: Tile, bp: NewBlueprint): TileSet {
   const tiles = new TileSet();

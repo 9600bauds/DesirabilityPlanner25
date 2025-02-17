@@ -3,6 +3,8 @@ import CanvasRenderer from './classes/CanvasRenderer';
 import UIManager from './classes/UIManager';
 import Sidebar from './components/Sidebar';
 import GridStateManager from './classes/GridStateManager';
+import { populateCategories } from './data/CATEGORIES';
+import { instantiateBlueprints } from './data/BLUEPRINTS';
 
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById(
@@ -12,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('Canvas element not found!');
     return;
   }
+
+  instantiateBlueprints();
+  populateCategories();
 
   const gridStateManager = new GridStateManager();
 
@@ -30,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         onPanClick={() => uiManager.setCursorAction('panning')}
         onEraserClick={() => uiManager.setCursorAction('erasing')}
-        onZoomInClick={() => canvasRenderer.zoomIn(uiManager.renderContext)}
-        onZoomOutClick={() => canvasRenderer.zoomOut(uiManager.renderContext)}
-        setSelectedBlueprints={uiManager.setSelectedBlueprints}
+        onZoomInClick={() => canvasRenderer.zoomIn()}
+        onZoomOutClick={() => canvasRenderer.zoomOut()}
+        setSelectedSubcategory={uiManager.setSelectedSubcategory}
       />
     );
   } else {
