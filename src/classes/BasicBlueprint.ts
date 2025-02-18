@@ -1,4 +1,4 @@
-import { chebyshevDistance, Rectangle, Tile, TileSet } from '../utils/geometry';
+import { Rectangle, Tile, TileSet } from '../utils/geometry';
 import NewBlueprint from '../types/NewBlueprint';
 import colors from '../utils/colors';
 import { CATEGORIES } from '../data/CATEGORIES';
@@ -61,23 +61,7 @@ class BasicBlueprint {
         const desireBox = new DesireBox(data.desireBox);
         const origin = offset ? offset : new Tile(0, 0);
         const ourRect = new Rectangle(origin, this.height, this.width);
-        const minX = 0 - desireBox.maxRange + (offset ? offset.x : 0);
-        const maxX = this.width + desireBox.maxRange + (offset ? offset.x : 0);
-        const minY = 0 - desireBox.maxRange + (offset ? offset.y : 0);
-        const maxY = this.height + desireBox.maxRange + (offset ? offset.y : 0);
-        for (let x = minX; x < maxX; x++) {
-          for (let y = minY; y < maxY; y++) {
-            const thisTile = new Tile(x, y);
-            const dist = chebyshevDistance(thisTile, ourRect);
-            const desirabilityEffect = desireBox.distToEffect(dist);
-            if (!desirabilityEffect) continue;
-            const tileAsKey = thisTile.toKey();
-            this.desirabilityMap.set(
-              tileAsKey,
-              desirabilityEffect + (this.desirabilityMap.get(tileAsKey) ?? 0)
-            );
-          }
-        }
+        desireBox.addToDesirabilityMap(this.desirabilityMap, ourRect);
       }
     };
     addToDesirabilityMap(newBp);

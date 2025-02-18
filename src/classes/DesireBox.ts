@@ -1,4 +1,5 @@
 import { NewDesireBox } from '../interfaces/NewDesireBox';
+import { chebyshevDistance, Rectangle, Tile } from '../utils/geometry';
 
 class DesireBox {
   readonly baseDesirability: number;
@@ -22,6 +23,29 @@ class DesireBox {
     const distanceModifier = (stepsAway - 1) * this.stepVal;
     return this.baseDesirability + distanceModifier;
   }
+
+  public addToDesirabilityMap = (
+    desirabilityMap: Map<string, number>,
+    bounds: Rectangle
+  ) => {
+    const minX = bounds.origin.x - this.maxRange;
+    const maxX = bounds.origin.x + bounds.width + this.maxRange;
+    const minY = bounds.origin.y - this.maxRange;
+    const maxY = bounds.origin.y + bounds.height + this.maxRange;
+    for (let x = minX; x < maxX; x++) {
+      for (let y = minY; y < maxY; y++) {
+        const tile = new Tile(x, y);
+        const dist = chebyshevDistance(tile, bounds);
+        const desirabilityEffect = this.distToEffect(dist);
+        if (!desirabilityEffect) continue;
+        const tileAsKey = tile.toKey();
+        desirabilityMap.set(
+          tileAsKey,
+          desirabilityEffect + (desirabilityMap.get(tileAsKey) ?? 0)
+        );
+      }
+    }
+  };
 }
 
 export default DesireBox;
