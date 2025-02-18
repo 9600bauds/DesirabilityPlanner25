@@ -87,16 +87,6 @@ export class TileSet {
   }
 }
 
-export class Line {
-  public p1: DOMPoint;
-  public p2: DOMPoint;
-
-  constructor(p1: DOMPoint, p2: DOMPoint) {
-    this.p1 = p1;
-    this.p2 = p2;
-  }
-}
-
 export class Rectangle {
   public origin: Tile;
   //Note that for all rectangle math, height and width are effectively +1:
@@ -167,3 +157,6 @@ export function chebyshevDistance(tile: Tile, rect: Rectangle): number {
 
   return Math.max(distanceX, distanceY);
 }
+
+export const degreesToRads = (deg: number) => (deg * Math.PI) / 180.0;
+export const radsToDegrees = (rad: number) => (rad * 180.0) / Math.PI;

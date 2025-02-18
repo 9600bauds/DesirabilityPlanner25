@@ -4,8 +4,11 @@ import colors from '../utils/colors';
 import { CATEGORIES } from '../data/CATEGORIES';
 import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
 import DesireBox from './desireBox';
+import { Svg, Symbol } from '@svgdotjs/svg.js';
+import { canvasTilePx } from '../utils/constants';
 
 class BasicBlueprint {
+  key: string;
   width: number;
   height: number;
   tilesOccupied: TileSet;
@@ -15,21 +18,13 @@ class BasicBlueprint {
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
   label?: string;
-  fillColor?: string = colors.backgroundWhite;
-  borderColor?: string = colors.strongOutlineBlack;
 
-  constructor(newBp: NewBlueprint) {
+  visualRepresentation?: Symbol;
+
+  constructor(newBp: NewBlueprint, key: string, svgCanvas: Svg) {
+    this.key = key;
     this.height = newBp.height;
     this.width = newBp.width;
-    if (newBp.borderColor) {
-      this.borderColor = newBp.borderColor;
-    }
-    if (newBp.fillColor) {
-      this.fillColor = newBp.fillColor;
-    } else if (newBp.category) {
-      const category = CATEGORIES[newBp.category];
-      if (category) this.fillColor = category.baseColor;
-    }
     this.label = newBp.label;
     if (newBp.cost) {
       this.cost = newBp.cost;
@@ -37,6 +32,40 @@ class BasicBlueprint {
     if (newBp.employeesRequired) {
       this.employeesRequired = newBp.employeesRequired;
     }
+
+    const symbol = svgCanvas.symbol().attr('id', `${this.key}-base`);
+    symbol.css('overflow', 'visible'); //Necessary for buildings with negative coord graphics
+    let fillColor = colors.backgroundWhite;
+    if (newBp.fillColor) {
+      fillColor = newBp.fillColor;
+    } else if (newBp.category) {
+      const category = CATEGORIES[newBp.category];
+      if (category) fillColor = category.baseColor;
+    }
+
+    const addToSymbol = (
+      data: NewBlueprint,
+      symbol: Symbol,
+      fillColor: string,
+      offset?: Tile
+    ) => {
+      const rect = symbol
+        .rect(canvasTilePx * data.width, canvasTilePx * data.height)
+        .fill(fillColor);
+      if (offset) {
+        rect.move(canvasTilePx * offset.x, canvasTilePx * offset.y);
+      }
+    };
+
+    addToSymbol(newBp, symbol, fillColor);
+    if (newBp.children) {
+      for (const child of newBp.children) {
+        const childBlueprint = NEW_BLUEPRINTS[child.childKey];
+        addToSymbol(childBlueprint, symbol, fillColor, child.relativeOrigin);
+      }
+    }
+    symbol.stroke({ color: '#f06', opacity: 0.6, width: 5 });
+    this.visualRepresentation = symbol;
 
     this.tilesOccupied = new TileSet();
     const addToTilesOccupied = (data: NewBlueprint, offset?: Tile) => {

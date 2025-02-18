@@ -1,19 +1,20 @@
+import { Svg } from '@svgdotjs/svg.js';
 import BasicBlueprint from '../classes/BasicBlueprint';
 import HouseBlueprint from '../classes/HouseBlueprint';
 import BuildingBlueprint from '../types/BuildingBlueprint';
 import NewBlueprint from '../types/NewBlueprint';
 import { Tile } from '../utils/geometry';
 
-export function instantiateBlueprints() {
+export function instantiateBlueprints(svgCanvas: Svg) {
   for (const [key, newBpData] of Object.entries(NEW_BLUEPRINTS)) {
     let createdBlueprint: BuildingBlueprint;
     if (
       'desirabilityToEvolve' in newBpData ||
       'desirabilityToDevolve' in newBpData
     ) {
-      createdBlueprint = new HouseBlueprint(newBpData);
+      createdBlueprint = new HouseBlueprint(newBpData, key, svgCanvas);
     } else {
-      createdBlueprint = new BasicBlueprint(newBpData);
+      createdBlueprint = new BasicBlueprint(newBpData, key, svgCanvas);
     }
     BLUEPRINTS[key] = createdBlueprint;
   }

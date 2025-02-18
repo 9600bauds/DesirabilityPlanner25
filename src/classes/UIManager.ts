@@ -17,7 +17,7 @@ class UIManager {
   public renderContext: RenderContext;
 
   constructor(
-    canvas: HTMLCanvasElement,
+    canvas: HTMLElement,
     canvasRenderer: CanvasRenderer,
     gridStateManager: GridStateManager
   ) {
