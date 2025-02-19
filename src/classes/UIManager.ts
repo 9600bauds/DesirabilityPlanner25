@@ -100,7 +100,7 @@ class UIManager {
   };
 
   private canvasSizeUpdated() {
-    this.canvasRenderer.updateCanvasSize();
+    this.canvasRenderer.canvasSizeUpdated();
   }
 
   private handleMouseMove = (event: MouseEvent) => {

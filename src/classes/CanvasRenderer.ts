@@ -6,7 +6,6 @@ import {
   gridPixelSize,
   gridSize,
   rotationAngle,
-  rotationRadians,
 } from '../utils/constants';
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
@@ -19,9 +18,6 @@ class CanvasRenderer {
   private buildingGroup: SVGG;
   private labelGroup: SVGG;
 
-  private clientWidth: number;
-  private clientHeight: number;
-
   private transparentBuildings = false;
   private currentRotation: number = 0;
   private zoomLevel = 1.0;
@@ -32,7 +28,7 @@ class CanvasRenderer {
   private isPanning = false;
   private lastPanX = 0;
   private lastPanY = 0;
-
+  // These two are effectively our pan offsets since nothing else uses them
   private viewBoxX = 0;
   private viewBoxY = 0;
 
@@ -41,11 +37,20 @@ class CanvasRenderer {
   private dragStartTile?: Tile;
   private dragBox?: Rectangle;
 
+  // Various size and viewbox variables
+  private clientWidth: number;
+  private clientHeight: number;
   get viewboxCenterX() {
     return this.viewBoxX + this.clientWidth / this.zoomLevel / 2;
   }
   get viewboxCenterY() {
     return this.viewBoxY + this.clientHeight / this.zoomLevel / 2;
+  }
+  get viewBoxWidth() {
+    return this.clientWidth / this.zoomLevel;
+  }
+  get viewBoxHeight() {
+    return this.clientHeight / this.zoomLevel;
   }
 
   constructor(svgCanvas: Svg, canvasContainer: HTMLElement) {
@@ -57,11 +62,13 @@ class CanvasRenderer {
     this.backgroundGroup = this.displayCanvas.group();
     this.buildingGroup = this.displayCanvas.group();
 
+    // We draw the background only once!
     this.drawBackground(this.backgroundGroup);
 
-    this.centerViewBoxAt(gridPixelSize / 2, gridPixelSize / 2);
+    // Center on origin
+    this.centerViewBoxAt(gridPixelCenter, gridPixelCenter);
 
-    this.updateCanvasSize();
+    this.canvasSizeUpdated();
   }
 
   private drawBackground(backgroundGroup: SVGG) {
@@ -77,7 +84,7 @@ class CanvasRenderer {
     );
 
     backgroundGroup
-      .rect(gridPixelSize, gridPixelSize)
+      .rect(gridPixelSize, gridPixelSize) //Fill the whole canvas with this
       .fill(backgroundPattern)
       .back(); // Ensure background is behind other elements
   }
@@ -87,11 +94,8 @@ class CanvasRenderer {
    */
 
   private centerViewBoxAt(x: number, y: number) {
-    const viewBoxWidth = this.clientWidth / this.zoomLevel;
-    const viewBoxHeight = this.clientHeight / this.zoomLevel;
-
-    x -= viewBoxWidth / 2;
-    y -= viewBoxHeight / 2;
+    x -= this.viewBoxWidth / 2;
+    y -= this.viewBoxHeight / 2;
 
     this.viewBoxX = x;
     this.viewBoxY = y;
@@ -128,6 +132,7 @@ class CanvasRenderer {
   }
 
   private rotatePointFromOrigin(x: number, y: number, rotationAngle: number) {
+    // Translate the point to origin to make the math easier
     x -= gridPixelCenter;
     y -= gridPixelCenter;
 
@@ -150,14 +155,11 @@ class CanvasRenderer {
    * Transformations
    */
   private updateTransform() {
-    const viewBoxWidth = this.clientWidth / this.zoomLevel;
-    const viewBoxHeight = this.clientHeight / this.zoomLevel;
-
     this.displayCanvas.viewbox(
       this.viewBoxX,
       this.viewBoxY,
-      viewBoxWidth,
-      viewBoxHeight
+      this.viewBoxWidth,
+      this.viewBoxHeight
     );
 
     if (this.currentRotation) {
@@ -175,7 +177,7 @@ class CanvasRenderer {
     }
   }
 
-  public updateCanvasSize() {
+  public canvasSizeUpdated() {
     this.clientWidth = this.displayCanvas.node.clientWidth;
     this.clientHeight = this.displayCanvas.node.clientHeight;
 
@@ -183,17 +185,21 @@ class CanvasRenderer {
   }
 
   public toggleGridRotation(): void {
+    // We want to keep our view centered on the same spot after zooming, so let's store the old coords.
     let x = this.viewboxCenterX;
     let y = this.viewboxCenterY;
+
     if (this.currentRotation === 0) {
       this.currentRotation = rotationAngle;
+      // We are rotating, so rotate the new center too
       ({ x, y } = this.rotatePointFromOrigin(x, y, this.currentRotation));
     } else {
+      // We are undoing the rotation, so undo the rotation for the center too
       ({ x, y } = this.rotatePointFromOrigin(x, y, -this.currentRotation));
       this.currentRotation = 0;
     }
+    this.centerViewBoxAt(x, y); // Re-center please
     this.updateTransform();
-    this.centerViewBoxAt(x, y);
   }
 
   public toggleBuildingTransparency(context: RenderContext): void {
@@ -218,13 +224,13 @@ class CanvasRenderer {
   }
 
   private zoom(factor: number) {
+    // We want to keep our view centered on the same spot after zooming, so let's store the old coords.
     const oldY = this.viewboxCenterY;
     const oldX = this.viewboxCenterX;
-    // Update zoom level
+
     this.zoomLevel *= factor;
 
-    this.centerViewBoxAt(oldX, oldY);
-
+    this.centerViewBoxAt(oldX, oldY); // Re-center please
     this.updateTransform();
   }
 
@@ -325,10 +331,8 @@ class CanvasRenderer {
   }
 
   public drawBuilding(building: PlacedBuilding) {
-    if (!building.blueprint.visualRepresentation) return;
-
     const importedElement = this.buildingGroup
-      .use(building.blueprint.visualRepresentation)
+      .use(building.blueprint.baseGraphic)
       .move(building.origin.x * canvasTilePx, building.origin.y * canvasTilePx);
 
     this.buildingGroup.add(importedElement);
