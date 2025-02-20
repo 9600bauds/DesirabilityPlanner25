@@ -36,7 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const reactRoot = ReactDOM.createRoot(sidebar); // Create a React root in the sidebar element
     reactRoot.render(
       <Sidebar
-        onRotateClick={() => canvasRenderer.toggleGridRotation()}
+        onRotateClick={() =>
+          canvasRenderer.toggleGridRotation(uiManager.renderContext)
+        }
         onPanClick={() => uiManager.setCursorAction('panning')}
         onEraserClick={() => uiManager.setCursorAction('erasing')}
         onZoomInClick={() => canvasRenderer.zoomIn()}

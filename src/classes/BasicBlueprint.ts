@@ -17,15 +17,15 @@ class BasicBlueprint {
 
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
-  label?: string;
+  baseLabel?: string;
 
-  baseGraphic: Symbol;
+  baseGraphic?: Symbol;
 
   constructor(newBp: NewBlueprint, key: string, svgCanvas: Svg) {
     this.key = key;
     this.height = newBp.height;
     this.width = newBp.width;
-    this.label = newBp.label;
+    this.baseLabel = newBp.label;
     if (newBp.cost) {
       this.cost = newBp.cost;
     }
@@ -80,7 +80,8 @@ class BasicBlueprint {
     }
   };
 
-  private buildSymbol(svgCanvas: Svg, newBp: NewBlueprint) {
+  private buildSymbol(svgCanvas: Svg, newBp: NewBlueprint): Symbol | undefined {
+    if (newBp.invisible) return;
     const symbol = svgCanvas.symbol().attr('id', `${this.key}-base`);
     symbol.css('overflow', 'visible'); //Necessary for buildings with negative coord graphics
 
@@ -100,38 +101,45 @@ class BasicBlueprint {
   private recursiveAddToSymbol = (
     data: NewBlueprint,
     symbol: Symbol,
-    origin: Tile,
-    parent?: NewBlueprint
+    origin: Tile
   ) => {
-    let fillColor = this.getBpFillColor(data);
-    if (!fillColor && parent) fillColor = this.getBpFillColor(parent);
-
-    if (fillColor) {
-      symbol
-        .rect(coordToPx(data.width), coordToPx(data.height))
-        .fill(fillColor)
-        .move(coordToPx(origin.x), coordToPx(origin.y));
+    if (data.invisible) {
+      return;
     }
+    const fillColor = this.getBpFillColor(data);
+    symbol
+      .rect(coordToPx(data.width), coordToPx(data.height))
+      .fill(fillColor)
+      .move(coordToPx(origin.x), coordToPx(origin.y));
     if (data.children) {
       for (const child of data.children) {
         const childBlueprint = NEW_BLUEPRINTS[child.childKey];
         this.recursiveAddToSymbol(
           childBlueprint,
           symbol,
-          origin.add(child.relativeOrigin),
-          data
+          origin.add(child.relativeOrigin)
         );
       }
     }
   };
 
-  private getBpFillColor(bp: NewBlueprint): string | undefined {
+  private getBpFillColor(bp: NewBlueprint): string {
     if (bp.fillColor) {
       return bp.fillColor;
-    } else if (bp.category) {
+    }
+    if (bp.category) {
       const category = CATEGORIES[bp.category];
       if (category) return category.baseColor;
     }
+    return colors.backgroundWhite;
+  }
+
+  public getLabel(maxDesirability?: number) {
+    const labelHeight = coordToPx(this.height);
+    const labelWidth = coordToPx(this.width);
+    return `<div class="buildingLabel" style="width: ${labelHeight}px; height: ${labelWidth}px">
+          ${this.baseLabel}
+        </div>`;
   }
 }
 

@@ -10,14 +10,17 @@ export function populateCategories() {
       ([_key, newBp]) => newBp.category === categoryKey
     );
 
-    for (const [key, _newBpData] of blueprintsInThisCategory) {
-      const splitKey = key.split('_')[0];
+    for (const [key, newBpData] of blueprintsInThisCategory) {
+      if (newBpData.hidden) {
+        continue;
+      }
       const theBlueprint = BLUEPRINTS[key];
       if (!theBlueprint) {
         throw new Error(
-          `newBlueprint with key ${key} (split: ${splitKey}) did not correspond to any blueprint!`
+          `newBlueprint with key ${key} did not correspond to any blueprint!`
         );
       }
+      const splitKey = key.split('_')[0];
       if (!thisCategory.subCategories.has(splitKey)) {
         const newSub: Subcategory = {
           displayName: splitKey,

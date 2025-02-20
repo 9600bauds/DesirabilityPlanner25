@@ -6,7 +6,8 @@ import { CATEGORIES } from '../data/CATEGORIES';
 export interface NewBasicBlueprint {
   label?: string;
   fillColor?: string;
-  borderColor?: string;
+  invisible?: boolean; //If true, this building and its children have no graphic.
+  hidden?: boolean; //If true, building will not show up as a sidebar option to be placed
   width: number;
   height: number;
   cost?: number[]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard

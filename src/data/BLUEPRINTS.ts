@@ -719,10 +719,12 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     category: 'STORAGE',
   },
   'Storage Yard Hut': {
+    hidden: true,
     fillColor: 'rgb(219, 206, 194)',
     height: 1,
     width: 1,
     desireBox: { baseDesirability: -5, stepDist: 2, stepVal: 2, maxRange: 3 },
+    category: 'STORAGE',
   },
   'Temple Complex_1': {
     label: 'Temple Complex',
@@ -751,9 +753,12 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     category: 'RELIGION',
   },
   'Temple Complex Altar': {
+    hidden: true,
+    invisible: true,
     height: 3,
     width: 3,
     desireBox: { baseDesirability: 20, stepDist: 2, stepVal: -4, maxRange: 6 },
+    category: 'RELIGION',
   },
   Fort: {
     label: 'Fort',
@@ -765,9 +770,11 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     category: 'MILITARY',
   },
   'Fort Yard': {
+    hidden: true,
     height: 4,
     width: 4,
     desireBox: { baseDesirability: -20, stepDist: 2, stepVal: 2, maxRange: 6 },
+    category: 'MILITARY',
   },
   /* 
 

@@ -65,6 +65,7 @@ class CanvasRenderer {
       'justify-content': 'center',
       'text-align': 'center',
       color: 'black',
+      padding: '2px',
       '-webkit-text-stroke': '3px white',
       'paint-order': 'stroke fill', //Looks better but apparently is not supported in all browsers?
       //'text-shadow': '-2px -2px 0 white,  2px -2px 0 white, -2px  2px 0 white,  2px  2px 0 white, -2px  0px 0 white,  2px  0px 0 white, 0px -2px 0 white, 0px 2px 0 white', //Looks worse but apparently has better compatibility?
@@ -197,7 +198,7 @@ class CanvasRenderer {
     this.updateTransform();
   }
 
-  public toggleGridRotation(): void {
+  public toggleGridRotation(context: RenderContext): void {
     // We want to keep our view centered on the same spot after zooming, so let's store the old coords.
     let x = this.viewboxCenterX;
     let y = this.viewboxCenterY;
@@ -213,11 +214,11 @@ class CanvasRenderer {
     }
     this.centerViewBoxAt(x, y); // Re-center please
     this.updateTransform();
+    this.render(context); //Todo: Technically this does not always need a rerender. But this is a low priority optimization.
   }
 
   public toggleBuildingTransparency(context: RenderContext): void {
-    this.transparentBuildings = !this.transparentBuildings;
-    this.render(context);
+    this.setBuildingTransparency(!this.transparentBuildings, context);
   }
 
   public setBuildingTransparency(
@@ -225,7 +226,7 @@ class CanvasRenderer {
     context: RenderContext
   ): void {
     this.transparentBuildings = newSetting;
-    this.render(context);
+    this.render(context); //Todo: This doesn't need a full rerender. Right?
   }
 
   public zoomIn() {
@@ -284,7 +285,7 @@ class CanvasRenderer {
     this.isDragging = true;
     this.dragStartTile = thisTile;
     this.updateDragBox(thisTile);
-    this.render(context);
+    this.render(context); //Todo: This doesn't need a full rerender, but this is a very low priority optimization
   }
 
   //This will explicitly only be called if we're not panning. Thus, we can make our logic per-tile.
@@ -316,7 +317,7 @@ class CanvasRenderer {
 
   public handleMouseLeave(context: RenderContext) {
     this.lastMouseoverTile = undefined;
-    this.render(context);
+    this.render(context); //Todo: This MIGHT not need a full rerender, but this is a very low priority optimization
   }
 
   private updateDragBox(newPos: Tile) {
@@ -345,37 +346,22 @@ class CanvasRenderer {
   }
 
   public drawBuilding(building: PlacedBuilding) {
+    if (!building.blueprint.baseGraphic) return;
     const importedElement = this.buildingGroup
       .use(building.blueprint.baseGraphic)
       .move(coordToPx(building.origin.x), coordToPx(building.origin.y));
 
     this.buildingGroup.add(importedElement);
 
-    /*this.labelGroup
-      .text(function (add) {
-        add.tspan('Lorem ipsum');
-      })
-      .move(
-        coordToPx(building.origin.x) + building.blueprint.width / 2,
-        coordToPx(building.origin.y) + building.blueprint.height / 2
-      )
-      .rotate(-45);*/
-
     const textHeight = coordToPx(building.blueprint.height);
     const textWidth = coordToPx(building.blueprint.width);
     const foreignObject = this.labelGroup.foreignObject(textHeight, textWidth);
-    foreignObject.add(
-      SVG(
-        `<div class="buildingLabel" style="width: ${textWidth}px; height: ${textHeight}px">
-          lorem ipsum
-        </div>`,
-        true
-      )
-    );
-    foreignObject.move(
-      coordToPx(building.origin.x),
-      coordToPx(building.origin.y)
-    );
+    const labelElement = building.blueprint.getLabel();
+
+    foreignObject
+      .add(SVG(labelElement, true))
+      .move(coordToPx(building.origin.x), coordToPx(building.origin.y));
+
     if (this.currentRotation) {
       foreignObject.rotate(-this.currentRotation);
     }
