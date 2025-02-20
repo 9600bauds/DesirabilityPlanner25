@@ -37,6 +37,10 @@ export class Tile {
     return new Tile(this.x + other.x, this.y + other.y);
   }
 
+  offset(x: number, y: number): Tile {
+    return new Tile(this.x + x, this.y + y);
+  }
+
   substract(other: Tile): Tile {
     return new Tile(this.x - other.x, this.y - other.y);
   }
