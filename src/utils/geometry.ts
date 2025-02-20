@@ -1,3 +1,5 @@
+import { coordToPx } from './constants';
+
 export class Tile {
   public x: number;
   public y: number;
@@ -164,3 +166,79 @@ export function chebyshevDistance(tile: Tile, rect: Rectangle): number {
 
 export const degreesToRads = (deg: number) => (deg * Math.PI) / 180.0;
 export const radsToDegrees = (rad: number) => (rad * 180.0) / Math.PI;
+
+enum dirs {
+  UP,
+  RIGHT,
+  DOWN,
+  LEFT,
+}
+
+/*
+ * After 4 hours of searching, I finally confirmed that:
+ * Despite SVG being the most popular vector image format used on the web, it doesn't support stroke alignments
+ * ...because they inexplicably removed them
+ * It also doesn't allow you to add a stroke to an entire group, it just adds the stroke to each member individually
+ * There are also no utilities to calculate the outline of a group
+ * With some libraries you can get the outline of each member but you can't get the union of them
+ * With filters you can achieve a hacky outline-esque effect but it lags massively when you zoom in too much
+ *
+ * So I just stared at an excel spreadsheet for 30 minutes and cranked out whatever tracing algorithm this is, instead.
+ *
+ * Assumes 0,0 is part of the outline or it fails. Assumes all points are connected with no holes in the middle.
+ * But those are reasonable assumptions since there's only one non-rectangular building in the game and this was a massive waste of time in the first place.
+ */
+export function getOutlinePath(tiles: TileSet) {
+  const origin = new Tile(0, 0);
+  let pathData = 'M0,0';
+  let turns = 0;
+  let loc = new Tile(0, 0);
+  let dir = dirs.RIGHT;
+  let newDir = dirs.RIGHT;
+  while (true) {
+    const up = loc.offset(0, -1);
+    const right = loc.offset(1, 0);
+    const down = loc.offset(0, 1);
+    const left = loc.offset(-1, 0);
+    const upleft = loc.offset(-1, -1);
+    //See which border lines are near this point
+    const borderN = tiles.has(up) != tiles.has(upleft);
+    const borderE = tiles.has(loc) != tiles.has(up);
+    const borderS = tiles.has(loc) != tiles.has(left);
+    const borderW = tiles.has(left) != tiles.has(upleft);
+    //Check all the corner configurations to see if we need to turn
+    if (borderE && borderS) {
+      newDir = tiles.has(loc) ? dirs.RIGHT : dirs.DOWN; //┏
+    } else if (borderE && borderN) {
+      newDir = tiles.has(loc) ? dirs.RIGHT : dirs.UP; //┗
+    } else if (borderW && borderN) {
+      newDir = tiles.has(loc) ? dirs.UP : dirs.LEFT; //┛
+    } else if (borderW && borderS) {
+      newDir = tiles.has(loc) ? dirs.LEFT : dirs.DOWN; //┓
+    }
+    if (newDir !== dir) {
+      // We've turned! Add this point to the path
+      pathData += `L${coordToPx(loc.x)},${coordToPx(loc.y)}`;
+      dir = newDir;
+    }
+    //Move
+    if (dir === dirs.UP) {
+      loc = up;
+    } else if (dir === dirs.RIGHT) {
+      loc = right;
+    } else if (dir === dirs.DOWN) {
+      loc = down;
+    } else if (dir === dirs.LEFT) {
+      loc = left;
+    }
+    if (loc.equals(origin)) {
+      //We're back home!
+      pathData += ' Z';
+      return pathData;
+    }
+    turns++;
+    if (turns > 50) {
+      throw new Error('Failed to draw an outline for set of points!');
+    }
+  }
+}

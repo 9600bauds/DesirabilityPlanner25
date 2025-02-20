@@ -708,7 +708,6 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
   },
   'Storage Yard': {
     label: 'Storage Yard',
-    fillColor: '#F5E2B4',
     height: 3,
     width: 3,
     cost: [14, 56, 70, 84, 105],
@@ -720,7 +719,7 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     category: 'STORAGE',
   },
   'Storage Yard Hut': {
-    fillColor: '#F8C1B5',
+    fillColor: 'rgb(219, 206, 194)',
     height: 1,
     width: 1,
     desireBox: { baseDesirability: -5, stepDist: 2, stepVal: 2, maxRange: 3 },

@@ -6,6 +6,7 @@ import {
   gridPixelSize,
   gridSize,
   rotationAngle,
+  coordToPx,
 } from '../utils/constants';
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
@@ -101,13 +102,6 @@ class CanvasRenderer {
     this.viewBoxY = y;
 
     this.updateTransform();
-  }
-
-  private tileToPoint(tile: Tile): DOMPoint {
-    const x = tile.x * canvasTilePx;
-    const y = tile.y * canvasTilePx;
-
-    return new DOMPoint(x, y);
   }
 
   private pointToTile(point: DOMPoint): Tile | undefined {
@@ -333,7 +327,7 @@ class CanvasRenderer {
   public drawBuilding(building: PlacedBuilding) {
     const importedElement = this.buildingGroup
       .use(building.blueprint.baseGraphic)
-      .move(building.origin.x * canvasTilePx, building.origin.y * canvasTilePx);
+      .move(coordToPx(building.origin.x), coordToPx(building.origin.y));
 
     this.buildingGroup.add(importedElement);
   }
