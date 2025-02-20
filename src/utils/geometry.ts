@@ -183,16 +183,19 @@ enum dirs {
  * With some libraries you can get the outline of each member but you can't get the union of them
  * With filters you can achieve a hacky outline-esque effect but it lags massively when you zoom in too much
  *
- * So I just stared at an excel spreadsheet for 30 minutes and cranked out whatever tracing algorithm this is, instead.
+ * So I just stared at an excel spreadsheet for 30 minutes and cranked out whatever grid tracing algorithm this is, instead.
  *
- * Assumes 0,0 is part of the outline or it fails. Assumes all points are connected with no holes in the middle.
- * But those are reasonable assumptions since there's only one non-rectangular building in the game and this was a massive waste of time in the first place.
+ * Assumes 0,0 is part of the outline or it fails.
+ * Assumes all points are connected with no holes in the middle.
+ * But those are reasonable assumptions since there's only one non-rectangular building in the game
+ * and this was a massive waste of time in the first place.
  */
+// prettier-ignore
 export function getOutlinePath(tiles: TileSet) {
+  let pathData = 'M0,0'; //'M' means 'move to here without drawing anything'
   const origin = new Tile(0, 0);
-  let pathData = 'M0,0';
+  let loc = origin;
   let turns = 0;
-  let loc = new Tile(0, 0);
   let dir = dirs.RIGHT;
   let newDir = dirs.RIGHT;
   while (true) {
@@ -202,23 +205,23 @@ export function getOutlinePath(tiles: TileSet) {
     const left = loc.offset(-1, 0);
     const upleft = loc.offset(-1, -1);
     //See which border lines are near this point
-    const borderN = tiles.has(up) != tiles.has(upleft);
-    const borderE = tiles.has(loc) != tiles.has(up);
-    const borderS = tiles.has(loc) != tiles.has(left);
-    const borderW = tiles.has(left) != tiles.has(upleft);
+    const borderN = tiles.has(up) != tiles.has(upleft);   //|╹|
+    const borderE = tiles.has(loc) != tiles.has(up);      //|╺|
+    const borderS = tiles.has(loc) != tiles.has(left);    //|╻|
+    const borderW = tiles.has(left) != tiles.has(upleft); //|╸|
     //Check all the corner configurations to see if we need to turn
-    if (borderE && borderS) {
-      newDir = tiles.has(loc) ? dirs.RIGHT : dirs.DOWN; //┏
-    } else if (borderE && borderN) {
-      newDir = tiles.has(loc) ? dirs.RIGHT : dirs.UP; //┗
-    } else if (borderW && borderN) {
-      newDir = tiles.has(loc) ? dirs.UP : dirs.LEFT; //┛
-    } else if (borderW && borderS) {
-      newDir = tiles.has(loc) ? dirs.LEFT : dirs.DOWN; //┓
+    if (borderE && borderS) {         //|▛| / |▗| - note that tiles.has(loc) is inverted for this one
+      newDir = !tiles.has(loc) ? dirs.DOWN : dirs.RIGHT;
+    } else if (borderE && borderN) {  //|▙| / |▝|
+      newDir = tiles.has(loc) ? dirs.RIGHT : dirs.UP;
+    } else if (borderW && borderN) {  //|▟| / |▘|
+      newDir = tiles.has(loc) ? dirs.UP : dirs.LEFT;
+    } else if (borderW && borderS) {  //|▜| / |▖|
+      newDir = tiles.has(loc) ? dirs.LEFT : dirs.DOWN;
     }
     if (newDir !== dir) {
       // We've turned! Add this point to the path
-      pathData += `L${coordToPx(loc.x)},${coordToPx(loc.y)}`;
+      pathData += `L${coordToPx(loc.x)},${coordToPx(loc.y)} `; //'L' means 'draw a line to this point'
       dir = newDir;
     }
     //Move
@@ -233,7 +236,7 @@ export function getOutlinePath(tiles: TileSet) {
     }
     if (loc.equals(origin)) {
       //We're back home!
-      pathData += ' Z';
+      pathData += ' Z'; //This tells the path to close itself by going back to the start point
       return pathData;
     }
     turns++;
