@@ -11,6 +11,7 @@ import {
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
 import { G as SVGG, Svg } from '@svgdotjs/svg.js';
+import { SVG } from '@svgdotjs/svg.js';
 
 class CanvasRenderer {
   private displayCanvas: Svg;
@@ -62,6 +63,7 @@ class CanvasRenderer {
 
     this.backgroundGroup = this.displayCanvas.group();
     this.buildingGroup = this.displayCanvas.group();
+    this.labelGroup = this.displayCanvas.group();
 
     // We draw the background only once!
     this.drawBackground(this.backgroundGroup);
@@ -165,9 +167,14 @@ class CanvasRenderer {
         rotate: this.currentRotation,
         origin: { x: gridPixelCenter, y: gridPixelCenter },
       });
+      this.labelGroup.transform({
+        rotate: this.currentRotation,
+        origin: { x: gridPixelCenter, y: gridPixelCenter },
+      });
     } else {
       this.backgroundGroup.transform({});
       this.buildingGroup.transform({});
+      this.labelGroup.transform({});
     }
   }
 
@@ -318,6 +325,7 @@ class CanvasRenderer {
 
   public render(context: RenderContext) {
     this.buildingGroup.clear();
+    this.labelGroup.clear();
     for (const building of context.getBuildings()) {
       this.drawBuilding(building);
     }
@@ -330,6 +338,35 @@ class CanvasRenderer {
       .move(coordToPx(building.origin.x), coordToPx(building.origin.y));
 
     this.buildingGroup.add(importedElement);
+
+    /*this.labelGroup
+      .text(function (add) {
+        add.tspan('Lorem ipsum');
+      })
+      .move(
+        coordToPx(building.origin.x) + building.blueprint.width / 2,
+        coordToPx(building.origin.y) + building.blueprint.height / 2
+      )
+      .rotate(-45);*/
+
+    const textHeight = coordToPx(building.blueprint.height);
+    const textWidth = coordToPx(building.blueprint.width);
+    const foreignObject = this.labelGroup.foreignObject(textHeight, textWidth);
+    foreignObject.add(
+      SVG(
+        `<div style="width: ${textWidth}px; height: ${textHeight}px; display: flex; align-items: center; justify-content: center; text-align: center;">
+  lorem ipsum
+</div>`,
+        true
+      )
+    );
+    foreignObject.move(
+      coordToPx(building.origin.x),
+      coordToPx(building.origin.y)
+    );
+    if (this.currentRotation) {
+      foreignObject.rotate(-this.currentRotation);
+    }
   }
 }
 
