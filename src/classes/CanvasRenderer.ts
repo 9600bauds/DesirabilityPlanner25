@@ -58,6 +58,18 @@ class CanvasRenderer {
   constructor(svgCanvas: Svg, canvasContainer: HTMLElement) {
     this.displayCanvas = svgCanvas;
 
+    // This feature has been completely undocumented for 7 years and I only found it by digging through the source.
+    this.displayCanvas.style().rule('.buildingLabel', {
+      display: 'flex',
+      'align-items': 'center',
+      'justify-content': 'center',
+      'text-align': 'center',
+      color: 'black',
+      '-webkit-text-stroke': '3px white',
+      'paint-order': 'stroke fill', //Looks better but apparently is not supported in all browsers?
+      //'text-shadow': '-2px -2px 0 white,  2px -2px 0 white, -2px  2px 0 white,  2px  2px 0 white, -2px  0px 0 white,  2px  0px 0 white, 0px -2px 0 white, 0px 2px 0 white', //Looks worse but apparently has better compatibility?
+    });
+
     this.clientWidth = canvasContainer.clientWidth;
     this.clientHeight = canvasContainer.clientHeight;
 
@@ -354,9 +366,9 @@ class CanvasRenderer {
     const foreignObject = this.labelGroup.foreignObject(textHeight, textWidth);
     foreignObject.add(
       SVG(
-        `<div style="width: ${textWidth}px; height: ${textHeight}px; display: flex; align-items: center; justify-content: center; text-align: center;">
-  lorem ipsum
-</div>`,
+        `<div class="buildingLabel" style="width: ${textWidth}px; height: ${textHeight}px">
+          lorem ipsum
+        </div>`,
         true
       )
     );
