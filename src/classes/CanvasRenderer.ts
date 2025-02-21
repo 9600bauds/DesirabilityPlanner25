@@ -10,15 +10,18 @@ import {
 } from '../utils/constants';
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
-import { G as SVGG, Svg } from '@svgdotjs/svg.js';
+import { G as SVGG, Svg, Symbol } from '@svgdotjs/svg.js';
 import { SVG } from '@svgdotjs/svg.js';
 
 class CanvasRenderer {
   private displayCanvas: Svg;
 
   private backgroundGroup: SVGG;
+  private desireValuesGroup: SVGG;
   private buildingGroup: SVGG;
   private labelGroup: SVGG;
+
+  private desireValueMap: Map<number, Symbol> = new Map();
 
   private transparentBuildings = false;
   private currentRotation: number = 0;
@@ -75,6 +78,7 @@ class CanvasRenderer {
     this.clientHeight = canvasContainer.clientHeight;
 
     this.backgroundGroup = this.displayCanvas.group();
+    this.desireValuesGroup = this.displayCanvas.group();
     this.buildingGroup = this.displayCanvas.group();
     this.labelGroup = this.displayCanvas.group();
 
@@ -89,11 +93,11 @@ class CanvasRenderer {
 
   private drawBackground(backgroundGroup: SVGG) {
     const backgroundPattern = backgroundGroup.pattern(
-      canvasTilePx,
-      canvasTilePx,
+      coordToPx(1),
+      coordToPx(1),
       (pattern) => {
         pattern
-          .rect(canvasTilePx, canvasTilePx)
+          .rect(coordToPx(1), coordToPx(1))
           .fill('none')
           .stroke(colors.strongOutlineBlack);
       }
@@ -337,12 +341,48 @@ class CanvasRenderer {
    */
 
   public render(context: RenderContext) {
+    console.log('Rerendering grid...');
+
+    const baseValues = context.getBaseValues();
+    const placedBuildings = context.getBuildings();
+    const cursorAction = context.getCursorAction();
+    const selectedBlueprint = context.getSelectedBlueprint();
+
+    // We populate this each rerender
+    const buildingsBeingRemoved: Set<PlacedBuilding> = new Set();
+    const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
+
+    // Clear what needs to be cleared.
+    // Todo: Maybe we can clear only some things, depending on what needs rerendering
     this.buildingGroup.clear();
     this.labelGroup.clear();
+    this.desireValuesGroup.clear();
+
+    // Draw buildings
     for (const building of context.getBuildings()) {
       this.drawBuilding(building);
     }
-    console.log('Rerendering grid...');
+
+    // Render grid
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const tile = new Tile(x, y);
+        const desirabilityForThisTile = getAdjustedDesirability(tile);
+        if (desirabilityForThisTile === 0) continue;
+        this.drawTile(desirabilityForThisTile, tile);
+      }
+    }
+
+    function getAdjustedDesirability(tile: Tile) {
+      let desirabilityForThisTile = baseValues[tile.x][tile.y];
+      for (const building of buildingsBeingAdded) {
+        desirabilityForThisTile += building.getDesirabilityEffect(tile);
+      }
+      for (const building of buildingsBeingRemoved) {
+        desirabilityForThisTile -= building.getDesirabilityEffect(tile);
+      }
+      return desirabilityForThisTile;
+    }
   }
 
   public drawBuilding(building: PlacedBuilding) {
@@ -366,6 +406,40 @@ class CanvasRenderer {
       foreignObject.rotate(-this.currentRotation);
     }
   }
-}
 
+  private drawTile(desirabilityValue: number, origin: Tile) {
+    let symbol = this.desireValueMap.get(desirabilityValue);
+    if (!symbol) {
+      symbol = this.displayCanvas
+        .symbol()
+        .attr('id', `tileValue-${desirabilityValue}`);
+
+      symbol
+        .rect(coordToPx(1), coordToPx(1))
+        .fill(desirabilityColor(desirabilityValue))
+        .stroke(colors.strongOutlineBlack);
+
+      symbol
+        .text(desirabilityValue.toString())
+        .font({ anchor: 'middle', 'dominant-baseline': 'middle' })
+        .center(coordToPx(1) / 2, coordToPx(1) / 2);
+
+      this.desireValueMap.set(desirabilityValue, symbol);
+    }
+    this.desireValuesGroup
+      .use(symbol)
+      .move(coordToPx(origin.x), coordToPx(origin.y));
+  }
+
+  /*private bestDesirabilityForBuilding(building: Building) {
+        let bestDesirability = Number.MIN_SAFE_INTEGER;
+        for (const tile of building.offsetTilesOccupied) {
+          bestDesirability = Math.max(
+            bestDesirability,
+            getAdjustedDesirability(tile)
+          );
+        }
+        return bestDesirability;
+  }*/
+}
 export default CanvasRenderer;
