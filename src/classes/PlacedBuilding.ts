@@ -1,11 +1,12 @@
 import BuildingBlueprint from '../types/BuildingBlueprint';
-import { Tile, Rectangle, TileSet } from '../utils/geometry';
+import { Tile, Rectangle, offsetSetOfTiles } from '../utils/geometry';
+import * as Collections from 'typescript-collections';
 
 class PlacedBuilding {
   blueprint: BuildingBlueprint;
   origin: Tile;
   rect: Rectangle;
-  offsetTilesOccupied: TileSet;
+  offsetTilesOccupied: Collections.Set<Tile>;
 
   constructor(origin: Tile, type: BuildingBlueprint) {
     this.blueprint = type;
@@ -15,18 +16,14 @@ class PlacedBuilding {
       this.blueprint.height,
       this.blueprint.width
     );
-    this.offsetTilesOccupied = this.blueprint.tilesOccupied.offsetSet(
+    this.offsetTilesOccupied = offsetSetOfTiles(
+      this.blueprint.tilesOccupied,
       this.origin
     );
   }
 
   public interceptsTile(t2: Tile) {
-    for (const t1 of this.offsetTilesOccupied) {
-      if (t1.equals(t2)) {
-        return true;
-      }
-    }
-    return false;
+    return this.offsetTilesOccupied.contains(t2);
   }
 
   public interceptsRectangle(rect: Rectangle): boolean {
@@ -35,7 +32,7 @@ class PlacedBuilding {
 
   public getDesirabilityEffect(tile: Tile): number {
     const adjustedTile = tile.substract(this.origin);
-    const effect = this.blueprint.desirabilityMap.get(adjustedTile.toKey());
+    const effect = this.blueprint.desirabilityDict.getValue(adjustedTile);
     if (!effect) {
       return 0;
     }

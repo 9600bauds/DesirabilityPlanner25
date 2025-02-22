@@ -326,6 +326,24 @@ class CanvasRenderer {
     const buildingsBeingRemoved: Set<PlacedBuilding> = new Set();
     const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
 
+    if (cursorAction === 'placing') {
+      if (this.lastMouseoverTile && selectedBlueprint) {
+        const virtualBuilding = new PlacedBuilding(
+          this.lastMouseoverTile,
+          selectedBlueprint
+        );
+        buildingsBeingAdded.add(virtualBuilding);
+      }
+    } else if (cursorAction === 'erasing') {
+      if (this.isDragging) {
+        for (const building of placedBuildings) {
+          if (this.dragBox && building.interceptsRectangle(this.dragBox)) {
+            buildingsBeingRemoved.add(building);
+          }
+        }
+      }
+    }
+
     // Render grid
     this.tilesGroup.clear();
     const newTilesFragment = new Fragment();
@@ -349,6 +367,45 @@ class CanvasRenderer {
     for (const building of context.getBuildings()) {
       this.drawBuilding(building);
     }
+
+    /*for (const virtualBuilding of buildingsBeingAdded) {
+      this.drawOutline(
+        virtualBuilding.offsetTilesOccupied,
+        colors.strongOutlineBlack,
+        3
+      );
+      const blockedTiles = new TileSet();
+      const openTiles = new TileSet();
+      for (const tile of virtualBuilding.offsetTilesOccupied) {
+        if (context.isTileOccupied(tile)) {
+          blockedTiles.add(tile);
+        } else {
+          openTiles.add(tile);
+        }
+      }
+      if (blockedTiles.size > 0) {
+        for (const tile of blockedTiles) {
+          this.drawRectangle(
+            new Rectangle(tile, 1, 1),
+            undefined,
+            colors.redMidTransparency
+          );
+        }
+        for (const tile of openTiles) {
+          this.drawRectangle(
+            new Rectangle(tile, 1, 1),
+            undefined,
+            colors.greenMidTransparency
+          );
+        }
+      } else {
+        this.drawBuilding(
+          virtualBuilding,
+          this.transparentBuildings,
+          colors.greenLowTransparency
+        );
+      }
+    }*/
 
     function getAdjustedDesirability(tile: Tile) {
       let desirabilityForThisTile = baseValues[tile.x][tile.y];

@@ -1,4 +1,5 @@
 import { coordToPx } from './constants';
+import * as Collections from 'typescript-collections';
 
 export class Tile {
   public x: number;
@@ -21,16 +22,6 @@ export class Tile {
     return this.x * 31 + this.y;
   }
 
-  toKey(): string {
-    return `${this.x},${this.y}`;
-  }
-
-  //I once again have to do hackiness because JS cannot into custom classes as keys for sets/maps.
-  static fromKey(key: string): Tile {
-    const [x, y] = key.split(',').map(Number);
-    return new Tile(x, y);
-  }
-
   equals(other: Tile): boolean {
     return this.x === other.x && this.y === other.y;
   }
@@ -48,49 +39,15 @@ export class Tile {
   }
 }
 
-// It's genuinely insane that I need to have a wrapper class for this. Why, JS, why?
-export class TileSet {
-  private items: Tile[] = [];
-
-  add(tile: Tile): void {
-    if (!this.has(tile)) {
-      this.items.push(tile);
-    }
-  }
-
-  has(tile: Tile): boolean {
-    return this.items.some((item) => item.equals(tile));
-  }
-
-  get size(): number {
-    return this.items.length;
-  }
-
-  values(): Tile[] {
-    return [...this.items];
-  }
-
-  [Symbol.iterator](): Iterator<Tile> {
-    let index = 0;
-    const items = this.items;
-    return {
-      next(): IteratorResult<Tile> {
-        if (index < items.length) {
-          return { value: items[index++], done: false };
-        } else {
-          return { value: undefined, done: true };
-        }
-      },
-    };
-  }
-
-  offsetSet(offset: Tile): TileSet {
-    const newSet = new TileSet();
-    for (const tile of this.items) {
-      newSet.add(tile.add(offset));
-    }
-    return newSet;
-  }
+export function offsetSetOfTiles(
+  set: Collections.Set<Tile>,
+  offset: Tile
+): Collections.Set<Tile> {
+  const newSet = new Collections.Set<Tile>();
+  set.forEach((tile) => {
+    newSet.add(tile.add(offset));
+  });
+  return newSet;
 }
 
 export class Rectangle {
@@ -135,8 +92,9 @@ export class Rectangle {
 
     return isInsideHorizontal && isInsideVertical;
   }
-  public interceptsTiles(tiles: TileSet) {
-    for (const tile of tiles) {
+  public interceptsTiles(tiles: Collections.Set<Tile>) {
+    const tileArray = tiles.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
+    for (const tile of tileArray) {
       if (this.interceptsTile(tile)) {
         return true;
       }
@@ -191,7 +149,7 @@ enum dirs {
  * and this was a massive waste of time in the first place.
  */
 // prettier-ignore
-export function getOutlinePath(tiles: TileSet) {
+export function getOutlinePath(tiles: Collections.Set<Tile>) {
   let pathData = 'M0,0'; //'M' means 'move to here without drawing anything'
   const origin = new Tile(0, 0);
   let loc = origin;
@@ -205,19 +163,19 @@ export function getOutlinePath(tiles: TileSet) {
     const left = loc.offset(-1, 0);
     const upleft = loc.offset(-1, -1);
     //See which border lines are near this point
-    const borderN = tiles.has(up) != tiles.has(upleft);   //|╹|
-    const borderE = tiles.has(loc) != tiles.has(up);      //|╺|
-    const borderS = tiles.has(loc) != tiles.has(left);    //|╻|
-    const borderW = tiles.has(left) != tiles.has(upleft); //|╸|
+    const borderN = tiles.contains(up) != tiles.contains(upleft);   //|╹|
+    const borderE = tiles.contains(loc) != tiles.contains(up);      //|╺|
+    const borderS = tiles.contains(loc) != tiles.contains(left);    //|╻|
+    const borderW = tiles.contains(left) != tiles.contains(upleft); //|╸|
     //Check all the corner configurations to see if we need to turn
     if (borderE && borderS) {         //|▛| / |▗| - note that tiles.has(loc) is inverted for this one
-      newDir = !tiles.has(loc) ? dirs.DOWN : dirs.RIGHT;
+      newDir = !tiles.contains(loc) ? dirs.DOWN : dirs.RIGHT;
     } else if (borderE && borderN) {  //|▙| / |▝|
-      newDir = tiles.has(loc) ? dirs.RIGHT : dirs.UP;
+      newDir = tiles.contains(loc) ? dirs.RIGHT : dirs.UP;
     } else if (borderW && borderN) {  //|▟| / |▘|
-      newDir = tiles.has(loc) ? dirs.UP : dirs.LEFT;
+      newDir = tiles.contains(loc) ? dirs.UP : dirs.LEFT;
     } else if (borderW && borderS) {  //|▜| / |▖|
-      newDir = tiles.has(loc) ? dirs.LEFT : dirs.DOWN;
+      newDir = tiles.contains(loc) ? dirs.LEFT : dirs.DOWN;
     }
     if (newDir !== dir) {
       // We've turned! Add this point to the path

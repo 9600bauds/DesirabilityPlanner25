@@ -1,5 +1,6 @@
 import { NewDesireBox } from '../interfaces/NewDesireBox';
 import { chebyshevDistance, Rectangle, Tile } from '../utils/geometry';
+import * as Collections from 'typescript-collections';
 
 class DesireBox {
   readonly baseDesirability: number;
@@ -24,8 +25,8 @@ class DesireBox {
     return this.baseDesirability + distanceModifier;
   }
 
-  public addToDesirabilityMap = (
-    desirabilityMap: Map<string, number>,
+  public addTodesirabilityDict = (
+    desirabilityDict: Collections.Dictionary<Tile, number>,
     bounds: Rectangle
   ) => {
     const minX = bounds.origin.x - this.maxRange;
@@ -38,10 +39,9 @@ class DesireBox {
         const dist = chebyshevDistance(tile, bounds);
         const desirabilityEffect = this.distToEffect(dist);
         if (!desirabilityEffect) continue;
-        const tileAsKey = tile.toKey();
-        desirabilityMap.set(
-          tileAsKey,
-          desirabilityEffect + (desirabilityMap.get(tileAsKey) ?? 0)
+        desirabilityDict.setValue(
+          tile,
+          desirabilityEffect + (desirabilityDict.getValue(tile) ?? 0)
         );
       }
     }

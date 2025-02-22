@@ -1,5 +1,5 @@
 import BuildingBlueprint from '../types/BuildingBlueprint';
-import { Tile, Rectangle } from '../utils/geometry';
+import { Tile, Rectangle, offsetSetOfTiles } from '../utils/geometry';
 import GridState from './GridState';
 
 class GridStateManager {
@@ -32,9 +32,9 @@ class GridStateManager {
   };
 
   public canPlaceBuilding = (position: Tile, blueprint: BuildingBlueprint) => {
-    const tilesToCheck = blueprint.tilesOccupied.offsetSet(position);
-    for (const tile of tilesToCheck) {
-      if (this.isTileOccupied(tile)) {
+    const tileArray = blueprint.tilesOccupied.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
+    for (const tile of tileArray) {
+      if (this.isTileOccupied(tile.add(position))) {
         return false;
       }
     }
