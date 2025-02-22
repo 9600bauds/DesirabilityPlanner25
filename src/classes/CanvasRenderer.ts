@@ -76,12 +76,14 @@ class CanvasRenderer {
     this.clientWidth = canvasContainer.clientWidth;
     this.clientHeight = canvasContainer.clientHeight;
 
-    this.tilesGroup = this.displayCanvas.group();
-
     // We draw the background only once!
     this.backgroundGroup = this.displayCanvas.group();
     this.backgroundPattern = this.createBackgroundPattern();
     this.drawBackground();
+
+    this.tilesGroup = this.displayCanvas.group();
+    this.buildingGroup = this.displayCanvas.group();
+    this.labelGroup = this.displayCanvas.group();
 
     // Center on origin
     this.centerViewBoxAt(this.gridCenter);
@@ -158,25 +160,18 @@ class CanvasRenderer {
       translate: { x: this.offsetX, y: this.offsetY },
       origin: this.gridOrigin,
     });
-
-    /*if (this.currentRotation) {
-      this.backgroundGroup.transform({
-        rotate: this.currentRotation,
-        origin: { x: gridPixelCenter, y: gridPixelCenter },
-      });
-      this.buildingGroup.transform({
-        rotate: this.currentRotation,
-        origin: { x: gridPixelCenter, y: gridPixelCenter },
-      });
-      this.labelGroup.transform({
-        rotate: this.currentRotation,
-        origin: { x: gridPixelCenter, y: gridPixelCenter },
-      });
-    } else {
-      this.backgroundGroup.transform({});
-      this.buildingGroup.transform({});
-      this.labelGroup.transform({});
-    }*/
+    this.buildingGroup.transform({
+      rotate: this.currentRotation,
+      scale: this.zoomLevel,
+      translate: { x: this.offsetX, y: this.offsetY },
+      origin: this.gridOrigin,
+    });
+    this.labelGroup.transform({
+      rotate: this.currentRotation,
+      scale: this.zoomLevel,
+      translate: { x: this.offsetX, y: this.offsetY },
+      origin: this.gridOrigin,
+    });
   }
 
   public canvasSizeUpdated() {
@@ -348,10 +343,12 @@ class CanvasRenderer {
     }
     this.tilesGroup.add(newTilesFragment); //Causes an error because svg.js but it works
 
-    /*// Draw buildings
+    // Draw buildings
+    this.buildingGroup.clear();
+    this.labelGroup.clear();
     for (const building of context.getBuildings()) {
       this.drawBuilding(building);
-    }*/
+    }
 
     function getAdjustedDesirability(tile: Tile) {
       let desirabilityForThisTile = baseValues[tile.x][tile.y];
@@ -380,7 +377,8 @@ class CanvasRenderer {
 
     foreignObject
       .add(SVG(labelElement, true))
-      .move(coordToPx(building.origin.x), coordToPx(building.origin.y));
+      .move(coordToPx(building.origin.x), coordToPx(building.origin.y))
+      .css('overflow', 'visible'); //Todo: Labels shouldn't need this in the first place;
 
     if (this.currentRotation) {
       foreignObject.rotate(-this.currentRotation);
