@@ -1,23 +1,30 @@
 import RenderContext from '../interfaces/RenderContext';
 import colors, { desirabilityColor } from '../utils/colors';
 import {
-  canvasTilePx,
   gridPixelCenter,
   gridPixelSize,
   gridSize,
   rotationAngle,
   coordToPx,
+  pxToCoord,
 } from '../utils/constants';
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
-import { G as SVGG, Svg, Symbol } from '@svgdotjs/svg.js';
+import { Fragment, Pattern, G as SVGG, Svg, Symbol } from '@svgdotjs/svg.js';
 import { SVG } from '@svgdotjs/svg.js';
+
+interface gridPoint {
+  x: number;
+  y: number;
+}
 
 class CanvasRenderer {
   private displayCanvas: Svg;
 
+  private backgroundPattern: Pattern;
+
   private backgroundGroup: SVGG;
-  private desireValuesGroup: SVGG;
+  private tilesGroup: SVGG;
   private buildingGroup: SVGG;
   private labelGroup: SVGG;
 
@@ -31,11 +38,10 @@ class CanvasRenderer {
 
   // Panning variables
   private isPanning = false;
-  private lastPanX = 0;
-  private lastPanY = 0;
-  // These two are effectively our pan offsets since nothing else uses them
-  private viewBoxX = 0;
-  private viewBoxY = 0;
+  private lastPanCursorX = 0;
+  private lastPanCursorY = 0;
+  private offsetX = 0;
+  private offsetY = 0;
 
   // Clickdrag variables
   private isDragging = false;
@@ -45,23 +51,16 @@ class CanvasRenderer {
   // Various size and viewbox variables
   private clientWidth: number;
   private clientHeight: number;
-  get viewboxCenterX() {
-    return this.viewBoxX + this.clientWidth / this.zoomLevel / 2;
-  }
-  get viewboxCenterY() {
-    return this.viewBoxY + this.clientHeight / this.zoomLevel / 2;
-  }
-  get viewBoxWidth() {
-    return this.clientWidth / this.zoomLevel;
-  }
-  get viewBoxHeight() {
-    return this.clientHeight / this.zoomLevel;
+  private gridOrigin: gridPoint = { x: 0, y: 0 };
+  private gridCenter: gridPoint = { x: gridPixelCenter, y: gridPixelCenter };
+  private gridEnd: gridPoint = { x: gridPixelSize, y: gridPixelSize };
+  get viewCenter(): DOMPoint {
+    return new DOMPoint(this.clientWidth / 2, this.clientHeight / 2);
   }
 
   constructor(svgCanvas: Svg, canvasContainer: HTMLElement) {
     this.displayCanvas = svgCanvas;
 
-    // This feature has been completely undocumented for 7 years and I only found it by digging through the source.
     this.displayCanvas.style().rule('.buildingLabel', {
       display: 'flex',
       'align-items': 'center',
@@ -77,64 +76,59 @@ class CanvasRenderer {
     this.clientWidth = canvasContainer.clientWidth;
     this.clientHeight = canvasContainer.clientHeight;
 
-    this.backgroundGroup = this.displayCanvas.group();
-    this.desireValuesGroup = this.displayCanvas.group();
-    this.buildingGroup = this.displayCanvas.group();
-    this.labelGroup = this.displayCanvas.group();
+    this.tilesGroup = this.displayCanvas.group();
 
     // We draw the background only once!
-    this.drawBackground(this.backgroundGroup);
+    this.backgroundGroup = this.displayCanvas.group();
+    this.backgroundPattern = this.createBackgroundPattern();
+    this.drawBackground();
 
     // Center on origin
-    this.centerViewBoxAt(gridPixelCenter, gridPixelCenter);
+    this.centerViewBoxAt(this.gridCenter);
 
     this.canvasSizeUpdated();
-  }
-
-  private drawBackground(backgroundGroup: SVGG) {
-    const backgroundPattern = backgroundGroup.pattern(
-      coordToPx(1),
-      coordToPx(1),
-      (pattern) => {
-        pattern
-          .rect(coordToPx(1), coordToPx(1))
-          .fill('none')
-          .stroke(colors.strongOutlineBlack);
-      }
-    );
-
-    backgroundGroup
-      .rect(gridPixelSize, gridPixelSize) //Fill the whole canvas with this
-      .fill(backgroundPattern)
-      .back(); // Ensure background is behind other elements
   }
 
   /*
    * Coordinate transformations
    */
 
-  private centerViewBoxAt(x: number, y: number) {
-    x -= this.viewBoxWidth / 2;
-    y -= this.viewBoxHeight / 2;
+  private grid2canvas(point: gridPoint, useOffset: boolean = true): DOMPoint {
+    const cos = Math.cos(degreesToRads(this.currentRotation));
+    const sin = Math.sin(degreesToRads(this.currentRotation));
+    const offsetX = useOffset ? this.offsetX : 0;
+    const offsetY = useOffset ? this.offsetY : 0;
+    return new DOMPoint(
+      (point.x * cos - point.y * sin) * this.zoomLevel + offsetX,
+      (point.x * sin + point.y * cos) * this.zoomLevel + offsetY
+    );
+  }
 
-    this.viewBoxX = x;
-    this.viewBoxY = y;
+  private canvas2grid(point: DOMPoint): gridPoint {
+    const xUnscaled = (point.x - this.offsetX) / this.zoomLevel;
+    const yUnscaled = (point.y - this.offsetY) / this.zoomLevel;
+    const cos = Math.cos(degreesToRads(this.currentRotation));
+    const sin = Math.sin(degreesToRads(this.currentRotation));
+    return {
+      x: xUnscaled * cos + yUnscaled * sin,
+      y: -xUnscaled * sin + yUnscaled * cos,
+    };
+  }
 
+  private centerViewBoxAt(point: gridPoint) {
+    const rawCanvasPoint = this.grid2canvas(point, false);
+    const center = this.viewCenter;
+    this.offsetX = center.x - rawCanvasPoint.x;
+    this.offsetY = center.y - rawCanvasPoint.y;
     this.updateTransform();
   }
 
   private pointToTile(point: DOMPoint): Tile | undefined {
-    let x = this.viewBoxX + point.x / this.zoomLevel;
-    let y = this.viewBoxY + point.y / this.zoomLevel;
-
-    // If grid is rotated, reverse the rotation
-    if (this.currentRotation) {
-      ({ x, y } = this.rotatePointFromOrigin(x, y, -this.currentRotation));
-    }
+    const gridPt = this.canvas2grid(point);
 
     // Convert to tile coordinates
-    const tileX = Math.floor(x / canvasTilePx);
-    const tileY = Math.floor(y / canvasTilePx);
+    const tileX = pxToCoord(gridPt.x);
+    const tileY = pxToCoord(gridPt.y);
 
     // Check if the tile is within grid bounds
     if (tileX >= 0 && tileX < gridSize && tileY >= 0 && tileY < gridSize) {
@@ -142,22 +136,6 @@ class CanvasRenderer {
     }
 
     return undefined;
-  }
-
-  private rotatePointFromOrigin(x: number, y: number, rotationAngle: number) {
-    // Translate the point to origin to make the math easier
-    x -= gridPixelCenter;
-    y -= gridPixelCenter;
-
-    const cos = Math.cos(degreesToRads(rotationAngle));
-    const sin = Math.sin(degreesToRads(rotationAngle));
-    const rotatedX = x * cos - y * sin;
-    const rotatedY = x * sin + y * cos;
-
-    // Translate back
-    x = rotatedX + gridPixelCenter;
-    y = rotatedY + gridPixelCenter;
-    return { x, y };
   }
 
   public getMouseCoords(event: MouseEvent): Tile | undefined {
@@ -168,14 +146,20 @@ class CanvasRenderer {
    * Transformations
    */
   private updateTransform() {
-    this.displayCanvas.viewbox(
-      this.viewBoxX,
-      this.viewBoxY,
-      this.viewBoxWidth,
-      this.viewBoxHeight
-    );
+    this.backgroundGroup.transform({
+      rotate: this.currentRotation,
+      scale: this.zoomLevel,
+      translate: { x: this.offsetX, y: this.offsetY },
+      origin: this.gridOrigin,
+    });
+    this.tilesGroup.transform({
+      rotate: this.currentRotation,
+      scale: this.zoomLevel,
+      translate: { x: this.offsetX, y: this.offsetY },
+      origin: this.gridOrigin,
+    });
 
-    if (this.currentRotation) {
+    /*if (this.currentRotation) {
       this.backgroundGroup.transform({
         rotate: this.currentRotation,
         origin: { x: gridPixelCenter, y: gridPixelCenter },
@@ -192,7 +176,7 @@ class CanvasRenderer {
       this.backgroundGroup.transform({});
       this.buildingGroup.transform({});
       this.labelGroup.transform({});
-    }
+    }*/
   }
 
   public canvasSizeUpdated() {
@@ -204,21 +188,17 @@ class CanvasRenderer {
 
   public toggleGridRotation(context: RenderContext): void {
     // We want to keep our view centered on the same spot after zooming, so let's store the old coords.
-    let x = this.viewboxCenterX;
-    let y = this.viewboxCenterY;
 
+    const oldCenter = this.canvas2grid(this.viewCenter);
     if (this.currentRotation === 0) {
       this.currentRotation = rotationAngle;
-      // We are rotating, so rotate the new center too
-      ({ x, y } = this.rotatePointFromOrigin(x, y, this.currentRotation));
     } else {
-      // We are undoing the rotation, so undo the rotation for the center too
-      ({ x, y } = this.rotatePointFromOrigin(x, y, -this.currentRotation));
       this.currentRotation = 0;
     }
-    this.centerViewBoxAt(x, y); // Re-center please
+
     this.updateTransform();
-    this.render(context); //Todo: Technically this does not always need a rerender. But this is a low priority optimization.
+    this.centerViewBoxAt(oldCenter); // Re-center please
+    this.render(context); //Todo: Technically this does not always need a rerender. But this is a low priority optimization.*/
   }
 
   public toggleBuildingTransparency(context: RenderContext): void {
@@ -243,12 +223,11 @@ class CanvasRenderer {
 
   private zoom(factor: number) {
     // We want to keep our view centered on the same spot after zooming, so let's store the old coords.
-    const oldY = this.viewboxCenterY;
-    const oldX = this.viewboxCenterX;
+    const oldCenter = this.canvas2grid(this.viewCenter);
 
     this.zoomLevel *= factor;
 
-    this.centerViewBoxAt(oldX, oldY); // Re-center please
+    this.centerViewBoxAt(oldCenter); // Re-center please
     this.updateTransform();
   }
 
@@ -258,21 +237,21 @@ class CanvasRenderer {
 
   public startPanning(event: MouseEvent) {
     this.isPanning = true;
-    this.lastPanX = event.clientX;
-    this.lastPanY = event.clientY;
+    this.lastPanCursorX = event.clientX;
+    this.lastPanCursorY = event.clientY;
   }
 
   public handlePanning(event: MouseEvent) {
     if (!this.isPanning) return;
 
-    const deltaX = event.clientX - this.lastPanX;
-    const deltaY = event.clientY - this.lastPanY;
+    const deltaX = event.clientX - this.lastPanCursorX;
+    const deltaY = event.clientY - this.lastPanCursorY;
 
-    this.viewBoxX -= deltaX / this.zoomLevel;
-    this.viewBoxY -= deltaY / this.zoomLevel;
+    this.offsetX += deltaX;
+    this.offsetY += deltaY;
 
-    this.lastPanX = event.clientX;
-    this.lastPanY = event.clientY;
+    this.lastPanCursorX = event.clientX;
+    this.lastPanCursorY = event.clientY;
 
     this.updateTransform();
   }
@@ -321,7 +300,7 @@ class CanvasRenderer {
 
   public handleMouseLeave(context: RenderContext) {
     this.lastMouseoverTile = undefined;
-    this.render(context); //Todo: This MIGHT not need a full rerender, but this is a very low priority optimization
+    //this.render(context); //Todo: This MIGHT not need a full rerender, but this is a very low priority optimization
   }
 
   private updateDragBox(newPos: Tile) {
@@ -352,26 +331,27 @@ class CanvasRenderer {
     const buildingsBeingRemoved: Set<PlacedBuilding> = new Set();
     const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
 
-    // Clear what needs to be cleared.
-    // Todo: Maybe we can clear only some things, depending on what needs rerendering
-    this.buildingGroup.clear();
-    this.labelGroup.clear();
-    this.desireValuesGroup.clear();
-
-    // Draw buildings
-    for (const building of context.getBuildings()) {
-      this.drawBuilding(building);
-    }
-
     // Render grid
+    this.tilesGroup.clear();
+    const newTilesFragment = new Fragment();
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const tile = new Tile(x, y);
         const desirabilityForThisTile = getAdjustedDesirability(tile);
-        if (desirabilityForThisTile === 0) continue;
-        this.drawTile(desirabilityForThisTile, tile);
+        //if (desirabilityForThisTile === 0) continue;
+        let symbol = this.desireValueMap.get(desirabilityForThisTile);
+        if (!symbol) {
+          symbol = this.createDesireValSymbol(desirabilityForThisTile);
+        }
+        newTilesFragment.use(symbol).move(coordToPx(tile.x), coordToPx(tile.y));
       }
     }
+    this.tilesGroup.add(newTilesFragment); //Causes an error because svg.js but it works
+
+    /*// Draw buildings
+    for (const building of context.getBuildings()) {
+      this.drawBuilding(building);
+    }*/
 
     function getAdjustedDesirability(tile: Tile) {
       let desirabilityForThisTile = baseValues[tile.x][tile.y];
@@ -407,28 +387,42 @@ class CanvasRenderer {
     }
   }
 
-  private drawTile(desirabilityValue: number, origin: Tile) {
-    let symbol = this.desireValueMap.get(desirabilityValue);
-    if (!symbol) {
-      symbol = this.displayCanvas
-        .symbol()
-        .attr('id', `tileValue-${desirabilityValue}`);
+  private createDesireValSymbol(desirabilityValue: number) {
+    const symbol = this.displayCanvas
+      .symbol()
+      .attr('id', `tileValue-${desirabilityValue}`)
+      .css('display', 'block');
 
-      symbol
+    symbol
+      .rect(coordToPx(1), coordToPx(1))
+      .fill(desirabilityColor(desirabilityValue))
+      .stroke(colors.strongOutlineBlack)
+      .css('display', 'block');
+
+    symbol
+      .text(desirabilityValue.toString())
+      .font({ anchor: 'middle', 'dominant-baseline': 'middle' })
+      .css('display', 'block')
+      .center(coordToPx(1) / 2, coordToPx(1) / 2);
+
+    this.desireValueMap.set(desirabilityValue, symbol);
+    return symbol;
+  }
+
+  private createBackgroundPattern() {
+    return this.displayCanvas.pattern(coordToPx(1), coordToPx(1), (pattern) => {
+      pattern
         .rect(coordToPx(1), coordToPx(1))
-        .fill(desirabilityColor(desirabilityValue))
+        .fill('none')
         .stroke(colors.strongOutlineBlack);
+    });
+  }
 
-      symbol
-        .text(desirabilityValue.toString())
-        .font({ anchor: 'middle', 'dominant-baseline': 'middle' })
-        .center(coordToPx(1) / 2, coordToPx(1) / 2);
-
-      this.desireValueMap.set(desirabilityValue, symbol);
-    }
-    this.desireValuesGroup
-      .use(symbol)
-      .move(coordToPx(origin.x), coordToPx(origin.y));
+  private drawBackground() {
+    this.backgroundGroup
+      .rect(gridPixelSize, gridPixelSize) //Fill the whole canvas with this
+      .fill(this.backgroundPattern)
+      .back(); // Ensure background is behind other elements
   }
 
   /*private bestDesirabilityForBuilding(building: Building) {
