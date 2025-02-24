@@ -1,51 +1,41 @@
 import { NewDesireBox } from '../interfaces/NewDesireBox';
 import { chebyshevDistance, Rectangle, Tile } from '../utils/geometry';
-import * as Collections from 'typescript-collections';
 
 class DesireBox {
-  readonly baseDesirability: number;
-  readonly stepVal: number;
-  readonly stepDist: number;
-  readonly maxRange: number;
+  readonly effectPerRange: number[];
+  readonly bounds: Rectangle; //The origin of this rectangle is relative to 0,0 which is the origin of the base building
 
-  constructor(data: NewDesireBox) {
-    this.baseDesirability = data.baseDesirability;
-    this.stepVal = data.stepVal;
-    this.stepDist = data.stepDist;
-    this.maxRange = data.maxRange;
-  }
-
-  public distToEffect(dist: number) {
-    if (dist <= 0 || dist > this.maxRange) {
-      return 0; // We don't affect tiles inside us because reasons
+  constructor(data: NewDesireBox, origin: Tile, height: number, width: number) {
+    if (data.maxRange === undefined || data.maxRange > 99) {
+      throw new Error(
+        'Desirebox data had an invalid max range (should be <=99, but really, <=6 is what the game uses)!'
+      );
+    }
+    if (data.stepDist === undefined || data.stepDist < 1) {
+      console.log(data);
+      throw new Error(
+        'Desirebox data had an invalid stepDist (should be positive)!'
+      );
     }
 
-    const stepsAway = Math.ceil(dist / this.stepDist);
-    const distanceModifier = (stepsAway - 1) * this.stepVal;
-    return this.baseDesirability + distanceModifier;
+    this.effectPerRange = [];
+    for (let dist = 1; dist <= data.maxRange; dist++) {
+      //Note that dist 0 is not included, we don't affect tiles inside us because reasons
+      const stepsAway = Math.ceil(dist / data.stepDist);
+      const distanceModifier = (stepsAway - 1) * data.stepVal;
+
+      this.effectPerRange[dist] = data.baseDesirability + distanceModifier;
+    }
+    this.bounds = new Rectangle(origin, height, width);
   }
 
-  public addTodesirabilityDict = (
-    desirabilityDict: Collections.Dictionary<Tile, number>,
-    bounds: Rectangle
-  ) => {
-    const minX = bounds.origin.x - this.maxRange;
-    const maxX = bounds.origin.x + bounds.width + this.maxRange;
-    const minY = bounds.origin.y - this.maxRange;
-    const maxY = bounds.origin.y + bounds.height + this.maxRange;
-    for (let x = minX; x < maxX; x++) {
-      for (let y = minY; y < maxY; y++) {
-        const tile = new Tile(x, y);
-        const dist = chebyshevDistance(tile, bounds);
-        const desirabilityEffect = this.distToEffect(dist);
-        if (!desirabilityEffect) continue;
-        desirabilityDict.setValue(
-          tile,
-          desirabilityEffect + (desirabilityDict.getValue(tile) ?? 0)
-        );
-      }
+  public getEffectForRelativeTile(tile: Tile): number {
+    const dist = chebyshevDistance(tile, this.bounds);
+    if (dist in this.effectPerRange) {
+      return this.effectPerRange[dist];
     }
-  };
+    return 0;
+  }
 }
 
 export default DesireBox;

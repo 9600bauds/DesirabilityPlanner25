@@ -14,7 +14,7 @@ class BasicBlueprint {
   height: number;
   tilesOccupied: Collections.Set<Tile>;
 
-  desirabilityDict: Collections.Dictionary<Tile, number>;
+  desireBoxes: DesireBox[];
 
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
@@ -35,8 +35,8 @@ class BasicBlueprint {
       this.employeesRequired = newBp.employeesRequired;
     }
 
-    this.desirabilityDict = new Collections.Dictionary<Tile, number>();
-    this.recursiveAddToDesirabilityDict(newBp, new Tile(0, 0));
+    this.desireBoxes = [];
+    this.recursiveAddDesireBox(newBp, new Tile(0, 0));
 
     this.tilesOccupied = new Collections.Set<Tile>();
     this.recursiveAddToTilesOccupied(newBp, new Tile(0, 0));
@@ -63,19 +63,16 @@ class BasicBlueprint {
     }
   };
 
-  private recursiveAddToDesirabilityDict = (
-    data: NewBlueprint,
-    origin: Tile
-  ) => {
+  private recursiveAddDesireBox = (data: NewBlueprint, origin: Tile) => {
     if (data.desireBox) {
-      const desireBox = new DesireBox(data.desireBox);
-      const ourRect = new Rectangle(origin, this.height, this.width);
-      desireBox.addTodesirabilityDict(this.desirabilityDict, ourRect);
+      this.desireBoxes.push(
+        new DesireBox(data.desireBox, origin, data.height, data.width)
+      );
     }
     if (data.children) {
       for (const child of data.children) {
         const childBlueprint = NEW_BLUEPRINTS[child.childKey];
-        this.recursiveAddToDesirabilityDict(
+        this.recursiveAddDesireBox(
           childBlueprint,
           origin.add(child.relativeOrigin)
         );

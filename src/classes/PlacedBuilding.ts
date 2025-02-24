@@ -32,9 +32,9 @@ class PlacedBuilding {
 
   public getDesirabilityEffect(tile: Tile): number {
     const adjustedTile = tile.substract(this.origin);
-    const effect = this.blueprint.desirabilityDict.getValue(adjustedTile);
-    if (!effect) {
-      return 0;
+    let effect = 0;
+    for (const dbox of this.blueprint.desireBoxes) {
+      effect += dbox.getEffectForRelativeTile(adjustedTile);
     }
     return effect;
   }

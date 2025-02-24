@@ -506,7 +506,6 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     width: 1,
     cost: [1, 3, 4, 5, 6],
     employeesRequired: 0,
-    desireBox: { baseDesirability: 0, stepDist: 0, stepVal: 0, maxRange: 0 },
   },
   Roadblock: {
     label: 'Roadblock',
@@ -514,7 +513,6 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     width: 1,
     cost: [1, 4, 4, 5, 6],
     employeesRequired: 0,
-    desireBox: { baseDesirability: 0, stepDist: 0, stepVal: 0, maxRange: 0 },
     category: 'GOVT',
   },
   'Scribe School': {
@@ -622,7 +620,6 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     width: 1,
     cost: [7, 28, 35, 42, 52],
     employeesRequired: 0,
-    desireBox: { baseDesirability: 0, stepDist: 0, stepVal: 0, maxRange: 0 },
     category: 'MILITARY',
   },
   'Warship Wharf': {
