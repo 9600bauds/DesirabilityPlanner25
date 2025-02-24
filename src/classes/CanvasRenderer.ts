@@ -24,7 +24,6 @@ import {
   Use,
 } from '@svgdotjs/svg.js';
 import { SVG } from '@svgdotjs/svg.js';
-import * as Collections from 'typescript-collections';
 
 interface gridPoint {
   x: number;
@@ -76,9 +75,10 @@ class CanvasRenderer {
   constructor(svgCanvas: Svg, canvasContainer: HTMLElement) {
     this.displayCanvas = svgCanvas;
 
-    //this.displayCanvas.css('shapeRendering', 'crispEdges');
+    //this.displayCanvas.css('shapeRendering', 'optimizeSpeed');
 
-    this.displayCanvas.style().rule('.buildingLabel', {
+    const style = this.displayCanvas.style();
+    style.rule('.buildingLabel', {
       display: 'flex',
       'align-items': 'center',
       'justify-content': 'center',
@@ -379,17 +379,19 @@ class CanvasRenderer {
             throw new Error(
               'Did not have a corresponding <use> element for an old nonzero value!'
             );
-          oldUse.remove();
-          //oldUse.node.removeAttribute('href'); //Replace with something empty... I can't tell if this is slower or faster?
+          //oldUse.remove();
+          oldUse.node.removeAttribute('href'); //Replace with something empty... Seems faster than removing it
           this.groundValUses[tile.x][tile.y] = null;
         } else {
           //Should we create a new <use>, update the previous one, or, maybe it's the same value as before and nothing needs updating!
           const oldValue = this.oldGroundValues && this.oldGroundValues[x][y];
           if (!oldValue || oldValue === 0) {
             const symbol = this.getDesireValSymbol(desirabilityForThisTile);
+
             const newUse = newTilesFragment
               .use(symbol)
               .move(coordToPx(tile.x), coordToPx(tile.y));
+
             this.groundValUses[tile.x][tile.y] = newUse;
           } else if (oldValue === desirabilityForThisTile) {
             continue; //Nothing needs to be done here. Explicit continue because I like legibility
@@ -498,19 +500,16 @@ class CanvasRenderer {
   private createDesireValSymbol(desirabilityValue: number) {
     const symbol = this.displayCanvas
       .symbol()
-      .attr('id', `tileValue-${desirabilityValue}`)
-      .css('display', 'block');
+      .attr('id', `tileValue-${desirabilityValue}`);
 
     symbol
       .rect(coordToPx(1), coordToPx(1))
       .fill(desirabilityColor(desirabilityValue))
-      .stroke(colors.strongOutlineBlack)
-      .css('display', 'block');
+      .stroke(colors.strongOutlineBlack);
 
     symbol
       .text(desirabilityValue.toString())
       .font({ anchor: 'middle', 'dominant-baseline': 'middle' })
-      .css('display', 'block')
       .center(coordToPx(1) / 2, coordToPx(1) / 2);
 
     this.groundSymbolLookup.set(desirabilityValue, symbol);
@@ -525,12 +524,16 @@ class CanvasRenderer {
   }
 
   private createBackgroundPattern() {
-    return this.displayCanvas.pattern(coordToPx(1), coordToPx(1), (pattern) => {
-      pattern
-        .rect(coordToPx(1), coordToPx(1))
-        .fill('none')
-        .stroke(colors.strongOutlineBlack);
-    });
+    return this.backgroundGroup.pattern(
+      coordToPx(1),
+      coordToPx(1),
+      (pattern) => {
+        pattern
+          .rect(coordToPx(1), coordToPx(1))
+          .fill('none')
+          .stroke(colors.strongOutlineBlack);
+      }
+    );
   }
 
   private drawBackground() {
