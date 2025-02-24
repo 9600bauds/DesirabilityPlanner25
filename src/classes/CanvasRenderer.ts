@@ -10,8 +10,16 @@ import {
 } from '../utils/constants';
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
-import { Fragment, Pattern, G as SVGG, Svg, Symbol } from '@svgdotjs/svg.js';
+import {
+  Fragment,
+  Pattern,
+  G as SVGG,
+  Svg,
+  Symbol,
+  Use,
+} from '@svgdotjs/svg.js';
 import { SVG } from '@svgdotjs/svg.js';
+import * as Collections from 'typescript-collections';
 
 interface gridPoint {
   x: number;
@@ -28,7 +36,8 @@ class CanvasRenderer {
   private buildingGroup: SVGG;
   private labelGroup: SVGG;
 
-  private desireValueMap: Map<number, Symbol> = new Map();
+  private desireSymbolLookup: Map<number, Symbol> = new Map();
+  private desireUseDict: Collections.Dictionary<Tile, Use>;
 
   private transparentBuildings = false;
   private currentRotation: number = 0;
@@ -76,6 +85,7 @@ class CanvasRenderer {
     this.clientWidth = canvasContainer.clientWidth;
     this.clientHeight = canvasContainer.clientHeight;
 
+    this.desireUseDict = new Collections.Dictionary<Tile, Use>();
     // We draw the background only once!
     this.backgroundGroup = this.displayCanvas.group();
     this.backgroundPattern = this.createBackgroundPattern();
@@ -317,7 +327,6 @@ class CanvasRenderer {
   public render(context: RenderContext) {
     console.log('Rerendering grid...');
 
-    const baseValues = context.getBaseValues();
     const placedBuildings = context.getBuildings();
     const cursorAction = context.getCursorAction();
     const selectedBlueprint = context.getSelectedBlueprint();
@@ -345,21 +354,41 @@ class CanvasRenderer {
     }
 
     // Render grid
-    this.tilesGroup.clear();
-    const newTilesFragment = new Fragment();
+    const baseValues = context.getBaseValues();
+
+    //const newTilesFragment = new Fragment();
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const tile = new Tile(x, y);
         const desirabilityForThisTile = getAdjustedDesirability(tile);
-        //if (desirabilityForThisTile === 0) continue;
-        let symbol = this.desireValueMap.get(desirabilityForThisTile);
-        if (!symbol) {
-          symbol = this.createDesireValSymbol(desirabilityForThisTile);
+        if (desirabilityForThisTile === 0) {
+          const oldUse = this.desireUseDict.getValue(tile);
+          if (oldUse) {
+            oldUse.remove();
+            this.desireUseDict.remove(tile);
+            //oldUse.attr('href', null); //Replace with something empty... I can't tell if this is slower or faster?
+          }
+        } else {
+          let symbol = this.desireSymbolLookup.get(desirabilityForThisTile);
+          if (!symbol) {
+            symbol = this.createDesireValSymbol(desirabilityForThisTile);
+          }
+          const oldUse = this.desireUseDict.getValue(tile);
+          if (oldUse) {
+            // Instead of replacing the DOM element, update the href attribute to point to the new symbol
+            const symbolId = symbol.id();
+            oldUse.attr('href', `#${symbolId}`);
+          } else {
+            //const newUse = newTilesFragment.use(symbol).move(coordToPx(tile.x), coordToPx(tile.y)); //Todo: Use fragment but svg.js incorrectly types them
+            const newUse = this.tilesGroup
+              .use(symbol)
+              .move(coordToPx(tile.x), coordToPx(tile.y));
+            this.desireUseDict.setValue(tile, newUse);
+          }
         }
-        newTilesFragment.use(symbol).move(coordToPx(tile.x), coordToPx(tile.y));
       }
     }
-    this.tilesGroup.add(newTilesFragment); //Causes an error because svg.js but it works
+    //this.tilesGroup.add(newTilesFragment); //Causes an error because svg.js but it works
 
     // Draw buildings
     this.buildingGroup.clear();
@@ -460,7 +489,7 @@ class CanvasRenderer {
       .css('display', 'block')
       .center(coordToPx(1) / 2, coordToPx(1) / 2);
 
-    this.desireValueMap.set(desirabilityValue, symbol);
+    this.desireSymbolLookup.set(desirabilityValue, symbol);
     return symbol;
   }
 
