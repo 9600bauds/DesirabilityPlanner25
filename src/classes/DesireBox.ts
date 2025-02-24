@@ -12,7 +12,6 @@ class DesireBox {
       );
     }
     if (data.stepDist === undefined || data.stepDist < 1) {
-      console.log(data);
       throw new Error(
         'Desirebox data had an invalid stepDist (should be positive)!'
       );

@@ -8,7 +8,12 @@ import {
   coordToPx,
   pxToCoord,
 } from '../utils/constants';
-import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
+import {
+  Tile,
+  Rectangle,
+  degreesToRads,
+  getEmptyArray,
+} from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
 import {
   Fragment,
@@ -36,8 +41,9 @@ class CanvasRenderer {
   private buildingGroup: SVGG;
   private labelGroup: SVGG;
 
-  private desireSymbolLookup: Map<number, Symbol> = new Map();
-  private desireUseDict: Collections.Dictionary<Tile, Use>;
+  private groundSymbolLookup: Map<number, Symbol> = new Map();
+  private groundValUses = getEmptyArray(null) as (Use | null)[][];
+  private oldGroundValues = getEmptyArray(0) as number[][];
 
   private transparentBuildings = false;
   private currentRotation: number = 0;
@@ -70,6 +76,8 @@ class CanvasRenderer {
   constructor(svgCanvas: Svg, canvasContainer: HTMLElement) {
     this.displayCanvas = svgCanvas;
 
+    //this.displayCanvas.css('shapeRendering', 'crispEdges');
+
     this.displayCanvas.style().rule('.buildingLabel', {
       display: 'flex',
       'align-items': 'center',
@@ -85,7 +93,6 @@ class CanvasRenderer {
     this.clientWidth = canvasContainer.clientWidth;
     this.clientHeight = canvasContainer.clientHeight;
 
-    this.desireUseDict = new Collections.Dictionary<Tile, Use>();
     // We draw the background only once!
     this.backgroundGroup = this.displayCanvas.group();
     this.backgroundPattern = this.createBackgroundPattern();
@@ -354,41 +361,54 @@ class CanvasRenderer {
     }
 
     // Render grid
-    const baseValues = context.getBaseValues();
-
-    //const newTilesFragment = new Fragment();
+    const groundValues = context.getBaseValues();
+    const newTilesFragment = new Fragment(); //Use a fragment to add many DOM elements at once for more efficient DOM manipulation
     for (let y = 0; y < gridSize; y++) {
       for (let x = 0; x < gridSize; x++) {
         const tile = new Tile(x, y);
         const desirabilityForThisTile = getAdjustedDesirability(tile);
-        if (desirabilityForThisTile === 0) {
-          const oldUse = this.desireUseDict.getValue(tile);
-          if (oldUse) {
-            oldUse.remove();
-            this.desireUseDict.remove(tile);
-            //oldUse.attr('href', null); //Replace with something empty... I can't tell if this is slower or faster?
+        const shouldDrawThisTile = desirabilityForThisTile !== 0;
+
+        if (!shouldDrawThisTile) {
+          //We should delete the previous <use>!
+          if (!this.oldGroundValues || this.oldGroundValues[x][y] === 0) {
+            continue; //Nevermind, there was never anything to begin with
           }
+          const oldUse: Use | null = this.groundValUses[tile.x][tile.y];
+          if (!oldUse)
+            throw new Error(
+              'Did not have a corresponding <use> element for an old nonzero value!'
+            );
+          oldUse.remove();
+          //oldUse.node.removeAttribute('href'); //Replace with something empty... I can't tell if this is slower or faster?
+          this.groundValUses[tile.x][tile.y] = null;
         } else {
-          let symbol = this.desireSymbolLookup.get(desirabilityForThisTile);
-          if (!symbol) {
-            symbol = this.createDesireValSymbol(desirabilityForThisTile);
-          }
-          const oldUse = this.desireUseDict.getValue(tile);
-          if (oldUse) {
-            // Instead of replacing the DOM element, update the href attribute to point to the new symbol
-            const symbolId = symbol.id();
-            oldUse.attr('href', `#${symbolId}`);
-          } else {
-            //const newUse = newTilesFragment.use(symbol).move(coordToPx(tile.x), coordToPx(tile.y)); //Todo: Use fragment but svg.js incorrectly types them
-            const newUse = this.tilesGroup
+          //Should we create a new <use>, update the previous one, or, maybe it's the same value as before and nothing needs updating!
+          const oldValue = this.oldGroundValues && this.oldGroundValues[x][y];
+          if (!oldValue || oldValue === 0) {
+            const symbol = this.getDesireValSymbol(desirabilityForThisTile);
+            const newUse = newTilesFragment
               .use(symbol)
               .move(coordToPx(tile.x), coordToPx(tile.y));
-            this.desireUseDict.setValue(tile, newUse);
+            this.groundValUses[tile.x][tile.y] = newUse;
+          } else if (oldValue === desirabilityForThisTile) {
+            continue; //Nothing needs to be done here. Explicit continue because I like legibility
+          } else {
+            const oldUse: Use | null = this.groundValUses[tile.x][tile.y];
+            if (!oldUse)
+              throw new Error(
+                'Did not have a corresponding <use> element for an old nonzero value!'
+              );
+            // Instead of replacing the DOM element, update the href attribute to point to the new symbol
+            const symbol = this.getDesireValSymbol(desirabilityForThisTile);
+            oldUse.node.setAttribute('href', `#${symbol.id()}`); // Direct DOM manipulation (much faster)
           }
         }
+        this.oldGroundValues[x][y] = desirabilityForThisTile;
       }
     }
-    //this.tilesGroup.add(newTilesFragment); //Causes an error because svg.js but it works
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+    this.tilesGroup.add(newTilesFragment as any); //TS raises errors because svg.js has poorly defined types, but this actually does work. Pinky promise.
 
     // Draw buildings
     this.buildingGroup.clear();
@@ -437,7 +457,7 @@ class CanvasRenderer {
     }*/
 
     function getAdjustedDesirability(tile: Tile) {
-      let desirabilityForThisTile = baseValues[tile.x][tile.y];
+      let desirabilityForThisTile = groundValues[tile.x][tile.y];
       if (buildingsBeingAdded.size > 0) {
         for (const building of buildingsBeingAdded) {
           desirabilityForThisTile += building.getDesirabilityEffect(tile);
@@ -493,8 +513,15 @@ class CanvasRenderer {
       .css('display', 'block')
       .center(coordToPx(1) / 2, coordToPx(1) / 2);
 
-    this.desireSymbolLookup.set(desirabilityValue, symbol);
+    this.groundSymbolLookup.set(desirabilityValue, symbol);
     return symbol;
+  }
+
+  private getDesireValSymbol(desirabilityValue: number) {
+    return (
+      this.groundSymbolLookup.get(desirabilityValue) ??
+      this.createDesireValSymbol(desirabilityValue)
+    );
   }
 
   private createBackgroundPattern() {

@@ -1,4 +1,4 @@
-import { coordToPx } from './constants';
+import { coordToPx, gridSize } from './constants';
 import * as Collections from 'typescript-collections';
 
 export class Tile {
@@ -202,4 +202,10 @@ export function getOutlinePath(tiles: Collections.Set<Tile>) {
       throw new Error('Failed to draw an outline for set of points!');
     }
   }
+}
+
+export function getEmptyArray(baseValue: unknown) {
+  return Array.from({ length: gridSize }, () =>
+    Array.from({ length: gridSize }, () => baseValue)
+  );
 }

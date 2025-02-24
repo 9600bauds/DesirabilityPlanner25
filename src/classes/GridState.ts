@@ -1,4 +1,4 @@
-import { Tile } from '../utils/geometry';
+import { getEmptyArray, Tile } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
 import { gridSize } from '../utils/constants';
 import BuildingBlueprint from '../types/BuildingBlueprint';
@@ -23,9 +23,7 @@ class GridState {
   }
 
   private updateDesirabilityGrid() {
-    this.desirabilityGrid = Array.from({ length: gridSize }, () =>
-      Array.from({ length: gridSize }, () => 0)
-    ); //Reset the grid to zero
+    this.desirabilityGrid = getEmptyArray(0) as number[][]; //Reset the grid to zero
 
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
