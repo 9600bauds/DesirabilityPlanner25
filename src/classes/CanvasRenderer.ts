@@ -17,6 +17,7 @@ import {
 import PlacedBuilding from './PlacedBuilding';
 import {
   Fragment,
+  Image,
   Pattern,
   G as SVGG,
   Svg,
@@ -40,8 +41,8 @@ class CanvasRenderer {
   private buildingGroup: SVGG;
   private labelGroup: SVGG;
 
-  private groundSymbolLookup: Map<number, Symbol> = new Map();
-  private groundValUses = getEmptyArray(null) as (Use | null)[][];
+  private groundURILookup: Map<number, string> = new Map();
+  private groundValImages = getEmptyArray(null) as (Image | null)[][];
   private oldGroundValues = getEmptyArray(0) as number[][];
 
   private transparentBuildings = false;
@@ -374,36 +375,36 @@ class CanvasRenderer {
           if (!this.oldGroundValues || this.oldGroundValues[x][y] === 0) {
             continue; //Nevermind, there was never anything to begin with
           }
-          const oldUse: Use | null = this.groundValUses[tile.x][tile.y];
-          if (!oldUse)
+          const oldImage: Image | null = this.groundValImages[tile.x][tile.y];
+          if (!oldImage)
             throw new Error(
-              'Did not have a corresponding <use> element for an old nonzero value!'
+              'Did not have a corresponding <image> element for an old nonzero value!'
             );
-          //oldUse.remove();
-          oldUse.node.removeAttribute('href'); //Replace with something empty... Seems faster than removing it
-          this.groundValUses[tile.x][tile.y] = null;
+          oldImage.remove();
+          //oldImage.node.removeAttribute('href'); //Replace with something empty... Seems faster than removing it
+          this.groundValImages[tile.x][tile.y] = null;
         } else {
           //Should we create a new <use>, update the previous one, or, maybe it's the same value as before and nothing needs updating!
           const oldValue = this.oldGroundValues && this.oldGroundValues[x][y];
           if (!oldValue || oldValue === 0) {
-            const symbol = this.getDesireValSymbol(desirabilityForThisTile);
+            const URI = this.getGroundValURI(desirabilityForThisTile);
 
-            const newUse = newTilesFragment
-              .use(symbol)
+            const newImage = this.tilesGroup
+              .image(URI)
               .move(coordToPx(tile.x), coordToPx(tile.y));
 
-            this.groundValUses[tile.x][tile.y] = newUse;
+            this.groundValImages[tile.x][tile.y] = newImage;
           } else if (oldValue === desirabilityForThisTile) {
             continue; //Nothing needs to be done here. Explicit continue because I like legibility
           } else {
-            const oldUse: Use | null = this.groundValUses[tile.x][tile.y];
+            const oldUse: Image | null = this.groundValImages[tile.x][tile.y];
             if (!oldUse)
               throw new Error(
-                'Did not have a corresponding <use> element for an old nonzero value!'
+                'Did not have a corresponding <image> element for an old nonzero value!'
               );
             // Instead of replacing the DOM element, update the href attribute to point to the new symbol
-            const symbol = this.getDesireValSymbol(desirabilityForThisTile);
-            oldUse.node.setAttribute('href', `#${symbol.id()}`); // Direct DOM manipulation (much faster)
+            const URI = this.getGroundValURI(desirabilityForThisTile);
+            oldUse.load(URI);
           }
         }
         this.oldGroundValues[x][y] = desirabilityForThisTile;
@@ -497,29 +498,35 @@ class CanvasRenderer {
     }
   }
 
-  private createDesireValSymbol(desirabilityValue: number) {
-    const symbol = this.displayCanvas
-      .symbol()
-      .attr('id', `tileValue-${desirabilityValue}`);
+  private createGroundValURI(desirabilityValue: number) {
+    const sideLength = coordToPx(1);
+    const newSVG = SVG().size(sideLength, sideLength);
+    newSVG
+      .rect(sideLength, sideLength)
+      .fill(desirabilityColor(desirabilityValue));
+    //.stroke(colors.strongOutlineBlack);
 
-    symbol
-      .rect(coordToPx(1), coordToPx(1))
-      .fill(desirabilityColor(desirabilityValue))
-      .stroke(colors.strongOutlineBlack);
-
-    symbol
+    newSVG
       .text(desirabilityValue.toString())
       .font({ anchor: 'middle', 'dominant-baseline': 'middle' })
-      .center(coordToPx(1) / 2, coordToPx(1) / 2);
+      .center(sideLength / 2, sideLength / 2);
 
-    this.groundSymbolLookup.set(desirabilityValue, symbol);
-    return symbol;
+    const svgString = newSVG.svg();
+
+    // Create a Blob from the SVG string
+    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+
+    // Generate an object URL from the Blob
+    const imageURI = URL.createObjectURL(blob);
+
+    this.groundURILookup.set(desirabilityValue, imageURI);
+    return imageURI;
   }
 
-  private getDesireValSymbol(desirabilityValue: number) {
+  private getGroundValURI(desirabilityValue: number) {
     return (
-      this.groundSymbolLookup.get(desirabilityValue) ??
-      this.createDesireValSymbol(desirabilityValue)
+      this.groundURILookup.get(desirabilityValue) ??
+      this.createGroundValURI(desirabilityValue)
     );
   }
 
