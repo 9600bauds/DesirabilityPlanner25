@@ -10,6 +10,7 @@ import CanvasRenderer from '../classes/CanvasRenderer';
 import { Svg, SVG } from '@svgdotjs/svg.js';
 import CursorAction from '../types/CursorAction';
 import { BuildingCategory } from '../interfaces/BuildingCategory';
+import { gridPixelSize } from '../utils/constants';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE =====
@@ -25,7 +26,8 @@ const App: React.FC = () => {
   > | null>(null);
 
   const gridStateManager = useRef(new GridStateManager()).current;
-  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasInteractionContainer = useRef<HTMLDivElement>(null);
+  const canvasTransformContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
   const svgCanvasRef = useRef<Svg | null>(null);
 
@@ -39,22 +41,26 @@ const App: React.FC = () => {
 
   // ===== INITIALIZATION =====
   useEffect(() => {
-    if (!containerRef.current) {
+    if (
+      !canvasInteractionContainer.current ||
+      !canvasTransformContainer.current
+    ) {
       throw new Error(
         'Somehow did not have a ref to our container when initializing!'
       );
     }
     try {
       svgCanvasRef.current = SVG()
-        .addTo(containerRef.current)
-        .size('100%', '100%');
+        .addTo(canvasTransformContainer.current)
+        .size(gridPixelSize, gridPixelSize);
 
       const instantiated = instantiateBlueprints(svgCanvasRef.current);
       setPopulatedCategories(populateCategories(instantiated));
 
       rendererRef.current = new CanvasRenderer(
         svgCanvasRef.current,
-        containerRef.current
+        canvasInteractionContainer.current,
+        canvasTransformContainer.current
       );
       // Initial render
       rendererRef.current.render(renderContext);
@@ -211,16 +217,32 @@ const App: React.FC = () => {
   return (
     <div id="app-container" className="d-flex">
       <div
-        ref={containerRef}
-        id="canvas-container"
+        ref={canvasInteractionContainer}
+        id="canvas-interaction-container"
         className="bg-white"
-        style={{ width: '80vw', height: '100vh', position: 'relative' }}
+        style={{
+          position: 'relative',
+          width: '80vw',
+          height: '100vh',
+          overflow: 'hidden',
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onContextMenu={preventRightclickMenu}
-      />
+      >
+        <div
+          ref={canvasTransformContainer}
+          id="canvas-transform-container"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
       <div
         id="sidebar-container"
         style={{ minWidth: '150px', width: '20vw', height: '100vh' }}

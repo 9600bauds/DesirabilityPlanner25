@@ -32,6 +32,9 @@ interface gridPoint {
 }
 
 class CanvasRenderer {
+  private parentContainer: HTMLDivElement;
+  private transformContainer: HTMLDivElement;
+
   private displayCanvas: Svg;
 
   private backgroundPattern: Pattern;
@@ -73,8 +76,14 @@ class CanvasRenderer {
     return new DOMPoint(this.clientWidth / 2, this.clientHeight / 2);
   }
 
-  constructor(svgCanvas: Svg, canvasContainer: HTMLElement) {
+  constructor(
+    svgCanvas: Svg,
+    parentContainer: HTMLDivElement,
+    transformContainer: HTMLDivElement
+  ) {
     this.displayCanvas = svgCanvas;
+    this.parentContainer = parentContainer;
+    this.transformContainer = transformContainer;
 
     //this.displayCanvas.css('shapeRendering', 'optimizeSpeed');
 
@@ -91,8 +100,8 @@ class CanvasRenderer {
       //'text-shadow': '-2px -2px 0 white,  2px -2px 0 white, -2px  2px 0 white,  2px  2px 0 white, -2px  0px 0 white,  2px  0px 0 white, 0px -2px 0 white, 0px 2px 0 white', //Looks worse but apparently has better compatibility?
     });
 
-    this.clientWidth = canvasContainer.clientWidth;
-    this.clientHeight = canvasContainer.clientHeight;
+    this.clientWidth = parentContainer.clientWidth;
+    this.clientHeight = parentContainer.clientHeight;
 
     // We draw the background only once!
     this.backgroundGroup = this.displayCanvas.group();
@@ -166,30 +175,9 @@ class CanvasRenderer {
    * Transformations
    */
   private updateTransform() {
-    this.backgroundGroup.transform({
-      rotate: this.currentRotation,
-      scale: this.zoomLevel,
-      translate: { x: this.offsetX, y: this.offsetY },
-      origin: this.gridOrigin,
-    });
-    this.tilesGroup.transform({
-      rotate: this.currentRotation,
-      scale: this.zoomLevel,
-      translate: { x: this.offsetX, y: this.offsetY },
-      origin: this.gridOrigin,
-    });
-    this.buildingGroup.transform({
-      rotate: this.currentRotation,
-      scale: this.zoomLevel,
-      translate: { x: this.offsetX, y: this.offsetY },
-      origin: this.gridOrigin,
-    });
-    this.labelGroup.transform({
-      rotate: this.currentRotation,
-      scale: this.zoomLevel,
-      translate: { x: this.offsetX, y: this.offsetY },
-      origin: this.gridOrigin,
-    });
+    const transform = `translate(${this.offsetX}px, ${this.offsetY}px) rotate(${this.currentRotation}deg) scale(${this.zoomLevel})`;
+    this.transformContainer.style.transform = transform;
+    this.transformContainer.style.transformOrigin = '0 0';
   }
 
   public canvasSizeUpdated() {
@@ -291,8 +279,8 @@ class CanvasRenderer {
     this.lastMouseoverTile = thisTile;
 
     if (
-      !thisTile ||
-      (thisTile && previousTile && thisTile.equals(previousTile))
+      (thisTile && previousTile && thisTile.equals(previousTile)) ||
+      (!thisTile && previousTile)
     ) {
       return;
     }
@@ -316,8 +304,8 @@ class CanvasRenderer {
     //this.render(context); //Todo: This MIGHT not need a full rerender, but this is a very low priority optimization
   }
 
-  private updateDragBox(newPos: Tile) {
-    if (this.dragStartTile)
+  private updateDragBox(newPos: Tile | undefined) {
+    if (this.dragStartTile && newPos)
       this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
   }
 
