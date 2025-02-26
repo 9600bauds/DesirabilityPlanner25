@@ -1,7 +1,7 @@
 import { NewDesireBox } from './NewDesireBox';
 import { Tile } from '../utils/geometry';
 import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
-import { CATEGORIES } from '../data/CATEGORIES';
+import { NEW_CATEGORIES } from '../data/CATEGORIES';
 
 export interface NewBasicBlueprint {
   label?: string;
@@ -14,7 +14,7 @@ export interface NewBasicBlueprint {
   employeesRequired?: number;
   desireBox?: NewDesireBox;
   children?: ChildBlueprint[];
-  category?: keyof typeof CATEGORIES;
+  category?: keyof typeof NEW_CATEGORIES;
 }
 
 export interface ChildBlueprint {

@@ -66,7 +66,7 @@ class UIManager {
     return this.selectedSubcategory.blueprints[this.selectedArray];
   };
 
-  public setSelectedSubcategory = (subcat: Subcategory) => {
+  public selectSubcategory = (subcat: Subcategory) => {
     this.deselectSubcategory();
     this.setCursorAction('placing');
     this.selectedSubcategory = subcat;

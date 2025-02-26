@@ -1,7 +1,7 @@
 import { getOutlinePath, Rectangle, Tile } from '../utils/geometry';
 import NewBlueprint from '../types/NewBlueprint';
 import colors from '../utils/colors';
-import { CATEGORIES } from '../data/CATEGORIES';
+import { NEW_CATEGORIES } from '../data/CATEGORIES';
 import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
 import DesireBox from './desireBox';
 import { Svg, Symbol } from '@svgdotjs/svg.js';
@@ -126,7 +126,7 @@ class BasicBlueprint {
       return bp.fillColor;
     }
     if (bp.category) {
-      const category = CATEGORIES[bp.category];
+      const category = NEW_CATEGORIES[bp.category];
       if (category) return category.baseColor;
     }
     return colors.backgroundWhite;
@@ -135,7 +135,7 @@ class BasicBlueprint {
   public getLabel(maxDesirability?: number) {
     const labelHeight = coordToPx(this.height);
     const labelWidth = coordToPx(this.width);
-    return `<div class="buildingLabel" style="width: ${labelHeight}px; height: ${labelWidth}px">
+    return `<div class="buildingLabel" style="width: ${labelWidth}px; height: ${labelHeight}px">
           ${this.baseLabel}
         </div>`;
   }

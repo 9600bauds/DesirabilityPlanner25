@@ -5,7 +5,10 @@ import BuildingBlueprint from '../types/BuildingBlueprint';
 import NewBlueprint from '../types/NewBlueprint';
 import { Tile } from '../utils/geometry';
 
-export function instantiateBlueprints(svgCanvas: Svg) {
+export function instantiateBlueprints(
+  svgCanvas: Svg
+): Record<string, BuildingBlueprint> {
+  const instantiatedBlueprints: Record<string, BuildingBlueprint> = {};
   for (const [key, newBpData] of Object.entries(NEW_BLUEPRINTS)) {
     let createdBlueprint: BuildingBlueprint;
     if (
@@ -16,11 +19,10 @@ export function instantiateBlueprints(svgCanvas: Svg) {
     } else {
       createdBlueprint = new BasicBlueprint(newBpData, key, svgCanvas);
     }
-    BLUEPRINTS[key] = createdBlueprint;
+    instantiatedBlueprints[key] = createdBlueprint;
   }
+  return instantiatedBlueprints;
 }
-
-export const BLUEPRINTS: Record<string, BuildingBlueprint> = {};
 
 export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
   Academy: {

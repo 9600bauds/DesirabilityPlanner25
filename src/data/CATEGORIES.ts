@@ -1,10 +1,13 @@
 import { BuildingCategory } from '../interfaces/BuildingCategory';
 import Subcategory from '../interfaces/Subcategory';
-import { BLUEPRINTS, NEW_BLUEPRINTS } from './BLUEPRINTS';
+import BuildingBlueprint from '../types/BuildingBlueprint';
+import { NEW_BLUEPRINTS } from './BLUEPRINTS';
 
-export function populateCategories() {
-  for (const categoryKey in CATEGORIES) {
-    const thisCategory: BuildingCategory = CATEGORIES[categoryKey];
+export function populateCategories(
+  BLUEPRINTS: Record<string, BuildingBlueprint>
+): Record<string, BuildingCategory> {
+  for (const categoryKey in NEW_CATEGORIES) {
+    const thisCategory: BuildingCategory = NEW_CATEGORIES[categoryKey];
 
     const blueprintsInThisCategory = Object.entries(NEW_BLUEPRINTS).filter(
       ([_key, newBp]) => newBp.category === categoryKey
@@ -32,9 +35,10 @@ export function populateCategories() {
       }
     }
   }
+  return NEW_CATEGORIES;
 }
 
-export const CATEGORIES: Record<string, BuildingCategory> = {
+export const NEW_CATEGORIES: Record<string, BuildingCategory> = {
   HOUSE: {
     displayName: 'Housing',
     symbol: '🏠',

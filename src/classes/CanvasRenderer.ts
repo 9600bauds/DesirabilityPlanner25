@@ -485,7 +485,7 @@ class CanvasRenderer {
 
     const textHeight = coordToPx(building.blueprint.height);
     const textWidth = coordToPx(building.blueprint.width);
-    const foreignObject = this.labelGroup.foreignObject(textHeight, textWidth);
+    const foreignObject = this.labelGroup.foreignObject(textWidth, textHeight);
     const labelElement = building.blueprint.getLabel();
 
     foreignObject
