@@ -26,8 +26,7 @@ const App: React.FC = () => {
   > | null>(null);
 
   const gridStateManager = useRef(new GridStateManager()).current;
-  const canvasInteractionContainer = useRef<HTMLDivElement>(null);
-  const canvasTransformContainer = useRef<HTMLDivElement>(null);
+  const canvasContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
   const svgCanvasRef = useRef<Svg | null>(null);
 
@@ -41,27 +40,19 @@ const App: React.FC = () => {
 
   // ===== INITIALIZATION =====
   useEffect(() => {
-    if (
-      !canvasInteractionContainer.current ||
-      !canvasTransformContainer.current
-    ) {
+    if (!canvasContainer.current) {
       throw new Error(
         'Somehow did not have a ref to our container when initializing!'
       );
     }
     try {
-      svgCanvasRef.current = SVG()
-        .addTo(canvasTransformContainer.current)
-        .size(gridPixelSize, gridPixelSize);
+      svgCanvasRef.current = SVG();
 
       const instantiated = instantiateBlueprints(svgCanvasRef.current);
       setPopulatedCategories(populateCategories(instantiated));
 
-      rendererRef.current = new CanvasRenderer(
-        svgCanvasRef.current,
-        canvasInteractionContainer.current,
-        canvasTransformContainer.current
-      );
+      rendererRef.current = new CanvasRenderer(canvasContainer.current);
+
       // Initial render
       rendererRef.current.render(renderContext);
     } catch (error) {
@@ -217,8 +208,8 @@ const App: React.FC = () => {
   return (
     <div id="app-container" className="d-flex">
       <div
-        ref={canvasInteractionContainer}
-        id="canvas-interaction-container"
+        ref={canvasContainer}
+        id="canvas-container"
         className="bg-white"
         style={{
           position: 'relative',
@@ -231,18 +222,7 @@ const App: React.FC = () => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onContextMenu={preventRightclickMenu}
-      >
-        <div
-          ref={canvasTransformContainer}
-          id="canvas-transform-container"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            pointerEvents: 'none',
-          }}
-        />
-      </div>
+      />
       <div
         id="sidebar-container"
         style={{ minWidth: '150px', width: '20vw', height: '100vh' }}
