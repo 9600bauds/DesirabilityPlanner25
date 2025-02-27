@@ -218,72 +218,14 @@ class CanvasRenderer {
   private updateTiles(context: RenderContext) {
     const ctx = this.tilesCtx;
 
-    /*// Clear context
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();*/
-
-    // Fill with background color
-    /*ctx.fillStyle = '#EEEEEE';
-    ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);*/
-
-    // Get visible tile range
+    // Get visible tile range. We only need to update the stuff within visible range. We don't even need to clear the previous frame since there's no transparency anywhere.
     const viewport = this.getVisibleTileRange();
 
+    /*
+     * DRAW THE COLORED CELLS
+     */
     // Get base values and prepare variables
     const baseValues = context.getBaseValues();
-    /*const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
-    const buildingsBeingRemoved: Set<PlacedBuilding> = new Set();
-
-    // Handle preview for placement or erasing
-    const cursorAction = context.getCursorAction();
-    if (cursorAction === 'placing') {
-      if (this.lastMouseoverTile) {
-        const selectedBlueprint = context.getSelectedBlueprint();
-        if (selectedBlueprint) {
-          const virtualBuilding = new PlacedBuilding(
-            this.lastMouseoverTile,
-            selectedBlueprint
-          );
-          buildingsBeingAdded.add(virtualBuilding);
-        }
-      }
-    } else if (cursorAction === 'erasing' && this.isDragging && this.dragBox) {
-      for (const building of context.getBuildings()) {
-        if (building.interceptsRectangle(this.dragBox)) {
-          buildingsBeingRemoved.add(building);
-        }
-      }
-    }
-
-    // Helper function for calculating adjusted desirability
-    const getAdjustedDesirability = (tile: Tile) => {
-      let desirabilityForThisTile = baseValues[tile.x][tile.y];
-
-      // Add effects from buildings being added (preview)
-      if (buildingsBeingAdded.size > 0) {
-        for (const building of buildingsBeingAdded) {
-          desirabilityForThisTile += building.getDesirabilityEffect(tile);
-        }
-      }
-
-      // Subtract effects from buildings being removed (preview)
-      if (buildingsBeingRemoved.size > 0) {
-        for (const building of buildingsBeingRemoved) {
-          desirabilityForThisTile -= building.getDesirabilityEffect(tile);
-        }
-      }
-
-      return desirabilityForThisTile;
-    };*/
-
-    ctx.font = '10px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'white';
-
-    // Draw colored tiles in the visible area
     for (let x = viewport.startX; x <= viewport.endX; x++) {
       for (let y = viewport.startY; y <= viewport.endY; y++) {
         if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
@@ -292,27 +234,45 @@ class CanvasRenderer {
         //const desirabilityValue = getAdjustedDesirability(tile);
         const desirabilityValue = baseValues[COORD_TO_INT16(tile.x, tile.y)];
 
-        // Set fill color and draw rectangle
-        ctx.fillStyle = 'black';
-        ctx.fillRect(x * CELL_PX, y * CELL_PX, CELL_PX, CELL_PX);
-
         ctx.fillStyle = desirabilityColor(desirabilityValue);
-        ctx.fillRect(
-          x * CELL_PX + 1,
-          y * CELL_PX + 1,
-          CELL_PX - 1,
-          CELL_PX - 1
-        );
+        ctx.fillRect(x * CELL_PX, y * CELL_PX, CELL_PX, CELL_PX);
       }
     }
+
+    /*
+     * DRAW THE BLACK GRIDLINES
+     */
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = colors.pureBlack;
+    // Batch all line drawing into a single path
+    ctx.beginPath();
+    // Path the horizontal lines
+    for (let y = viewport.startY; y <= viewport.endY + 1; y++) {
+      ctx.moveTo(COORD_TO_PX(viewport.startX), COORD_TO_PX(y));
+      ctx.lineTo(COORD_TO_PX(viewport.endX + 1), COORD_TO_PX(y));
+    }
+    // Path the vertical lines
+    for (let x = viewport.startX; x <= viewport.endX + 1; x++) {
+      ctx.moveTo(COORD_TO_PX(x), COORD_TO_PX(viewport.startY));
+      ctx.lineTo(COORD_TO_PX(x), COORD_TO_PX(viewport.endY + 1));
+    }
+    // Execute the path!
+    ctx.stroke();
+
+    /*
+     * DRAW THE TEXT LABELS (most of the performance hit is from here!)
+     */
     if (this.zoomLevel > this.TEXT_ZOOM_THRESHOLD) {
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white';
       ctx.fillStyle = 'white';
       for (let x = viewport.startX; x <= viewport.endX; x++) {
         for (let y = viewport.startY; y <= viewport.endY; y++) {
           if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
 
           const tile = new Tile(x, y);
-          //const desirabilityValue = getAdjustedDesirability(tile);
           const desirabilityValue = baseValues[COORD_TO_INT16(tile.x, tile.y)];
 
           if (desirabilityValue === 0) continue;
@@ -328,7 +288,6 @@ class CanvasRenderer {
 
     this.tilesNeedUpdating = false;
   }
-
   /**
    * Get the range of tiles currently visible in the viewport
    */
