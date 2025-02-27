@@ -1,4 +1,4 @@
-import { coordToPx, gridSize } from './constants';
+import { COORD_TO_PX, GRID_SIZE } from './constants';
 import * as Collections from 'typescript-collections';
 
 export class Tile {
@@ -102,26 +102,6 @@ export class Rectangle {
     return false;
   }
 }
-
-export function chebyshevDistance(tile: Tile, rect: Rectangle): number {
-  let distanceX = 0;
-  let distanceY = 0;
-
-  if (tile.x < rect.origin.x) {
-    distanceX = rect.origin.x - tile.x;
-  } else if (tile.x >= rect.origin.x + rect.width) {
-    distanceX = tile.x - (rect.origin.x + rect.width - 1);
-  }
-
-  if (tile.y < rect.origin.y) {
-    distanceY = rect.origin.y - tile.y;
-  } else if (tile.y >= rect.origin.y + rect.height) {
-    distanceY = tile.y - (rect.origin.y + rect.height - 1);
-  }
-
-  return Math.max(distanceX, distanceY);
-}
-
 export const degreesToRads = (deg: number) => (deg * Math.PI) / 180.0;
 export const radsToDegrees = (rad: number) => (rad * 180.0) / Math.PI;
 
@@ -179,7 +159,7 @@ export function getOutlinePath(tiles: Collections.Set<Tile>) {
     }
     if (newDir !== dir) {
       // We've turned! Add this point to the path
-      pathData += `L${coordToPx(loc.x)},${coordToPx(loc.y)} `; //'L' means 'draw a line to this point'
+      pathData += `L${COORD_TO_PX(loc.x)},${COORD_TO_PX(loc.y)} `; //'L' means 'draw a line to this point'
       dir = newDir;
     }
     //Move
@@ -205,7 +185,7 @@ export function getOutlinePath(tiles: Collections.Set<Tile>) {
 }
 
 export function getEmptyArray(baseValue: unknown) {
-  return Array.from({ length: gridSize }, () =>
-    Array.from({ length: gridSize }, () => baseValue)
+  return Array.from({ length: GRID_SIZE }, () =>
+    Array.from({ length: GRID_SIZE }, () => baseValue)
   );
 }

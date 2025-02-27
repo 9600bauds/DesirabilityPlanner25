@@ -1,20 +1,16 @@
 import RenderContext from '../interfaces/RenderContext';
 import colors, { desirabilityColor } from '../utils/colors';
 import {
-  gridPixelCenter,
-  gridPixelSize,
-  gridSize,
-  rotationAngle,
-  coordToPx,
-  pxToCoord,
-  canvasTilePx,
+  GRID_CENTER_PX,
+  GRID_TOTAL_PX,
+  GRID_SIZE,
+  ROTATION_ANGLE,
+  COORD_TO_PX,
+  PX_TO_COORD,
+  CELL_PX,
+  COORD_TO_INT16,
 } from '../utils/constants';
-import {
-  Tile,
-  Rectangle,
-  degreesToRads,
-  getEmptyArray,
-} from '../utils/geometry';
+import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
 
 interface GridPoint {
@@ -28,16 +24,7 @@ class CanvasRenderer {
 
   // Canvas elements
   private tilesCanvas: HTMLCanvasElement;
-  private gridLinesCanvas: HTMLCanvasElement;
-  private textCanvas: HTMLCanvasElement;
-
-  // Canvas contexts
   private tilesCtx: CanvasRenderingContext2D;
-  private gridLinesCtx: CanvasRenderingContext2D;
-  private textCtx: CanvasRenderingContext2D;
-
-  // Grid state
-  private oldGridValues = getEmptyArray(0) as number[][];
 
   // Transform state
   private currentRotation: number = 0;
@@ -93,7 +80,7 @@ class CanvasRenderer {
     }) as CanvasRenderingContext2D;
 
     // Center view
-    this.centerViewAt({ x: gridPixelCenter, y: gridPixelCenter });
+    this.centerViewAt({ x: GRID_CENTER_PX, y: GRID_CENTER_PX });
 
     this.tilesNeedUpdating = true;
 
@@ -299,27 +286,22 @@ class CanvasRenderer {
     // Draw colored tiles in the visible area
     for (let x = viewport.startX; x <= viewport.endX; x++) {
       for (let y = viewport.startY; y <= viewport.endY; y++) {
-        if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
+        if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
 
         const tile = new Tile(x, y);
         //const desirabilityValue = getAdjustedDesirability(tile);
-        const desirabilityValue = baseValues[tile.x][tile.y];
+        const desirabilityValue = baseValues[COORD_TO_INT16(tile.x, tile.y)];
 
         // Set fill color and draw rectangle
         ctx.fillStyle = 'black';
-        ctx.fillRect(
-          x * canvasTilePx,
-          y * canvasTilePx,
-          canvasTilePx,
-          canvasTilePx
-        );
+        ctx.fillRect(x * CELL_PX, y * CELL_PX, CELL_PX, CELL_PX);
 
         ctx.fillStyle = desirabilityColor(desirabilityValue);
         ctx.fillRect(
-          x * canvasTilePx + 1,
-          y * canvasTilePx + 1,
-          canvasTilePx - 1,
-          canvasTilePx - 1
+          x * CELL_PX + 1,
+          y * CELL_PX + 1,
+          CELL_PX - 1,
+          CELL_PX - 1
         );
       }
     }
@@ -327,18 +309,18 @@ class CanvasRenderer {
       ctx.fillStyle = 'white';
       for (let x = viewport.startX; x <= viewport.endX; x++) {
         for (let y = viewport.startY; y <= viewport.endY; y++) {
-          if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
+          if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
 
           const tile = new Tile(x, y);
           //const desirabilityValue = getAdjustedDesirability(tile);
-          const desirabilityValue = baseValues[tile.x][tile.y];
+          const desirabilityValue = baseValues[COORD_TO_INT16(tile.x, tile.y)];
 
           if (desirabilityValue === 0) continue;
 
           ctx.fillText(
             desirabilityValue.toString(),
-            coordToPx(x) + canvasTilePx / 2,
-            coordToPx(y) + canvasTilePx / 2
+            COORD_TO_PX(x) + CELL_PX / 2,
+            COORD_TO_PX(y) + CELL_PX / 2
           );
         }
       }
@@ -364,15 +346,15 @@ class CanvasRenderer {
 
     // Calculate tile range with padding
     const padding = 1;
-    const startX = Math.max(0, Math.floor(pxToCoord(topLeft.x)) - padding);
-    const startY = Math.max(0, Math.floor(pxToCoord(topLeft.y)) - padding);
+    const startX = Math.max(0, Math.floor(PX_TO_COORD(topLeft.x)) - padding);
+    const startY = Math.max(0, Math.floor(PX_TO_COORD(topLeft.y)) - padding);
     const endX = Math.min(
-      gridSize - 1,
-      Math.ceil(pxToCoord(bottomRight.x)) + padding
+      GRID_SIZE - 1,
+      Math.ceil(PX_TO_COORD(bottomRight.x)) + padding
     );
     const endY = Math.min(
-      gridSize - 1,
-      Math.ceil(pxToCoord(bottomRight.y)) + padding
+      GRID_SIZE - 1,
+      Math.ceil(PX_TO_COORD(bottomRight.y)) + padding
     );
 
     return { startX, startY, endX, endY };
@@ -394,14 +376,12 @@ class CanvasRenderer {
     this.clientHeight = this.parentContainer.clientHeight;
 
     // Resize all canvases
-    [this.tilesCanvas, this.gridLinesCanvas, this.textCanvas].forEach(
-      (canvas) => {
-        canvas.width = this.clientWidth * this.devicePixelRatio;
-        canvas.height = this.clientHeight * this.devicePixelRatio;
-        canvas.style.width = this.clientWidth + 'px';
-        canvas.style.height = this.clientHeight + 'px';
-      }
-    );
+    [this.tilesCanvas].forEach((canvas) => {
+      canvas.width = this.clientWidth * this.devicePixelRatio;
+      canvas.height = this.clientHeight * this.devicePixelRatio;
+      canvas.style.width = this.clientWidth + 'px';
+      canvas.style.height = this.clientHeight + 'px';
+    });
 
     // Mark all areas as dirty
     this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
@@ -412,7 +392,7 @@ class CanvasRenderer {
     const oldCenter = this.canvas2grid(this.viewCenter);
 
     if (this.currentRotation === 0) {
-      this.currentRotation = rotationAngle;
+      this.currentRotation = ROTATION_ANGLE;
     } else {
       this.currentRotation = 0;
     }
@@ -478,11 +458,11 @@ class CanvasRenderer {
     const gridPt = this.canvas2grid(point);
 
     // Convert to tile coordinates
-    const tileX = pxToCoord(gridPt.x);
-    const tileY = pxToCoord(gridPt.y);
+    const tileX = PX_TO_COORD(gridPt.x);
+    const tileY = PX_TO_COORD(gridPt.y);
 
     // Check if the tile is within grid bounds
-    if (tileX >= 0 && tileX < gridSize && tileY >= 0 && tileY < gridSize) {
+    if (tileX >= 0 && tileX < GRID_SIZE && tileY >= 0 && tileY < GRID_SIZE) {
       return new Tile(tileX, tileY);
     }
 

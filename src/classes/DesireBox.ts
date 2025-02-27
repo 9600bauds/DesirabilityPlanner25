@@ -1,9 +1,10 @@
 import { NewDesireBox } from '../interfaces/NewDesireBox';
-import { chebyshevDistance, Rectangle, Tile } from '../utils/geometry';
+import { Rectangle, Tile } from '../utils/geometry';
 
 class DesireBox {
-  readonly effectPerRange: number[];
+  readonly effectPerRange: Int16Array;
   readonly bounds: Rectangle; //The origin of this rectangle is relative to 0,0 which is the origin of the base building
+  readonly maxRange: number;
 
   constructor(data: NewDesireBox, origin: Tile, height: number, width: number) {
     if (data.maxRange === undefined || data.maxRange > 99) {
@@ -17,23 +18,17 @@ class DesireBox {
       );
     }
 
-    this.effectPerRange = [];
+    this.effectPerRange = new Int16Array(data.maxRange + 1);
+    this.effectPerRange[0] = 0; //We don't affect tiles inside us because reasons
     for (let dist = 1; dist <= data.maxRange; dist++) {
-      //Note that dist 0 is not included, we don't affect tiles inside us because reasons
       const stepsAway = Math.ceil(dist / data.stepDist);
       const distanceModifier = (stepsAway - 1) * data.stepVal;
 
       this.effectPerRange[dist] = data.baseDesirability + distanceModifier;
     }
-    this.bounds = new Rectangle(origin, height, width);
-  }
 
-  public getEffectForRelativeTile(tile: Tile): number {
-    const dist = chebyshevDistance(tile, this.bounds);
-    if (dist in this.effectPerRange) {
-      return this.effectPerRange[dist];
-    }
-    return 0;
+    this.bounds = new Rectangle(origin, height, width);
+    this.maxRange = data.maxRange;
   }
 }
 

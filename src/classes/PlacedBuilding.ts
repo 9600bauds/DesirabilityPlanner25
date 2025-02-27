@@ -29,15 +29,6 @@ class PlacedBuilding {
   public interceptsRectangle(rect: Rectangle): boolean {
     return rect.interceptsTiles(this.offsetTilesOccupied);
   }
-
-  public getDesirabilityEffect(tile: Tile): number {
-    const adjustedTile = tile.substract(this.origin);
-    let effect = 0;
-    for (const dbox of this.blueprint.desireBoxes) {
-      effect += dbox.getEffectForRelativeTile(adjustedTile);
-    }
-    return effect;
-  }
 }
 
 export default PlacedBuilding;

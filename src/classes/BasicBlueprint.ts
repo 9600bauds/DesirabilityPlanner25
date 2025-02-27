@@ -5,7 +5,7 @@ import { NEW_CATEGORIES } from '../data/CATEGORIES';
 import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
 import DesireBox from './desireBox';
 import { Svg, Symbol } from '@svgdotjs/svg.js';
-import { coordToPx } from '../utils/constants';
+import { COORD_TO_PX } from '../utils/constants';
 import * as Collections from 'typescript-collections';
 
 class BasicBlueprint {
@@ -106,9 +106,9 @@ class BasicBlueprint {
     }
     const fillColor = this.getBpFillColor(data);
     symbol
-      .rect(coordToPx(data.width), coordToPx(data.height))
+      .rect(COORD_TO_PX(data.width), COORD_TO_PX(data.height))
       .fill(fillColor)
-      .move(coordToPx(origin.x), coordToPx(origin.y));
+      .move(COORD_TO_PX(origin.x), COORD_TO_PX(origin.y));
     if (data.children) {
       for (const child of data.children) {
         const childBlueprint = NEW_BLUEPRINTS[child.childKey];
@@ -133,8 +133,8 @@ class BasicBlueprint {
   }
 
   public getLabel(maxDesirability?: number) {
-    const labelHeight = coordToPx(this.height);
-    const labelWidth = coordToPx(this.width);
+    const labelHeight = COORD_TO_PX(this.height);
+    const labelWidth = COORD_TO_PX(this.width);
     return `<div class="buildingLabel" style="width: ${labelWidth}px; height: ${labelHeight}px">
           ${this.baseLabel}
         </div>`;

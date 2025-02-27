@@ -4,7 +4,7 @@ import BuildingBlueprint from '../types/BuildingBlueprint';
 import { Tile } from '../utils/geometry';
 
 interface RenderContext {
-  getBaseValues: () => number[][];
+  getBaseValues: () => Int16Array;
   getBuildings: () => Set<PlacedBuilding>;
   getCursorAction: () => CursorAction;
   getSelectedBlueprint: () => BuildingBlueprint | null;

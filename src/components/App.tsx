@@ -10,7 +10,7 @@ import CanvasRenderer from '../classes/CanvasRenderer';
 import { Svg, SVG } from '@svgdotjs/svg.js';
 import CursorAction from '../types/CursorAction';
 import { BuildingCategory } from '../interfaces/BuildingCategory';
-import { gridPixelSize } from '../utils/constants';
+import { GRID_TOTAL_PX } from '../utils/constants';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE =====
