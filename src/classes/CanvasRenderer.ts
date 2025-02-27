@@ -7,6 +7,7 @@ import {
   rotationAngle,
   coordToPx,
   pxToCoord,
+  canvasTilePx,
 } from '../utils/constants';
 import {
   Tile,
@@ -20,8 +21,6 @@ interface GridPoint {
   x: number;
   y: number;
 }
-
-type DirtyArea = 'tiles' | 'text' | 'grid-lines';
 
 class CanvasRenderer {
   // DOM elements
@@ -58,8 +57,7 @@ class CanvasRenderer {
   private dragBox?: Rectangle;
 
   // Rendering system
-  private isDirty: boolean = false;
-  private dirtyAreas: Set<DirtyArea> = new Set();
+  private tilesNeedUpdating = false;
   private pendingFrame: number | null = null;
   private currentContext: RenderContext | null = null;
 
@@ -67,7 +65,7 @@ class CanvasRenderer {
   private transparentBuildings: boolean = false;
 
   // Text rendering zoom threshold
-  private readonly TEXT_ZOOM_THRESHOLD = 0.5;
+  private readonly TEXT_ZOOM_THRESHOLD = 0.6;
 
   // Size variables
   private clientWidth: number;
@@ -88,25 +86,16 @@ class CanvasRenderer {
 
     // Create canvas elements - all sized to fit the viewport
     this.tilesCanvas = this.createCanvas('tiles-canvas', 1);
-    this.gridLinesCanvas = this.createCanvas('grid-lines-canvas', 2);
-    this.textCanvas = this.createCanvas('text-canvas', 3);
-
-    // Get canvas contexts
-    this.tilesCtx = this.getContext(this.tilesCanvas);
-    this.gridLinesCtx = this.getContext(this.gridLinesCanvas);
-    this.textCtx = this.getContext(this.textCanvas);
-
-    // Set initial background colors
-    this.tilesCtx.fillStyle = '#EEEEEE';
-    this.tilesCtx.fillRect(0, 0, this.clientWidth, this.clientHeight);
+    this.tilesCtx = this.tilesCanvas.getContext('2d', {
+      alpha: false,
+      desynchronized: true,
+      imageSmoothingEnabled: false,
+    }) as CanvasRenderingContext2D;
 
     // Center view
     this.centerViewAt({ x: gridPixelCenter, y: gridPixelCenter });
 
-    // Mark all areas as dirty for initial render
-    this.markDirty('grid-lines');
-    this.markDirty('tiles');
-    this.markDirty('text');
+    this.tilesNeedUpdating = true;
 
     // Start animation loop
     this.scheduleRender();
@@ -133,22 +122,6 @@ class CanvasRenderer {
     return canvas;
   }
 
-  private getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
-    const ctx = canvas.getContext('2d', {
-      alpha: canvas.id === 'tiles-canvas' ? false : true,
-      desynchronized: true,
-    });
-
-    if (!ctx) {
-      throw new Error(`Could not get 2D context for ${canvas.id}`);
-    }
-
-    // Apply device pixel ratio scaling for crisp rendering
-    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
-
-    return ctx;
-  }
-
   /*
    * Render loop and change detection
    */
@@ -162,39 +135,33 @@ class CanvasRenderer {
   private renderFrame(): void {
     this.pendingFrame = null;
 
-    if (this.isDirty && this.currentContext) {
-      console.time('render-frame');
+    if (this.tilesNeedUpdating && this.currentContext) {
+      let startTime = performance.now();
 
       // Apply canvas transforms before drawing
       this.applyCanvasTransforms();
 
-      // Update areas that need updating
-      if (this.dirtyAreas.has('grid-lines')) {
-        this.drawGridLines();
+      const transformTime = performance.now() - startTime;
+      if (transformTime > 5) {
+        //prettier-ignore
+        console.log("transformation took", transformTime, "ms!");
       }
+      startTime = performance.now();
 
-      if (this.dirtyAreas.has('tiles')) {
+      if (this.tilesNeedUpdating) {
         this.updateTiles(this.currentContext);
       }
 
-      if (this.dirtyAreas.has('text')) {
-        this.updateText(this.currentContext);
+      const tilesRendering = performance.now() - startTime;
+      if (tilesRendering > 5) {
+        //prettier-ignore
+        console.log("tile rendering took", tilesRendering, "ms!");
       }
-
-      // Clear dirty state
-      this.isDirty = false;
-      this.dirtyAreas.clear();
-
-      console.timeEnd('render-frame');
+      startTime = performance.now();
     }
 
     // Always schedule the next frame
     this.scheduleRender();
-  }
-
-  private markDirty(area: DirtyArea): void {
-    this.isDirty = true;
-    this.dirtyAreas.add(area);
   }
 
   /*
@@ -202,7 +169,7 @@ class CanvasRenderer {
    */
   private applyCanvasTransforms(): void {
     // Reset transforms
-    [this.tilesCtx, this.gridLinesCtx, this.textCtx].forEach((ctx) => {
+    [this.tilesCtx].forEach((ctx) => {
       // Start with device pixel ratio scaling
       ctx.setTransform(
         this.devicePixelRatio,
@@ -255,75 +222,7 @@ class CanvasRenderer {
     this.offsetX = center.x - point.x * this.zoomLevel;
     this.offsetY = center.y - point.y * this.zoomLevel;
 
-    // Mark all layers as dirty since transforms changed
-    this.markDirty('grid-lines');
-    this.markDirty('tiles');
-    this.markDirty('text');
-  }
-
-  /*
-   * Grid drawing methods
-   */
-
-  private drawGridLines() {
-    const ctx = this.gridLinesCtx;
-
-    // Clear context
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();
-
-    // Set up line style
-    ctx.strokeStyle = colors.strongOutlineBlack;
-    ctx.lineWidth = 0.5;
-
-    // Calculate visible grid area for optimization
-    const visibleArea = this.getVisibleGridArea();
-    const cellSize = coordToPx(1);
-
-    // Draw grid lines only in visible area (plus padding)
-    const startX = Math.floor(visibleArea.startX / cellSize) * cellSize;
-    const endX = Math.ceil(visibleArea.endX / cellSize) * cellSize;
-    const startY = Math.floor(visibleArea.startY / cellSize) * cellSize;
-    const endY = Math.ceil(visibleArea.endY / cellSize) * cellSize;
-
-    // Vertical lines
-    for (let x = startX; x <= endX; x += cellSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, startY);
-      ctx.lineTo(x, endY);
-      ctx.stroke();
-    }
-
-    // Horizontal lines
-    for (let y = startY; y <= endY; y += cellSize) {
-      ctx.beginPath();
-      ctx.moveTo(startX, y);
-      ctx.lineTo(endX, y);
-      ctx.stroke();
-    }
-  }
-
-  /**
-   * Get the visible area in grid coordinates
-   */
-  private getVisibleGridArea(): {
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-  } {
-    // Add padding to ensure all visible content is rendered
-    const padding = coordToPx(5);
-
-    // Convert screen coordinates to grid coordinates
-    return {
-      startX: -padding,
-      startY: -padding,
-      endX: gridPixelSize + padding,
-      endY: gridPixelSize + padding,
-    };
+    this.tilesNeedUpdating = true;
   }
 
   /**
@@ -332,23 +231,22 @@ class CanvasRenderer {
   private updateTiles(context: RenderContext) {
     const ctx = this.tilesCtx;
 
-    // Clear context
+    /*// Clear context
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();
+    ctx.restore();*/
 
     // Fill with background color
-    ctx.fillStyle = '#EEEEEE';
-    ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
+    /*ctx.fillStyle = '#EEEEEE';
+    ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);*/
 
     // Get visible tile range
     const viewport = this.getVisibleTileRange();
-    const cellSize = coordToPx(1);
 
     // Get base values and prepare variables
     const baseValues = context.getBaseValues();
-    const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
+    /*const buildingsBeingAdded: Set<PlacedBuilding> = new Set();
     const buildingsBeingRemoved: Set<PlacedBuilding> = new Set();
 
     // Handle preview for placement or erasing
@@ -391,7 +289,12 @@ class CanvasRenderer {
       }
 
       return desirabilityForThisTile;
-    };
+    };*/
+
+    ctx.font = '10px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'white';
 
     // Draw colored tiles in the visible area
     for (let x = viewport.startX; x <= viewport.endX; x++) {
@@ -399,69 +302,49 @@ class CanvasRenderer {
         if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
 
         const tile = new Tile(x, y);
-        const desirabilityValue = getAdjustedDesirability(tile);
-
-        // Store value for text rendering
-        this.oldGridValues[x][y] = desirabilityValue;
-
-        // Skip drawing empty tiles (they're already the background color)
-        if (desirabilityValue === 0) continue;
+        //const desirabilityValue = getAdjustedDesirability(tile);
+        const desirabilityValue = baseValues[tile.x][tile.y];
 
         // Set fill color and draw rectangle
+        ctx.fillStyle = 'black';
+        ctx.fillRect(
+          x * canvasTilePx,
+          y * canvasTilePx,
+          canvasTilePx,
+          canvasTilePx
+        );
+
         ctx.fillStyle = desirabilityColor(desirabilityValue);
-        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-      }
-    }
-  }
-
-  /**
-   * Draw text labels for the tile values when zoomed in enough
-   */
-  private updateText(context: RenderContext) {
-    const ctx = this.textCtx;
-
-    // Handle text visibility based on zoom level
-    if (this.zoomLevel < this.TEXT_ZOOM_THRESHOLD) {
-      // If zoomed out too far, just clear text canvas and return
-      ctx.save();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.restore();
-      return;
-    }
-
-    // Clear context
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();
-
-    // Get visible range of tiles
-    const viewport = this.getVisibleTileRange();
-    const cellSize = coordToPx(1);
-
-    // Set up text styling
-    ctx.font = '10px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'white';
-
-    // Draw text only for visible non-zero tiles
-    for (let x = viewport.startX; x <= viewport.endX; x++) {
-      for (let y = viewport.startY; y <= viewport.endY; y++) {
-        if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
-
-        const value = this.oldGridValues[x][y];
-        if (value === 0) continue;
-
-        // Draw the text
-        ctx.fillText(
-          value.toString(),
-          coordToPx(x) + cellSize / 2,
-          coordToPx(y) + cellSize / 2
+        ctx.fillRect(
+          x * canvasTilePx + 1,
+          y * canvasTilePx + 1,
+          canvasTilePx - 1,
+          canvasTilePx - 1
         );
       }
     }
+    if (this.zoomLevel > this.TEXT_ZOOM_THRESHOLD) {
+      ctx.fillStyle = 'white';
+      for (let x = viewport.startX; x <= viewport.endX; x++) {
+        for (let y = viewport.startY; y <= viewport.endY; y++) {
+          if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
+
+          const tile = new Tile(x, y);
+          //const desirabilityValue = getAdjustedDesirability(tile);
+          const desirabilityValue = baseValues[tile.x][tile.y];
+
+          if (desirabilityValue === 0) continue;
+
+          ctx.fillText(
+            desirabilityValue.toString(),
+            coordToPx(x) + canvasTilePx / 2,
+            coordToPx(y) + canvasTilePx / 2
+          );
+        }
+      }
+    }
+
+    this.tilesNeedUpdating = false;
   }
 
   /**
@@ -480,7 +363,7 @@ class CanvasRenderer {
     );
 
     // Calculate tile range with padding
-    const padding = 5;
+    const padding = 1;
     const startX = Math.max(0, Math.floor(pxToCoord(topLeft.x)) - padding);
     const startY = Math.max(0, Math.floor(pxToCoord(topLeft.y)) - padding);
     const endX = Math.min(
@@ -502,8 +385,7 @@ class CanvasRenderer {
   // Main render method
   public render(context: RenderContext) {
     this.currentContext = context;
-    this.markDirty('tiles');
-    this.markDirty('text');
+    this.tilesNeedUpdating = true;
   }
 
   // Size handling
@@ -522,9 +404,7 @@ class CanvasRenderer {
     );
 
     // Mark all areas as dirty
-    this.markDirty('grid-lines');
-    this.markDirty('tiles');
-    this.markDirty('text');
+    this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
   }
 
   // View transformations
@@ -542,9 +422,7 @@ class CanvasRenderer {
 
     // Store context and mark all areas as dirty
     this.currentContext = context;
-    this.markDirty('grid-lines');
-    this.markDirty('tiles');
-    this.markDirty('text');
+    this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
   }
 
   public zoomIn() {
@@ -563,9 +441,7 @@ class CanvasRenderer {
     this.centerViewAt(oldCenter);
 
     // Mark layers for redraw
-    this.markDirty('grid-lines');
-    this.markDirty('tiles');
-    this.markDirty('text');
+    this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
   }
 
   // Panning methods
@@ -589,9 +465,7 @@ class CanvasRenderer {
     this.lastPanCursorY = event.clientY;
 
     // Mark for redraw
-    this.markDirty('grid-lines');
-    this.markDirty('tiles');
-    this.markDirty('text');
+    this.tilesNeedUpdating = true; //we don't need to nuke the old values here
   }
 
   public stopPanning() {
@@ -630,7 +504,7 @@ class CanvasRenderer {
 
     // Store context and mark areas as dirty
     this.currentContext = context;
-    this.markDirty('tiles');
+    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
   }
 
   private updateDragBox(newPos: Tile | undefined) {
@@ -647,7 +521,7 @@ class CanvasRenderer {
 
     // Store context and mark areas as dirty
     this.currentContext = context;
-    this.markDirty('tiles');
+    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
 
     return returnBox;
   }
@@ -674,12 +548,12 @@ class CanvasRenderer {
         this.updateDragBox(thisTile);
         // Store context and mark areas as dirty
         this.currentContext = context;
-        this.markDirty('tiles');
+        this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
       }
     } else if (cursorAction === 'placing') {
       // Store context and mark areas as dirty
       this.currentContext = context;
-      this.markDirty('tiles');
+      this.tilesNeedUpdating = true; //old values are... we'll figure this out later
     }
   }
 
@@ -688,7 +562,7 @@ class CanvasRenderer {
 
     // Store context and mark areas as dirty
     this.currentContext = context;
-    this.markDirty('tiles');
+    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here?
   }
 
   // Building transparency
@@ -700,7 +574,7 @@ class CanvasRenderer {
 
     // Store context and mark areas as dirty
     this.currentContext = context;
-    this.markDirty('tiles');
+    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
   }
 
   // Building rendering - to be implemented in Phase 3
