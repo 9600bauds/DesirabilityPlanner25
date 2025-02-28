@@ -1,16 +1,14 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import GridStateManager from '../classes/GridStateManager';
 import BuildingBlueprint from '../types/BuildingBlueprint';
 import Subcategory from '../interfaces/Subcategory';
-import { Tile, Rectangle } from '../utils/geometry';
-import { NEW_CATEGORIES, populateCategories } from '../data/CATEGORIES';
+import { populateCategories } from '../data/CATEGORIES';
 import { instantiateBlueprints } from '../data/BLUEPRINTS';
 import CanvasRenderer from '../classes/CanvasRenderer';
 import { Svg, SVG } from '@svgdotjs/svg.js';
 import CursorAction from '../types/CursorAction';
 import { BuildingCategory } from '../interfaces/BuildingCategory';
-import { GRID_TOTAL_PX } from '../utils/constants';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE =====
@@ -30,14 +28,6 @@ const App: React.FC = () => {
   const rendererRef = useRef<CanvasRenderer | null>(null);
   const svgCanvasRef = useRef<Svg | null>(null);
 
-  const renderContext = {
-    getBaseValues: gridStateManager.getBaseValues,
-    getBuildings: gridStateManager.getBuildings,
-    getCursorAction: () => cursorAction,
-    getSelectedBlueprint: () => getSelectedBlueprint(),
-    isTileOccupied: gridStateManager.isTileOccupied,
-  };
-
   // ===== INITIALIZATION =====
   useEffect(() => {
     if (!canvasContainer.current) {
@@ -48,13 +38,17 @@ const App: React.FC = () => {
     try {
       svgCanvasRef.current = SVG();
 
+      const renderContext = {
+        getBaseValues: gridStateManager.getBaseValues,
+        getBuildings: gridStateManager.getBuildings,
+        getCursorAction: () => cursorAction,
+        getSelectedBlueprint: getSelectedBlueprint,
+        isTileOccupied: gridStateManager.isTileOccupied,
+      };
+      rendererRef.current = new CanvasRenderer(canvasContainer.current, renderContext);
+
       const instantiated = instantiateBlueprints(svgCanvasRef.current);
       setPopulatedCategories(populateCategories(instantiated));
-
-      rendererRef.current = new CanvasRenderer(canvasContainer.current);
-
-      // Initial render
-      rendererRef.current.render(renderContext);
     } catch (error) {
       console.error('Error initializing data:', error);
     }
@@ -71,7 +65,7 @@ const App: React.FC = () => {
   // Update renderer when blueprint selection changes
   useEffect(() => {
     if (!rendererRef.current) return;
-    rendererRef.current.render(renderContext);
+    rendererRef.current.render();
   }, [selectedSubcategory, selectedBlueprintIndex]);
 
   // I'm not too happy about this having to be inside an useEffect. But whatever.
@@ -86,20 +80,17 @@ const App: React.FC = () => {
         setSelectedBlueprintIndex(
           (prev) => (prev + 1) % selectedSubcategory.blueprints.length
         );
-        if (rendererRef.current) {
-          rendererRef.current.render(renderContext);
-        }
       }
 
       // Handle Control key for building transparency
       if (event.key === 'Control' && !event.repeat && rendererRef.current) {
-        rendererRef.current.setBuildingTransparency(true, renderContext);
+        rendererRef.current.setBuildingTransparency(true);
       }
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === 'Control' && rendererRef.current) {
-        rendererRef.current.setBuildingTransparency(false, renderContext);
+        rendererRef.current.setBuildingTransparency(false);
       }
     };
 
@@ -110,7 +101,7 @@ const App: React.FC = () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
-  }, [renderContext, selectedSubcategory, selectedBlueprintIndex]);
+  }, [selectedSubcategory, selectedBlueprintIndex]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!rendererRef.current) return;
@@ -120,17 +111,17 @@ const App: React.FC = () => {
       if (cursorAction === 'placing') {
         setCursorAction('panning');
         deselectSubcategory();
-        rendererRef.current.render(renderContext);
+        rendererRef.current.render();
       } else if (cursorAction === 'erasing') {
         setCursorAction('panning');
-        rendererRef.current.stopDragging(renderContext);
+        rendererRef.current.stopDragging();
       }
     } else if (event.button === 0) {
       // Left click
       if (cursorAction === 'panning') {
         rendererRef.current.startPanning(event.nativeEvent);
       } else if (cursorAction === 'erasing') {
-        rendererRef.current.startDragging(event.nativeEvent, renderContext);
+        rendererRef.current.startDragging(event.nativeEvent);
       }
     }
   };
@@ -142,10 +133,10 @@ const App: React.FC = () => {
       //Left click
       rendererRef.current.stopPanning();
       if (cursorAction === 'erasing') {
-        const erasedRect = rendererRef.current.stopDragging(renderContext);
+        const erasedRect = rendererRef.current.stopDragging();
         if (erasedRect) {
           if (gridStateManager.eraseRect(erasedRect)) {
-            rendererRef.current.render(renderContext);
+            rendererRef.current.render();
           }
         }
       } else if (cursorAction === 'placing') {
@@ -156,7 +147,7 @@ const App: React.FC = () => {
           if (blueprint) {
             rendererRef.current.stopPanning();
             if (gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              rendererRef.current.render(renderContext);
+              rendererRef.current.render();
             }
           }
         }
@@ -170,7 +161,7 @@ const App: React.FC = () => {
     if (cursorAction === 'panning') {
       rendererRef.current.handlePanning(event.nativeEvent);
     } else {
-      rendererRef.current.handleMouseMove(event.nativeEvent, renderContext);
+      rendererRef.current.handleMouseMove(event.nativeEvent);
     }
   };
 
@@ -179,7 +170,7 @@ const App: React.FC = () => {
     if (cursorAction === 'panning') {
       rendererRef.current.stopPanning();
     } else {
-      rendererRef.current.handleMouseLeave(renderContext);
+      rendererRef.current.handleMouseLeave();
     }
   };
 
@@ -231,7 +222,7 @@ const App: React.FC = () => {
           populatedCategories={populatedCategories}
           onRotateClick={() => {
             if (rendererRef.current) {
-              rendererRef.current.toggleGridRotation(renderContext);
+              rendererRef.current.toggleGridRotation();
             }
           }}
           onPanClick={() => {

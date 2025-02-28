@@ -1,6 +1,6 @@
 import PlacedBuilding from '../classes/PlacedBuilding';
-import { CursorAction } from '../classes/UIManager';
 import BuildingBlueprint from '../types/BuildingBlueprint';
+import CursorAction from '../types/CursorAction';
 import { Tile } from '../utils/geometry';
 
 interface RenderContext {

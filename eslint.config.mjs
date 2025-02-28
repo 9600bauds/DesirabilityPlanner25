@@ -38,6 +38,6 @@ export default tseslint.config({
       'warn',
       { 'argsIgnorePattern': '^_', 'varsIgnorePattern': '^_' }
     ],
-    'prettier/prettier': 'error',
+    'prettier/prettier': 'off',
   },
 });

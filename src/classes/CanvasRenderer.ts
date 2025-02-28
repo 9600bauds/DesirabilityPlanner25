@@ -1,5 +1,6 @@
 import RenderContext from '../interfaces/RenderContext';
-import colors, { desirabilityColor, getDesirabilityRGB } from '../utils/colors';
+import Viewport from '../interfaces/Viewport';
+import colors, { getDesirabilityRGB } from '../utils/colors';
 import {
   GRID_CENTER_PX,
   GRID_TOTAL_PX,
@@ -46,7 +47,7 @@ class CanvasRenderer {
   // Rendering system
   private tilesNeedUpdating = false;
   private pendingFrame: number | null = null;
-  private currentContext: RenderContext | null = null;
+  private renderContext: RenderContext;
 
   // Building rendering
   private transparentBuildings: boolean = false;
@@ -63,8 +64,9 @@ class CanvasRenderer {
     return new DOMPoint(this.clientWidth / 2, this.clientHeight / 2);
   }
 
-  constructor(parentContainer: HTMLDivElement) {
+  constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
     this.parentContainer = parentContainer;
+    this.renderContext = renderContext;
     this.devicePixelRatio = window.devicePixelRatio || 1;
 
     // Store dimensions
@@ -121,7 +123,7 @@ class CanvasRenderer {
   private renderFrame(): void {
     this.pendingFrame = null;
 
-    if (this.tilesNeedUpdating && this.currentContext) {
+    if (this.tilesNeedUpdating) {
       let startTime = performance.now();
 
       // Apply canvas transforms before drawing
@@ -135,7 +137,7 @@ class CanvasRenderer {
       startTime = performance.now();
 
       if (this.tilesNeedUpdating) {
-        this.updateTiles(this.currentContext);
+        this.updateTiles();
       }
 
       const tilesRendering = performance.now() - startTime;
@@ -214,7 +216,7 @@ class CanvasRenderer {
   /**
    * Update the tiles canvas with current grid values
    */
-  private updateTiles(context: RenderContext) {
+  private updateTiles() {
     // Get visible tile range. We only need to update the stuff within visible range. We don't even need to clear the previous frame since there's no transparency anywhere.
     const viewport = this.getVisibleTileRange();
     if (viewport.height < 1 || viewport.width < 1) {
@@ -222,7 +224,7 @@ class CanvasRenderer {
     }
 
     //This beauty stores all the precomputed desirability values.
-    const baseValues = context.getBaseValues();
+    const baseValues = this.renderContext.getBaseValues();
 
     /*
      * DRAW THE COLORED CELLS
@@ -250,7 +252,7 @@ class CanvasRenderer {
     // Put the image data on the temporary canvas
     tempCtx.putImageData(imageData, 0, 0);
     // Draw the scaled image
-    this.tilesCtx.imageSmoothingEnabled = false; //For some reason we need to set this every time?
+    this.tilesCtx.imageSmoothingEnabled = false;
     this.tilesCtx.drawImage(
       tempCanvas,
       0,
@@ -315,14 +317,7 @@ class CanvasRenderer {
   /**
    * Get the range of tiles currently visible in the viewport
    */
-  private getVisibleTileRange(): {
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-    width: number;
-    height: number;
-  } {
+  private getVisibleTileRange(): Viewport {
     // Convert viewport corners to grid coordinates
     const topLeft = this.canvas2grid(new DOMPoint(0, 0));
     const bottomRight = this.canvas2grid(
@@ -357,8 +352,7 @@ class CanvasRenderer {
    */
 
   // Main render method
-  public render(context: RenderContext) {
-    this.currentContext = context;
+  public render() {
     this.tilesNeedUpdating = true;
   }
 
@@ -380,7 +374,7 @@ class CanvasRenderer {
   }
 
   // View transformations
-  public toggleGridRotation(context: RenderContext): void {
+  public toggleGridRotation(): void {
     const oldCenter = this.canvas2grid(this.viewCenter);
 
     if (this.currentRotation === 0) {
@@ -393,7 +387,6 @@ class CanvasRenderer {
     this.centerViewAt(oldCenter);
 
     // Store context and mark all areas as dirty
-    this.currentContext = context;
     this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
   }
 
@@ -466,7 +459,7 @@ class CanvasRenderer {
   }
 
   // Drag handling
-  public startDragging(event: MouseEvent, context: RenderContext) {
+  public startDragging(event: MouseEvent) {
     const thisTile = this.getMouseCoords(event);
     if (!thisTile) return;
 
@@ -475,7 +468,6 @@ class CanvasRenderer {
     this.updateDragBox(thisTile);
 
     // Store context and mark areas as dirty
-    this.currentContext = context;
     this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
   }
 
@@ -485,21 +477,20 @@ class CanvasRenderer {
     }
   }
 
-  public stopDragging(context: RenderContext) {
+  public stopDragging() {
     if (!this.isDragging) return;
 
     const returnBox = this.dragBox;
     this.isDragging = false;
 
     // Store context and mark areas as dirty
-    this.currentContext = context;
     this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
 
     return returnBox;
   }
 
   // Mouse handling
-  public handleMouseMove(event: MouseEvent, context: RenderContext) {
+  public handleMouseMove(event: MouseEvent) {
     const previousTile = this.lastMouseoverTile;
     const thisTile = this.getMouseCoords(event);
     this.lastMouseoverTile = thisTile;
@@ -511,47 +502,35 @@ class CanvasRenderer {
       return;
     }
 
-    const cursorAction = context.getCursorAction();
+    const cursorAction = this.renderContext.getCursorAction();
 
     if (this.isDragging) {
       if (event.buttons !== 1) {
-        this.stopDragging(context);
+        this.stopDragging();
       } else {
         this.updateDragBox(thisTile);
         // Store context and mark areas as dirty
-        this.currentContext = context;
         this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
       }
     } else if (cursorAction === 'placing') {
       // Store context and mark areas as dirty
-      this.currentContext = context;
       this.tilesNeedUpdating = true; //old values are... we'll figure this out later
     }
   }
 
-  public handleMouseLeave(context: RenderContext) {
+  public handleMouseLeave() {
     this.lastMouseoverTile = undefined;
 
     // Store context and mark areas as dirty
-    this.currentContext = context;
     this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here?
   }
 
   // Building transparency
-  public setBuildingTransparency(
-    newSetting: boolean,
-    context: RenderContext
-  ): void {
+  public setBuildingTransparency(newSetting: boolean): void {
     this.transparentBuildings = newSetting;
 
     // Store context and mark areas as dirty
-    this.currentContext = context;
     this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
-  }
-
-  // Building rendering - to be implemented in Phase 3
-  public drawBuilding(building: PlacedBuilding) {
-    // TODO: Implement in Phase 3
   }
 }
 
