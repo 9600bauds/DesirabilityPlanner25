@@ -1,5 +1,5 @@
 import RenderContext from '../interfaces/RenderContext';
-import colors, { desirabilityColor } from '../utils/colors';
+import colors, { desirabilityColor, getDesirabilityRGB } from '../utils/colors';
 import {
   GRID_CENTER_PX,
   GRID_TOTAL_PX,
@@ -76,7 +76,6 @@ class CanvasRenderer {
     this.tilesCtx = this.tilesCanvas.getContext('2d', {
       alpha: false,
       desynchronized: true,
-      imageSmoothingEnabled: false,
     }) as CanvasRenderingContext2D;
 
     // Center view
@@ -216,60 +215,85 @@ class CanvasRenderer {
    * Update the tiles canvas with current grid values
    */
   private updateTiles(context: RenderContext) {
-    const ctx = this.tilesCtx;
-
     // Get visible tile range. We only need to update the stuff within visible range. We don't even need to clear the previous frame since there's no transparency anywhere.
     const viewport = this.getVisibleTileRange();
+    if (viewport.height < 1 || viewport.width < 1) {
+      return; //We are fully offscreen!
+    }
+
+    //This beauty stores all the precomputed desirability values.
+    const baseValues = context.getBaseValues();
 
     /*
      * DRAW THE COLORED CELLS
      */
-    // Get base values and prepare variables
-    const baseValues = context.getBaseValues();
-    for (let x = viewport.startX; x <= viewport.endX; x++) {
-      for (let y = viewport.startY; y <= viewport.endY; y++) {
-        if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
+    // We make use of a temporary canvas here. We draw each tile as 1 pixel big. Then we expand it to cover the entire canvas.
+    // This is more efficient, but we need this ugly temporary canvas to do it, because bitmap creation is asynchronous and I don't want to deal with that.
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = viewport.width;
+    tempCanvas.height = viewport.height;
+    const tempCtx = tempCanvas.getContext('2d')!;
+    const imageData = tempCtx.createImageData(viewport.width, viewport.height);
 
-        const tile = new Tile(x, y);
-        //const desirabilityValue = getAdjustedDesirability(tile);
-        const desirabilityValue = baseValues[COORD_TO_INT16(tile.x, tile.y)];
-
-        ctx.fillStyle = desirabilityColor(desirabilityValue);
-        ctx.fillRect(x * CELL_PX, y * CELL_PX, CELL_PX, CELL_PX);
+    // Fill the image with cell colors - one pixel per cell
+    let idx = 0;
+    for (let y = viewport.startY; y < viewport.endY; y++) {
+      for (let x = viewport.startX; x < viewport.endX; x++) {
+        const rgb = getDesirabilityRGB(baseValues[COORD_TO_INT16(x, y)]);
+        imageData.data[idx++] = rgb.r;
+        imageData.data[idx++] = rgb.g;
+        imageData.data[idx++] = rgb.b;
+        imageData.data[idx++] = 255; //We don't use alpha but still need to assign it
       }
     }
+
+    // Put the image data on the temporary canvas
+    tempCtx.putImageData(imageData, 0, 0);
+    // Draw the scaled image
+    this.tilesCtx.imageSmoothingEnabled = false; //For some reason we need to set this every time?
+    this.tilesCtx.drawImage(
+      tempCanvas,
+      0,
+      0,
+      viewport.width,
+      viewport.height,
+      COORD_TO_PX(viewport.startX),
+      COORD_TO_PX(viewport.startY),
+      COORD_TO_PX(viewport.width),
+      COORD_TO_PX(viewport.height)
+    );
 
     /*
      * DRAW THE BLACK GRIDLINES
      */
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = colors.pureBlack;
+    this.tilesCtx.lineWidth = 1;
+    this.tilesCtx.strokeStyle = colors.pureBlack;
     // Batch all line drawing into a single path
-    ctx.beginPath();
+    this.tilesCtx.beginPath();
     // Path the horizontal lines
-    for (let y = viewport.startY; y <= viewport.endY + 1; y++) {
-      ctx.moveTo(COORD_TO_PX(viewport.startX), COORD_TO_PX(y));
-      ctx.lineTo(COORD_TO_PX(viewport.endX + 1), COORD_TO_PX(y));
+    for (let y = viewport.startY; y <= viewport.endY; y++) {
+      this.tilesCtx.moveTo(COORD_TO_PX(viewport.startX), COORD_TO_PX(y));
+      this.tilesCtx.lineTo(COORD_TO_PX(viewport.endX), COORD_TO_PX(y));
     }
     // Path the vertical lines
-    for (let x = viewport.startX; x <= viewport.endX + 1; x++) {
-      ctx.moveTo(COORD_TO_PX(x), COORD_TO_PX(viewport.startY));
-      ctx.lineTo(COORD_TO_PX(x), COORD_TO_PX(viewport.endY + 1));
+    for (let x = viewport.startX; x <= viewport.endX; x++) {
+      this.tilesCtx.moveTo(COORD_TO_PX(x), COORD_TO_PX(viewport.startY));
+      this.tilesCtx.lineTo(COORD_TO_PX(x), COORD_TO_PX(viewport.endY));
     }
     // Execute the path!
-    ctx.stroke();
+    this.tilesCtx.stroke();
 
     /*
      * DRAW THE TEXT LABELS (most of the performance hit is from here!)
      */
     if (this.zoomLevel > this.TEXT_ZOOM_THRESHOLD) {
-      ctx.font = '10px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'white';
-      ctx.fillStyle = 'white';
-      for (let x = viewport.startX; x <= viewport.endX; x++) {
-        for (let y = viewport.startY; y <= viewport.endY; y++) {
+      this.tilesCtx.font = '10px Arial';
+      this.tilesCtx.textAlign = 'center';
+      this.tilesCtx.textBaseline = 'middle';
+      this.tilesCtx.fillStyle = 'white';
+      this.tilesCtx.fillStyle = 'white';
+      for (let x = viewport.startX; x < viewport.endX; x++) {
+        for (let y = viewport.startY; y < viewport.endY; y++) {
           if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
 
           const tile = new Tile(x, y);
@@ -277,7 +301,7 @@ class CanvasRenderer {
 
           if (desirabilityValue === 0) continue;
 
-          ctx.fillText(
+          this.tilesCtx.fillText(
             desirabilityValue.toString(),
             COORD_TO_PX(x) + CELL_PX / 2,
             COORD_TO_PX(y) + CELL_PX / 2
@@ -296,6 +320,8 @@ class CanvasRenderer {
     startY: number;
     endX: number;
     endY: number;
+    width: number;
+    height: number;
   } {
     // Convert viewport corners to grid coordinates
     const topLeft = this.canvas2grid(new DOMPoint(0, 0));
@@ -305,18 +331,25 @@ class CanvasRenderer {
 
     // Calculate tile range with padding
     const padding = 1;
-    const startX = Math.max(0, Math.floor(PX_TO_COORD(topLeft.x)) - padding);
-    const startY = Math.max(0, Math.floor(PX_TO_COORD(topLeft.y)) - padding);
+    const startX = Math.max(0, PX_TO_COORD(topLeft.x) - padding);
+    const startY = Math.max(0, PX_TO_COORD(topLeft.y) - padding);
     const endX = Math.min(
       GRID_SIZE - 1,
-      Math.ceil(PX_TO_COORD(bottomRight.x)) + padding
+      PX_TO_COORD(bottomRight.x) + 1 + padding
     );
     const endY = Math.min(
       GRID_SIZE - 1,
-      Math.ceil(PX_TO_COORD(bottomRight.y)) + padding
+      PX_TO_COORD(bottomRight.y) + 1 + padding
     );
 
-    return { startX, startY, endX, endY };
+    return {
+      startX,
+      startY,
+      endX,
+      endY,
+      width: endX - startX,
+      height: endY - startY,
+    };
   }
 
   /*
