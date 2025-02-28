@@ -496,11 +496,28 @@ class CanvasRenderer {
      * DRAW THE TEXT LABELS (most of the performance hit is from here!)
      */
     if (this.zoomLevel > this.TEXT_ZOOM_THRESHOLD) {
-      this.tilesCtx.font = '10px Arial';
+      // Save the current transform state
+      this.tilesCtx.save();
+
+      // Reset transform to identity but keep device pixel ratio
+      this.tilesCtx.setTransform(
+        this.devicePixelRatio,
+        0,
+        0,
+        this.devicePixelRatio,
+        0,
+        0
+      );
+
+      // Set text style
+      this.tilesCtx.font = 'bold 14px Arial';
       this.tilesCtx.textAlign = 'center';
       this.tilesCtx.textBaseline = 'middle';
-      this.tilesCtx.fillStyle = 'white';
-      this.tilesCtx.fillStyle = 'white';
+      this.tilesCtx.lineWidth = 2;
+      this.tilesCtx.strokeStyle = 'white';
+      this.tilesCtx.fillStyle = 'black';
+
+      // Draw all text without rotation
       for (let x = viewport.startX; x < viewport.endX; x++) {
         for (let y = viewport.startY; y < viewport.endY; y++) {
           if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
@@ -510,13 +527,24 @@ class CanvasRenderer {
 
           if (desirabilityValue === 0) continue;
 
-          this.tilesCtx.fillText(
-            desirabilityValue.toString(),
-            COORD_TO_PX(x) + CELL_PX / 2,
-            COORD_TO_PX(y) + CELL_PX / 2
-          );
+          // Get the center point of this tile in canvas space
+          const centerPoint = {
+            x: COORD_TO_PX(x) + CELL_PX / 2,
+            y: COORD_TO_PX(y) + CELL_PX / 2,
+          };
+
+          // Apply all transformations to this point to get screen coordinates
+          const screenPoint = this.grid2canvas(centerPoint);
+
+          // Draw the text at screen coordinates without any rotation
+          const valueText = desirabilityValue.toString();
+          this.tilesCtx.strokeText(valueText, screenPoint.x, screenPoint.y);
+          this.tilesCtx.fillText(valueText, screenPoint.x, screenPoint.y);
         }
       }
+
+      // Restore the transform
+      this.tilesCtx.restore();
     }
   }
 }
