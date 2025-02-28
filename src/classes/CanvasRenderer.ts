@@ -192,24 +192,26 @@ class CanvasRenderer {
 
   // Get the range of tiles currently visible in the viewport
   public getViewport(): Viewport {
-    // Convert viewport corners to grid coordinates
-    const topLeft = this.canvas2grid(new DOMPoint(0, 0));
-    const bottomRight = this.canvas2grid(
-      new DOMPoint(this.clientWidth, this.clientHeight)
-    );
+    // When the grid is rotated, we need to check all four corners of the viewport
+    const corners = [
+      this.canvas2grid(new DOMPoint(0, 0)), // top-left
+      this.canvas2grid(new DOMPoint(this.clientWidth, 0)), // top-right
+      this.canvas2grid(new DOMPoint(0, this.clientHeight)), // bottom-left
+      this.canvas2grid(new DOMPoint(this.clientWidth, this.clientHeight)), // bottom-right
+    ];
+
+    // Find the bounding box of all corners
+    const minX = Math.min(...corners.map((p) => p.x));
+    const minY = Math.min(...corners.map((p) => p.y));
+    const maxX = Math.max(...corners.map((p) => p.x));
+    const maxY = Math.max(...corners.map((p) => p.y));
 
     // Calculate tile range with padding
-    const padding = 1;
-    const startX = Math.max(0, PX_TO_COORD(topLeft.x) - padding);
-    const startY = Math.max(0, PX_TO_COORD(topLeft.y) - padding);
-    const endX = Math.min(
-      GRID_SIZE - 1,
-      PX_TO_COORD(bottomRight.x) + 1 + padding
-    );
-    const endY = Math.min(
-      GRID_SIZE - 1,
-      PX_TO_COORD(bottomRight.y) + 1 + padding
-    );
+    const padding = 0; //For later, if/we ever implement unnecessary renders when panning in the padding
+    const startX = Math.max(0, PX_TO_COORD(minX) - padding);
+    const startY = Math.max(0, PX_TO_COORD(minY) - padding);
+    const endX = Math.min(GRID_SIZE - 1, PX_TO_COORD(maxX) + 1 + padding);
+    const endY = Math.min(GRID_SIZE - 1, PX_TO_COORD(maxY) + 1 + padding);
 
     return {
       startX,
@@ -245,7 +247,7 @@ class CanvasRenderer {
   }
 
   public toggleGridRotation(): void {
-    //const oldCenter = this.canvas2grid(this.viewCenter);
+    const oldCenter = this.canvas2grid(this.viewCenter);
 
     if (this.currentRotation === 0) {
       this.currentRotation = ROTATION_ANGLE;
@@ -254,15 +256,23 @@ class CanvasRenderer {
     }
 
     // Recenter view
-    //this.centerViewAt(oldCenter);
+    this.centerViewAt(oldCenter);
 
     this.scheduleRender(CanvasUpdateFlag.ALL);
   }
 
   public centerViewAt(point: GridPoint) {
     const center = this.viewCenter;
-    this.offsetX = center.x - point.x * this.zoomLevel;
-    this.offsetY = center.y - point.y * this.zoomLevel;
+    const cos = Math.cos(degreesToRads(this.currentRotation));
+    const sin = Math.sin(degreesToRads(this.currentRotation));
+
+    // Apply rotation transformation with zoom
+    const transformedX = (point.x * cos - point.y * sin) * this.zoomLevel;
+    const transformedY = (point.x * sin + point.y * cos) * this.zoomLevel;
+
+    // Calculate the offset to place the transformed point at the center
+    this.offsetX = center.x - transformedX;
+    this.offsetY = center.y - transformedY;
 
     this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   }
