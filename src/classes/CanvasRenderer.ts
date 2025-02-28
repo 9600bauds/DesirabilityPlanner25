@@ -18,7 +18,7 @@ export enum CanvasUpdateFlag {
   NONE = 0,
   TRANSFORM = 1 << 0,
   TILES = 1 << 1,
-  ALL = ~0 // All bits set to 1
+  ALL = ~0, // All bits set to 1
 }
 
 export interface GridPoint {
@@ -75,11 +75,11 @@ class CanvasRenderer {
     const createCanvas = (id: string, zIndex: number): HTMLCanvasElement => {
       const canvas = document.createElement('canvas');
       canvas.id = id;
-  
+
       // Size canvas to match the viewport (not the grid)
       canvas.width = this.clientWidth * this.devicePixelRatio;
       canvas.height = this.clientHeight * this.devicePixelRatio;
-  
+
       // Set display size via CSS
       canvas.style.position = 'absolute';
       canvas.style.top = '0';
@@ -88,7 +88,7 @@ class CanvasRenderer {
       canvas.style.height = this.clientHeight + 'px';
       canvas.style.zIndex = zIndex.toString();
       canvas.style.pointerEvents = 'none';
-  
+
       this.parentContainer.appendChild(canvas);
       return canvas;
     };
@@ -115,6 +115,13 @@ class CanvasRenderer {
     this.scheduleRender(CanvasUpdateFlag.ALL);
   }
 
+  /*
+   * Public methods
+   */
+  public selectedBlueprintChanged() {
+    //Todo: Update virtual building
+  }
+
   public scheduleRender(updateFlags: number): void {
     this.sectionsNeedUpdating |= updateFlags; //Add the flags of the parts that need updating via bitwise OR
 
@@ -123,6 +130,259 @@ class CanvasRenderer {
     }
   }
 
+  // Size handling
+  public canvasSizeUpdated() {
+    this.clientWidth = this.parentContainer.clientWidth;
+    this.clientHeight = this.parentContainer.clientHeight;
+
+    // Resize all canvases
+    [this.tilesCanvas].forEach((canvas) => {
+      canvas.width = this.clientWidth * this.devicePixelRatio;
+      canvas.height = this.clientHeight * this.devicePixelRatio;
+      canvas.style.width = this.clientWidth + 'px';
+      canvas.style.height = this.clientHeight + 'px';
+    });
+
+    this.scheduleRender(CanvasUpdateFlag.ALL);
+  }
+
+  /*
+   * Coordinate transformations
+   */
+  private grid2canvas(point: GridPoint): DOMPoint {
+    const cos = Math.cos(degreesToRads(this.currentRotation));
+    const sin = Math.sin(degreesToRads(this.currentRotation));
+
+    return new DOMPoint(
+      (point.x * cos - point.y * sin) * this.zoomLevel + this.offsetX,
+      (point.x * sin + point.y * cos) * this.zoomLevel + this.offsetY
+    );
+  }
+
+  private canvas2grid(point: DOMPoint): GridPoint {
+    const xUnscaled = (point.x - this.offsetX) / this.zoomLevel;
+    const yUnscaled = (point.y - this.offsetY) / this.zoomLevel;
+    const cos = Math.cos(degreesToRads(this.currentRotation));
+    const sin = Math.sin(degreesToRads(this.currentRotation));
+
+    return {
+      x: xUnscaled * cos + yUnscaled * sin,
+      y: -xUnscaled * sin + yUnscaled * cos,
+    };
+  }
+
+  private pointToTile(point: DOMPoint): Tile | undefined {
+    const gridPt = this.canvas2grid(point);
+
+    // Convert to tile coordinates
+    const tileX = PX_TO_COORD(gridPt.x);
+    const tileY = PX_TO_COORD(gridPt.y);
+
+    // Check if the tile is within grid bounds
+    if (tileX >= 0 && tileX < GRID_SIZE && tileY >= 0 && tileY < GRID_SIZE) {
+      return new Tile(tileX, tileY);
+    }
+
+    return undefined;
+  }
+
+  public getMouseCoords(event: MouseEvent): Tile | undefined {
+    return this.pointToTile(new DOMPoint(event.clientX, event.clientY));
+  }
+
+  // Get the range of tiles currently visible in the viewport
+  public getViewport(): Viewport {
+    // Convert viewport corners to grid coordinates
+    const topLeft = this.canvas2grid(new DOMPoint(0, 0));
+    const bottomRight = this.canvas2grid(
+      new DOMPoint(this.clientWidth, this.clientHeight)
+    );
+
+    // Calculate tile range with padding
+    const padding = 1;
+    const startX = Math.max(0, PX_TO_COORD(topLeft.x) - padding);
+    const startY = Math.max(0, PX_TO_COORD(topLeft.y) - padding);
+    const endX = Math.min(
+      GRID_SIZE - 1,
+      PX_TO_COORD(bottomRight.x) + 1 + padding
+    );
+    const endY = Math.min(
+      GRID_SIZE - 1,
+      PX_TO_COORD(bottomRight.y) + 1 + padding
+    );
+
+    return {
+      startX,
+      startY,
+      endX,
+      endY,
+      width: endX - startX,
+      height: endY - startY,
+    };
+  }
+
+  /*
+   * Canvas transforms
+   */
+  private applyCanvasTransforms(): void {
+    // Reset transforms
+    [this.tilesCtx].forEach((ctx) => {
+      // Start with device pixel ratio scaling
+      ctx.setTransform(
+        this.devicePixelRatio,
+        0,
+        0,
+        this.devicePixelRatio,
+        0,
+        0
+      );
+
+      // Apply our transformations
+      ctx.translate(this.offsetX, this.offsetY);
+      ctx.scale(this.zoomLevel, this.zoomLevel);
+      ctx.rotate(degreesToRads(this.currentRotation));
+    });
+  }
+
+  public toggleGridRotation(): void {
+    //const oldCenter = this.canvas2grid(this.viewCenter);
+
+    if (this.currentRotation === 0) {
+      this.currentRotation = ROTATION_ANGLE;
+    } else {
+      this.currentRotation = 0;
+    }
+
+    // Recenter view
+    //this.centerViewAt(oldCenter);
+
+    this.scheduleRender(CanvasUpdateFlag.ALL);
+  }
+
+  public centerViewAt(point: GridPoint) {
+    const center = this.viewCenter;
+    this.offsetX = center.x - point.x * this.zoomLevel;
+    this.offsetY = center.y - point.y * this.zoomLevel;
+
+    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
+  }
+
+  public zoomIn() {
+    this.zoom(1.2);
+  }
+
+  public zoomOut() {
+    this.zoom(1 / 1.2);
+  }
+
+  private zoom(factor: number) {
+    const oldCenter = this.canvas2grid(this.viewCenter);
+    this.zoomLevel *= factor;
+
+    // Recenter view
+    this.centerViewAt(oldCenter);
+
+    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
+  }
+
+  // Panning methods
+  public startPanning(event: MouseEvent) {
+    this.isPanning = true;
+    this.lastPanCursorX = event.clientX;
+    this.lastPanCursorY = event.clientY;
+    this.parentContainer.style.cursor = 'grabbing';
+  }
+
+  public handlePanning(event: MouseEvent) {
+    if (!this.isPanning) return;
+
+    const deltaX = event.clientX - this.lastPanCursorX;
+    const deltaY = event.clientY - this.lastPanCursorY;
+
+    this.offsetX += deltaX;
+    this.offsetY += deltaY;
+
+    this.lastPanCursorX = event.clientX;
+    this.lastPanCursorY = event.clientY;
+
+    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
+  }
+
+  public stopPanning() {
+    this.isPanning = false;
+    this.parentContainer.style.cursor = 'grab';
+  }
+
+  // Drag handling
+  public startDragging(event: MouseEvent) {
+    const thisTile = this.getMouseCoords(event);
+    if (!thisTile) return;
+
+    this.isDragging = true;
+    this.dragStartTile = thisTile;
+    this.updateDragBox(thisTile);
+  }
+
+  private updateDragBox(newPos: Tile | undefined) {
+    if (this.dragStartTile && newPos) {
+      this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
+    }
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
+  }
+
+  public stopDragging() {
+    if (!this.isDragging) return;
+
+    const returnBox = this.dragBox;
+    this.isDragging = false;
+
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
+
+    return returnBox;
+  }
+
+  // Mouse handling
+  public handleMouseMove(event: MouseEvent) {
+    const previousTile = this.lastMouseoverTile;
+    const thisTile = this.getMouseCoords(event);
+    this.lastMouseoverTile = thisTile;
+
+    if (
+      (thisTile && previousTile && thisTile.equals(previousTile)) ||
+      (!thisTile && !previousTile)
+    ) {
+      return;
+    }
+
+    const cursorAction = this.renderContext.getCursorAction();
+
+    if (this.isDragging) {
+      if (event.buttons !== 1) {
+        this.stopDragging();
+      } else {
+        this.updateDragBox(thisTile);
+      }
+    } else if (cursorAction === 'placing') {
+      //Todo: Update virtual building here
+    }
+  }
+
+  public handleMouseLeave() {
+    this.lastMouseoverTile = undefined;
+
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: This shouldn't need a rerender but I'll deal with it later
+  }
+
+  // Building transparency
+  public setBuildingTransparency(newSetting: boolean): void {
+    this.transparentBuildings = newSetting;
+
+    //Todo: What needs rerendering here?
+  }
+
+  /*
+   * Actual rendering methods
+   */
   private render(): void {
     let startTime = performance.now();
 
@@ -148,55 +408,6 @@ class CanvasRenderer {
 
     this.pendingFrame = null;
     this.sectionsNeedUpdating = CanvasUpdateFlag.NONE;
-  }
-
-  /*
-   * Coordinate transformations
-   */
-
-  private grid2canvas(point: GridPoint): DOMPoint {
-    const cos = Math.cos(degreesToRads(this.currentRotation));
-    const sin = Math.sin(degreesToRads(this.currentRotation));
-
-    return new DOMPoint(
-      (point.x * cos - point.y * sin) * this.zoomLevel + this.offsetX,
-      (point.x * sin + point.y * cos) * this.zoomLevel + this.offsetY
-    );
-  }
-
-  private canvas2grid(point: DOMPoint): GridPoint {
-    const xUnscaled = (point.x - this.offsetX) / this.zoomLevel;
-    const yUnscaled = (point.y - this.offsetY) / this.zoomLevel;
-    const cos = Math.cos(degreesToRads(this.currentRotation));
-    const sin = Math.sin(degreesToRads(this.currentRotation));
-
-    return {
-      x: xUnscaled * cos + yUnscaled * sin,
-      y: -xUnscaled * sin + yUnscaled * cos,
-    };
-  }
-
-  /*
-   * Canvas transforms
-   */
-  private applyCanvasTransforms(): void {
-    // Reset transforms
-    [this.tilesCtx].forEach((ctx) => {
-      // Start with device pixel ratio scaling
-      ctx.setTransform(
-        this.devicePixelRatio,
-        0,
-        0,
-        this.devicePixelRatio,
-        0,
-        0
-      );
-
-      // Apply our transformations
-      ctx.translate(this.offsetX, this.offsetY);
-      ctx.rotate(degreesToRads(this.currentRotation));
-      ctx.scale(this.zoomLevel, this.zoomLevel);
-    });
   }
 
   /*
@@ -297,216 +508,6 @@ class CanvasRenderer {
         }
       }
     }
-  }
-
-  /**
-   * Get the range of tiles currently visible in the viewport
-   */
-  public getViewport(): Viewport {
-    // Convert viewport corners to grid coordinates
-    const topLeft = this.canvas2grid(new DOMPoint(0, 0));
-    const bottomRight = this.canvas2grid(
-      new DOMPoint(this.clientWidth, this.clientHeight)
-    );
-
-    // Calculate tile range with padding
-    const padding = 1;
-    const startX = Math.max(0, PX_TO_COORD(topLeft.x) - padding);
-    const startY = Math.max(0, PX_TO_COORD(topLeft.y) - padding);
-    const endX = Math.min(
-      GRID_SIZE - 1,
-      PX_TO_COORD(bottomRight.x) + 1 + padding
-    );
-    const endY = Math.min(
-      GRID_SIZE - 1,
-      PX_TO_COORD(bottomRight.y) + 1 + padding
-    );
-
-    return {
-      startX,
-      startY,
-      endX,
-      endY,
-      width: endX - startX,
-      height: endY - startY,
-    };
-  }
-
-  // Size handling
-  public canvasSizeUpdated() {
-    this.clientWidth = this.parentContainer.clientWidth;
-    this.clientHeight = this.parentContainer.clientHeight;
-
-    // Resize all canvases
-    [this.tilesCanvas].forEach((canvas) => {
-      canvas.width = this.clientWidth * this.devicePixelRatio;
-      canvas.height = this.clientHeight * this.devicePixelRatio;
-      canvas.style.width = this.clientWidth + 'px';
-      canvas.style.height = this.clientHeight + 'px';
-    });
-
-    this.scheduleRender(CanvasUpdateFlag.ALL);
-  }
-
-  // View transformations
-  public toggleGridRotation(): void {
-    //const oldCenter = this.canvas2grid(this.viewCenter);
-
-    if (this.currentRotation === 0) {
-      this.currentRotation = ROTATION_ANGLE;
-    } else {
-      this.currentRotation = 0;
-    }
-
-    // Recenter view
-    //this.centerViewAt(oldCenter);
-
-    this.scheduleRender(CanvasUpdateFlag.ALL);
-  }
-
-  public centerViewAt(point: GridPoint) {
-    const center = this.viewCenter;
-    this.offsetX = center.x - point.x * this.zoomLevel;
-    this.offsetY = center.y - point.y * this.zoomLevel;
-
-    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
-  }
-
-  public zoomIn() {
-    this.zoom(1.2);
-  }
-
-  public zoomOut() {
-    this.zoom(1 / 1.2);
-  }
-
-  private zoom(factor: number) {
-    const oldCenter = this.canvas2grid(this.viewCenter);
-    this.zoomLevel *= factor;
-
-    // Recenter view
-    this.centerViewAt(oldCenter);
-
-    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
-  }
-
-  // Panning methods
-  public startPanning(event: MouseEvent) {
-    this.isPanning = true;
-    this.lastPanCursorX = event.clientX;
-    this.lastPanCursorY = event.clientY;
-    this.parentContainer.style.cursor = 'grabbing';
-  }
-
-  public handlePanning(event: MouseEvent) {
-    if (!this.isPanning) return;
-
-    const deltaX = event.clientX - this.lastPanCursorX;
-    const deltaY = event.clientY - this.lastPanCursorY;
-
-    this.offsetX += deltaX;
-    this.offsetY += deltaY;
-
-    this.lastPanCursorX = event.clientX;
-    this.lastPanCursorY = event.clientY;
-
-    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
-  }
-
-  public stopPanning() {
-    this.isPanning = false;
-    this.parentContainer.style.cursor = 'grab';
-  }
-
-  // Tile coordinate methods
-  private pointToTile(point: DOMPoint): Tile | undefined {
-    const gridPt = this.canvas2grid(point);
-
-    // Convert to tile coordinates
-    const tileX = PX_TO_COORD(gridPt.x);
-    const tileY = PX_TO_COORD(gridPt.y);
-
-    // Check if the tile is within grid bounds
-    if (tileX >= 0 && tileX < GRID_SIZE && tileY >= 0 && tileY < GRID_SIZE) {
-      return new Tile(tileX, tileY);
-    }
-
-    return undefined;
-  }
-
-  public getMouseCoords(event: MouseEvent): Tile | undefined {
-    return this.pointToTile(new DOMPoint(event.clientX, event.clientY));
-  }
-
-  // Drag handling
-  public startDragging(event: MouseEvent) {
-    const thisTile = this.getMouseCoords(event);
-    if (!thisTile) return;
-
-    this.isDragging = true;
-    this.dragStartTile = thisTile;
-    this.updateDragBox(thisTile);
-  }
-
-  private updateDragBox(newPos: Tile | undefined) {
-    if (this.dragStartTile && newPos) {
-      this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
-    }
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
-  }
-
-  public stopDragging() {
-    if (!this.isDragging) return;
-
-    const returnBox = this.dragBox;
-    this.isDragging = false;
-
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
-
-    return returnBox;
-  }
-
-  // Mouse handling
-  public handleMouseMove(event: MouseEvent) {
-    const previousTile = this.lastMouseoverTile;
-    const thisTile = this.getMouseCoords(event);
-    this.lastMouseoverTile = thisTile;
-
-    if (
-      (thisTile && previousTile && thisTile.equals(previousTile)) ||
-      (!thisTile && !previousTile)
-    ) {
-      return;
-    }
-
-    const cursorAction = this.renderContext.getCursorAction();
-
-    if (this.isDragging) {
-      if (event.buttons !== 1) {
-        this.stopDragging();
-      } else {
-        this.updateDragBox(thisTile);
-      }
-    } else if (cursorAction === 'placing') {
-      //Todo: Update virtual building here
-    }
-  }
-
-  public handleMouseLeave() {
-    this.lastMouseoverTile = undefined;
-
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: This shouldn't need a rerender but I'll deal with it later
-  }
-
-  // Building transparency
-  public setBuildingTransparency(newSetting: boolean): void {
-    this.transparentBuildings = newSetting;
-
-    //Todo: What needs rerendering here?
-  }
-
-  public selectedBlueprintChanged() {
-    //Todo: Update virtual building
   }
 }
 

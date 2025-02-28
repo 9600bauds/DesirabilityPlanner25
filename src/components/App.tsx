@@ -45,7 +45,10 @@ const App: React.FC = () => {
         getSelectedBlueprint: getSelectedBlueprint,
         isTileOccupied: gridStateManager.isTileOccupied,
       };
-      rendererRef.current = new CanvasRenderer(canvasContainer.current, renderContext);
+      rendererRef.current = new CanvasRenderer(
+        canvasContainer.current,
+        renderContext
+      );
 
       const instantiated = instantiateBlueprints(svgCanvasRef.current);
       setPopulatedCategories(populateCategories(instantiated));
@@ -64,7 +67,7 @@ const App: React.FC = () => {
 
   // Notify our renderer when the selected blueprint changes
   useEffect(() => {
-    if (rendererRef.current){
+    if (rendererRef.current) {
       rendererRef.current.selectedBlueprintChanged();
     }
 
