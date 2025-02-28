@@ -192,7 +192,11 @@ class CanvasRenderer {
 
   // Get the range of tiles currently visible in the viewport
   public getViewport(): Viewport {
-    // When the grid is rotated, we need to check all four corners of the viewport
+    // Currently, this function uses a very simple and slightly wasteful algorithm.
+    // In order to handle grid rotation, we need to get the axis-aligned bounding box of all four corners of the viewport.
+    // This means that when the grid is rotated, up to 50% of the tiles we render are wasted effort since they're offscreen!
+    // We could further optimize this by memoizing most of this logic and only updating it when the rotation or client height/width change.
+    // However, fixing that is tricky without messing with the SIMD optimization. And there are much more significant optimizations we should do, first.
     const corners = [
       this.canvas2grid(new DOMPoint(0, 0)), // top-left
       this.canvas2grid(new DOMPoint(this.clientWidth, 0)), // top-right
@@ -200,14 +204,14 @@ class CanvasRenderer {
       this.canvas2grid(new DOMPoint(this.clientWidth, this.clientHeight)), // bottom-right
     ];
 
-    // Find the bounding box of all corners
+    // Find the axis-aligned bounding box of all corners
     const minX = Math.min(...corners.map((p) => p.x));
     const minY = Math.min(...corners.map((p) => p.y));
     const maxX = Math.max(...corners.map((p) => p.x));
     const maxY = Math.max(...corners.map((p) => p.y));
 
     // Calculate tile range with padding
-    const padding = 0; //For later, if/we ever implement unnecessary renders when panning in the padding
+    const padding = 0; //For later, if/we ever optimize away unnecessary renders when panning small distances
     const startX = Math.max(0, PX_TO_COORD(minX) - padding);
     const startY = Math.max(0, PX_TO_COORD(minY) - padding);
     const endX = Math.min(GRID_SIZE - 1, PX_TO_COORD(maxX) + 1 + padding);
@@ -424,7 +428,9 @@ class CanvasRenderer {
    * Render the tiles
    */
   private renderTiles() {
-    // Get visible tile range. We only need to update the stuff within visible range. We don't even need to clear the previous frame since there's no transparency anywhere.
+    // Get visible tile range. We only need to update the stuff within visible range.
+    // We don't even need to clear the previous frame since there's no transparency anywhere, so it only matters when panning to outside the grid's edge
+    // (and in that case, it merely results in the fun hall of mirrors effect that's really fun to play with, so it's almost a feature really)
     const viewport = this.getViewport();
     if (viewport.height < 1 || viewport.width < 1) {
       return; //We are fully offscreen!
@@ -480,12 +486,12 @@ class CanvasRenderer {
     // Batch all line drawing into a single path
     this.tilesCtx.beginPath();
     // Path the horizontal lines
-    for (let y = viewport.startY; y <= viewport.endY; y++) {
+    for (let y = viewport.startY + 1; y < viewport.endY; y++) {
       this.tilesCtx.moveTo(COORD_TO_PX(viewport.startX), COORD_TO_PX(y));
       this.tilesCtx.lineTo(COORD_TO_PX(viewport.endX), COORD_TO_PX(y));
     }
     // Path the vertical lines
-    for (let x = viewport.startX; x <= viewport.endX; x++) {
+    for (let x = viewport.startX + 1; x < viewport.endX; x++) {
       this.tilesCtx.moveTo(COORD_TO_PX(x), COORD_TO_PX(viewport.startY));
       this.tilesCtx.lineTo(COORD_TO_PX(x), COORD_TO_PX(viewport.endY));
     }
