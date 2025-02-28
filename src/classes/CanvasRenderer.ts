@@ -14,7 +14,14 @@ import {
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
 import PlacedBuilding from './PlacedBuilding';
 
-interface GridPoint {
+export enum CanvasUpdateFlag {
+  NONE = 0,
+  TRANSFORM = 1 << 0,
+  TILES = 1 << 1,
+  ALL = ~0 // All bits set to 1
+}
+
+export interface GridPoint {
   x: number;
   y: number;
 }
@@ -45,7 +52,7 @@ class CanvasRenderer {
   private dragBox?: Rectangle;
 
   // Rendering system
-  private tilesNeedUpdating = false;
+  private sectionsNeedUpdating: number = CanvasUpdateFlag.NONE; //Uses a bitflag system
   private pendingFrame: number | null = null;
   private renderContext: RenderContext;
 
@@ -65,6 +72,27 @@ class CanvasRenderer {
   }
 
   constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
+    const createCanvas = (id: string, zIndex: number): HTMLCanvasElement => {
+      const canvas = document.createElement('canvas');
+      canvas.id = id;
+  
+      // Size canvas to match the viewport (not the grid)
+      canvas.width = this.clientWidth * this.devicePixelRatio;
+      canvas.height = this.clientHeight * this.devicePixelRatio;
+  
+      // Set display size via CSS
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = this.clientWidth + 'px';
+      canvas.style.height = this.clientHeight + 'px';
+      canvas.style.zIndex = zIndex.toString();
+      canvas.style.pointerEvents = 'none';
+  
+      this.parentContainer.appendChild(canvas);
+      return canvas;
+    };
+
     this.parentContainer = parentContainer;
     this.renderContext = renderContext;
     this.devicePixelRatio = window.devicePixelRatio || 1;
@@ -74,7 +102,7 @@ class CanvasRenderer {
     this.clientHeight = parentContainer.clientHeight;
 
     // Create canvas elements - all sized to fit the viewport
-    this.tilesCanvas = this.createCanvas('tiles-canvas', 1);
+    this.tilesCanvas = createCanvas('tiles-canvas', 1);
     this.tilesCtx = this.tilesCanvas.getContext('2d', {
       alpha: false,
       desynchronized: true,
@@ -83,96 +111,43 @@ class CanvasRenderer {
     // Center view
     this.centerViewAt({ x: GRID_CENTER_PX, y: GRID_CENTER_PX });
 
-    this.tilesNeedUpdating = true;
-
-    // Start animation loop
-    this.scheduleRender();
+    // Go ahead and get us started here
+    this.scheduleRender(CanvasUpdateFlag.ALL);
   }
 
-  private createCanvas(id: string, zIndex: number): HTMLCanvasElement {
-    const canvas = document.createElement('canvas');
-    canvas.id = id;
+  public scheduleRender(updateFlags: number): void {
+    this.sectionsNeedUpdating |= updateFlags; //Add the flags of the parts that need updating via bitwise OR
 
-    // Size canvas to match the viewport (not the grid)
-    canvas.width = this.clientWidth * this.devicePixelRatio;
-    canvas.height = this.clientHeight * this.devicePixelRatio;
-
-    // Set display size via CSS
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.width = this.clientWidth + 'px';
-    canvas.style.height = this.clientHeight + 'px';
-    canvas.style.zIndex = zIndex.toString();
-    canvas.style.pointerEvents = 'none';
-
-    this.parentContainer.appendChild(canvas);
-    return canvas;
-  }
-
-  /*
-   * Render loop and change detection
-   */
-
-  private scheduleRender(): void {
     if (!this.pendingFrame) {
-      this.pendingFrame = requestAnimationFrame(this.renderFrame.bind(this));
+      this.pendingFrame = requestAnimationFrame(this.render.bind(this));
     }
   }
 
-  private renderFrame(): void {
-    this.pendingFrame = null;
+  private render(): void {
+    let startTime = performance.now();
 
-    if (this.tilesNeedUpdating) {
-      let startTime = performance.now();
-
-      // Apply canvas transforms before drawing
+    if (this.sectionsNeedUpdating & CanvasUpdateFlag.TRANSFORM) {
       this.applyCanvasTransforms();
-
       const transformTime = performance.now() - startTime;
-      if (transformTime > 5) {
+      if (transformTime > 3) {
         //prettier-ignore
-        console.log("transformation took", transformTime, "ms!");
-      }
-      startTime = performance.now();
-
-      if (this.tilesNeedUpdating) {
-        this.updateTiles();
-      }
-
-      const tilesRendering = performance.now() - startTime;
-      if (tilesRendering > 5) {
-        //prettier-ignore
-        console.log("tile rendering took", tilesRendering, "ms!");
+        console.log("Transformation took", transformTime, "ms!");
       }
       startTime = performance.now();
     }
 
-    // Always schedule the next frame
-    this.scheduleRender();
-  }
+    if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
+      this.renderTiles();
+      const tilesTime = performance.now() - startTime;
+      if (tilesTime > 5) {
+        //prettier-ignore
+        console.log("Tile rendering took", tilesTime, "ms!");
+      }
+      startTime = performance.now();
+    }
 
-  /*
-   * Apply transforms directly to each canvas
-   */
-  private applyCanvasTransforms(): void {
-    // Reset transforms
-    [this.tilesCtx].forEach((ctx) => {
-      // Start with device pixel ratio scaling
-      ctx.setTransform(
-        this.devicePixelRatio,
-        0,
-        0,
-        this.devicePixelRatio,
-        0,
-        0
-      );
-
-      // Apply our transformations
-      ctx.translate(this.offsetX, this.offsetY);
-      ctx.rotate(degreesToRads(this.currentRotation));
-      ctx.scale(this.zoomLevel, this.zoomLevel);
-    });
+    this.pendingFrame = null;
+    this.sectionsNeedUpdating = CanvasUpdateFlag.NONE;
   }
 
   /*
@@ -202,23 +177,34 @@ class CanvasRenderer {
   }
 
   /*
-   * View transformation methods
+   * Canvas transforms
    */
+  private applyCanvasTransforms(): void {
+    // Reset transforms
+    [this.tilesCtx].forEach((ctx) => {
+      // Start with device pixel ratio scaling
+      ctx.setTransform(
+        this.devicePixelRatio,
+        0,
+        0,
+        this.devicePixelRatio,
+        0,
+        0
+      );
 
-  private centerViewAt(point: GridPoint) {
-    const center = this.viewCenter;
-    this.offsetX = center.x - point.x * this.zoomLevel;
-    this.offsetY = center.y - point.y * this.zoomLevel;
-
-    this.tilesNeedUpdating = true;
+      // Apply our transformations
+      ctx.translate(this.offsetX, this.offsetY);
+      ctx.rotate(degreesToRads(this.currentRotation));
+      ctx.scale(this.zoomLevel, this.zoomLevel);
+    });
   }
 
-  /**
-   * Update the tiles canvas with current grid values
+  /*
+   * Render the tiles
    */
-  private updateTiles() {
+  private renderTiles() {
     // Get visible tile range. We only need to update the stuff within visible range. We don't even need to clear the previous frame since there's no transparency anywhere.
-    const viewport = this.getVisibleTileRange();
+    const viewport = this.getViewport();
     if (viewport.height < 1 || viewport.width < 1) {
       return; //We are fully offscreen!
     }
@@ -311,13 +297,12 @@ class CanvasRenderer {
         }
       }
     }
-
-    this.tilesNeedUpdating = false;
   }
+
   /**
    * Get the range of tiles currently visible in the viewport
    */
-  private getVisibleTileRange(): Viewport {
+  public getViewport(): Viewport {
     // Convert viewport corners to grid coordinates
     const topLeft = this.canvas2grid(new DOMPoint(0, 0));
     const bottomRight = this.canvas2grid(
@@ -347,15 +332,6 @@ class CanvasRenderer {
     };
   }
 
-  /*
-   * Public API methods
-   */
-
-  // Main render method
-  public render() {
-    this.tilesNeedUpdating = true;
-  }
-
   // Size handling
   public canvasSizeUpdated() {
     this.clientWidth = this.parentContainer.clientWidth;
@@ -369,13 +345,12 @@ class CanvasRenderer {
       canvas.style.height = this.clientHeight + 'px';
     });
 
-    // Mark all areas as dirty
-    this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
+    this.scheduleRender(CanvasUpdateFlag.ALL);
   }
 
   // View transformations
   public toggleGridRotation(): void {
-    const oldCenter = this.canvas2grid(this.viewCenter);
+    //const oldCenter = this.canvas2grid(this.viewCenter);
 
     if (this.currentRotation === 0) {
       this.currentRotation = ROTATION_ANGLE;
@@ -384,10 +359,17 @@ class CanvasRenderer {
     }
 
     // Recenter view
-    this.centerViewAt(oldCenter);
+    //this.centerViewAt(oldCenter);
 
-    // Store context and mark all areas as dirty
-    this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
+    this.scheduleRender(CanvasUpdateFlag.ALL);
+  }
+
+  public centerViewAt(point: GridPoint) {
+    const center = this.viewCenter;
+    this.offsetX = center.x - point.x * this.zoomLevel;
+    this.offsetY = center.y - point.y * this.zoomLevel;
+
+    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   }
 
   public zoomIn() {
@@ -405,8 +387,7 @@ class CanvasRenderer {
     // Recenter view
     this.centerViewAt(oldCenter);
 
-    // Mark layers for redraw
-    this.tilesNeedUpdating = true; //NOTE: nuke all old values here!!
+    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
   }
 
   // Panning methods
@@ -429,8 +410,7 @@ class CanvasRenderer {
     this.lastPanCursorX = event.clientX;
     this.lastPanCursorY = event.clientY;
 
-    // Mark for redraw
-    this.tilesNeedUpdating = true; //we don't need to nuke the old values here
+    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   }
 
   public stopPanning() {
@@ -466,15 +446,13 @@ class CanvasRenderer {
     this.isDragging = true;
     this.dragStartTile = thisTile;
     this.updateDragBox(thisTile);
-
-    // Store context and mark areas as dirty
-    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
   }
 
   private updateDragBox(newPos: Tile | undefined) {
     if (this.dragStartTile && newPos) {
       this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
     }
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
   }
 
   public stopDragging() {
@@ -483,8 +461,7 @@ class CanvasRenderer {
     const returnBox = this.dragBox;
     this.isDragging = false;
 
-    // Store context and mark areas as dirty
-    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
 
     return returnBox;
   }
@@ -509,28 +486,27 @@ class CanvasRenderer {
         this.stopDragging();
       } else {
         this.updateDragBox(thisTile);
-        // Store context and mark areas as dirty
-        this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
       }
     } else if (cursorAction === 'placing') {
-      // Store context and mark areas as dirty
-      this.tilesNeedUpdating = true; //old values are... we'll figure this out later
+      //Todo: Update virtual building here
     }
   }
 
   public handleMouseLeave() {
     this.lastMouseoverTile = undefined;
 
-    // Store context and mark areas as dirty
-    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here?
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: This shouldn't need a rerender but I'll deal with it later
   }
 
   // Building transparency
   public setBuildingTransparency(newSetting: boolean): void {
     this.transparentBuildings = newSetting;
 
-    // Store context and mark areas as dirty
-    this.tilesNeedUpdating = true; //not sure if we need to nuke the old values here, this is prob another layer
+    //Todo: What needs rerendering here?
+  }
+
+  public selectedBlueprintChanged() {
+    //Todo: Update virtual building
   }
 }
 

@@ -5,7 +5,7 @@ import BuildingBlueprint from '../types/BuildingBlueprint';
 import Subcategory from '../interfaces/Subcategory';
 import { populateCategories } from '../data/CATEGORIES';
 import { instantiateBlueprints } from '../data/BLUEPRINTS';
-import CanvasRenderer from '../classes/CanvasRenderer';
+import CanvasRenderer, { CanvasUpdateFlag } from '../classes/CanvasRenderer';
 import { Svg, SVG } from '@svgdotjs/svg.js';
 import CursorAction from '../types/CursorAction';
 import { BuildingCategory } from '../interfaces/BuildingCategory';
@@ -62,14 +62,14 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Update renderer when blueprint selection changes
+  // Notify our renderer when the selected blueprint changes
   useEffect(() => {
-    if (!rendererRef.current) return;
-    rendererRef.current.render();
-  }, [selectedSubcategory, selectedBlueprintIndex]);
+    if (rendererRef.current){
+      rendererRef.current.selectedBlueprintChanged();
+    }
 
-  // I'm not too happy about this having to be inside an useEffect. But whatever.
-  useEffect(() => {
+    // ...We also need to re-apply these events every single time we change our selected blueprint because React caches the current values or something.
+    // I don't entirely understand what's going on here. But the performance hit is undetectable so whatever.
     const handleKeyDown = (event: KeyboardEvent) => {
       // Handle 'r' key for blueprint rotation
       if (
@@ -111,7 +111,6 @@ const App: React.FC = () => {
       if (cursorAction === 'placing') {
         setCursorAction('panning');
         deselectSubcategory();
-        rendererRef.current.render();
       } else if (cursorAction === 'erasing') {
         setCursorAction('panning');
         rendererRef.current.stopDragging();
@@ -136,7 +135,7 @@ const App: React.FC = () => {
         const erasedRect = rendererRef.current.stopDragging();
         if (erasedRect) {
           if (gridStateManager.eraseRect(erasedRect)) {
-            rendererRef.current.render();
+            rendererRef.current.scheduleRender(CanvasUpdateFlag.ALL);
           }
         }
       } else if (cursorAction === 'placing') {
@@ -147,7 +146,7 @@ const App: React.FC = () => {
           if (blueprint) {
             rendererRef.current.stopPanning();
             if (gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              rendererRef.current.render();
+              rendererRef.current.scheduleRender(CanvasUpdateFlag.ALL);
             }
           }
         }
