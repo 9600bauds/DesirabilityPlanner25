@@ -1,6 +1,11 @@
 import { COORD_TO_PX, GRID_SIZE } from './constants';
 import * as Collections from 'typescript-collections';
 
+export interface GridPoint {
+  x: number;
+  y: number;
+}
+
 export class Tile {
   public x: number;
   public y: number;

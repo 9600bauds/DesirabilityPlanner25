@@ -87,7 +87,7 @@ class Building {
     const outline = getOutlinePath(this.origin, this.tilesOccupied);
     const fillPaths: fillPath[] = [];
 
-    this.recursiveAddFillPaths(newBp, fillPaths, new Tile(0, 0));
+    this.recursiveAddFillPaths(newBp, fillPaths, this.origin);
 
     const graphic = { outline, fillPaths };
     return graphic;

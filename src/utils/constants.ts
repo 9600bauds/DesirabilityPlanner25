@@ -1,3 +1,5 @@
+import { GridPoint } from './geometry';
+
 export const GRID_SIZE = 256;
 export const GRID_MAX_X = GRID_SIZE - 1;
 export const GRID_MAX_Y = GRID_SIZE - 1;
@@ -9,7 +11,7 @@ export function COORD_TO_INT16(x: number, y: number): number {
 }
 
 // Convert grid index back to x,y coordinates
-export function INT16_TO_COORD(index: number): { x: number; y: number } {
+export function INT16_TO_COORD(index: number): GridPoint {
   return {
     x: index & GRID_MAX_Y, // Equivalent to index % 256 but faster
     y: index >> GRID_SIZE_BITS, // Equivalent to Math.floor(index / 256)
@@ -26,6 +28,26 @@ export const GRID_CENTER_PX = GRID_TOTAL_PX / 2;
 export const ROTATION_ANGLE = 45;
 export const ROTATION_RADS = 0.785398; // PI/4
 export const SINE_COSINE = 0.7071067811865475; // sin(45) === cos(45) === sqrt(2)/2 === 0.7071067811865475
+
+export function ROTATE_AROUND_ORIGIN(point: GridPoint): {
+  x: number;
+  y: number;
+} {
+  return {
+    x: point.x * SINE_COSINE - point.y * SINE_COSINE,
+    y: point.x * SINE_COSINE + point.y * SINE_COSINE,
+  };
+}
+
+export function COUNTERROTATE_AROUND_ORIGIN(point: GridPoint): {
+  x: number;
+  y: number;
+} {
+  return {
+    x: point.x * SINE_COSINE + point.y * SINE_COSINE,
+    y: -point.x * SINE_COSINE + point.y * SINE_COSINE,
+  };
+}
 
 export const MIN_DESIRABILITY_COLOR = -10;
 export const MAX_DESIRABILITY_COLOR = 50;

@@ -9,25 +9,20 @@ import {
   PX_TO_COORD,
   CELL_PX,
   COORD_TO_INT16,
-  SINE_COSINE,
   ROTATION_RADS,
   GRID_MAX_X,
   GRID_MAX_Y,
+  ROTATE_AROUND_ORIGIN,
+  COUNTERROTATE_AROUND_ORIGIN,
 } from '../utils/constants';
-import { Tile, Rectangle } from '../utils/geometry';
+import { Tile, Rectangle, GridPoint } from '../utils/geometry';
 import Building from './Building';
 
 export enum CanvasUpdateFlag {
   NONE = 0,
-  TRANSFORM = 1 << 0,
-  TILES = 1 << 1,
-  BUILDINGS = 1 << 2,
+  TILES = 1 << 0,
+  BUILDINGS = 1 << 1,
   ALL = ~0, // All bits set to 1
-}
-
-export interface GridPoint {
-  x: number;
-  y: number;
 }
 
 class CanvasRenderer {
@@ -52,6 +47,8 @@ class CanvasRenderer {
   // Canvas elements
   private tilesCanvas: HTMLCanvasElement;
   private tilesCtx: CanvasRenderingContext2D;
+  private tileNumbersCanvas: HTMLCanvasElement;
+  private tileNumbersCtx: CanvasRenderingContext2D;
   private buildingsCanvas: HTMLCanvasElement;
   private buildingsCtx: CanvasRenderingContext2D;
 
@@ -113,7 +110,13 @@ class CanvasRenderer {
       desynchronized: true,
     }) as CanvasRenderingContext2D;
 
-    this.buildingsCanvas = createCanvas('buildings-canvas', 2);
+    this.tileNumbersCanvas = createCanvas('tile-numbers-canvas', 2);
+    this.tileNumbersCtx = this.tilesCanvas.getContext('2d', {
+      alpha: true,
+      desynchronized: true,
+    }) as CanvasRenderingContext2D;
+
+    this.buildingsCanvas = createCanvas('buildings-canvas', 3);
     this.buildingsCtx = this.buildingsCanvas.getContext('2d', {
       alpha: true,
       desynchronized: true,
@@ -132,6 +135,7 @@ class CanvasRenderer {
 
   public destroy() {
     this.parentContainer.removeChild(this.tilesCanvas);
+    this.parentContainer.removeChild(this.tileNumbersCanvas);
     this.parentContainer.removeChild(this.buildingsCanvas);
   }
 
@@ -156,12 +160,14 @@ class CanvasRenderer {
     this.clientHeight = this.parentContainer.clientHeight;
 
     // Resize all canvases
-    [this.tilesCanvas, this.buildingsCanvas].forEach((canvas) => {
-      canvas.width = this.clientWidth * this.devicePixelRatio;
-      canvas.height = this.clientHeight * this.devicePixelRatio;
-      canvas.style.width = this.clientWidth + 'px';
-      canvas.style.height = this.clientHeight + 'px';
-    });
+    [this.tilesCanvas, this.tileNumbersCanvas, this.buildingsCanvas].forEach(
+      (canvas) => {
+        canvas.width = this.clientWidth * this.devicePixelRatio;
+        canvas.height = this.clientHeight * this.devicePixelRatio;
+        canvas.style.width = this.clientWidth + 'px';
+        canvas.style.height = this.clientHeight + 'px';
+      }
+    );
 
     this.scheduleRender(CanvasUpdateFlag.ALL);
   }
@@ -170,33 +176,19 @@ class CanvasRenderer {
    * Coordinate transformations
    */
   private grid2canvas(point: GridPoint): DOMPoint {
-    if (!this.isRotated) {
-      return new DOMPoint(
-        point.x * this.zoomLevel + this.offsetX,
-        point.y * this.zoomLevel + this.offsetY
-      );
-    } else {
-      return new DOMPoint(
-        (point.x * SINE_COSINE - point.y * SINE_COSINE) * this.zoomLevel +
-          this.offsetX,
-        (point.x * SINE_COSINE + point.y * SINE_COSINE) * this.zoomLevel +
-          this.offsetY
-      );
-    }
+    if (this.isRotated) point = ROTATE_AROUND_ORIGIN(point);
+    return new DOMPoint(
+      point.x * this.zoomLevel + this.offsetX,
+      point.y * this.zoomLevel + this.offsetY
+    );
   }
 
-  private canvas2grid(point: DOMPoint): GridPoint {
-    const xUnscaled = (point.x - this.offsetX) / this.zoomLevel;
-    const yUnscaled = (point.y - this.offsetY) / this.zoomLevel;
-
-    if (!this.isRotated) {
-      return { x: xUnscaled, y: yUnscaled };
-    } else {
-      return {
-        x: xUnscaled * SINE_COSINE + yUnscaled * SINE_COSINE,
-        y: -xUnscaled * SINE_COSINE + yUnscaled * SINE_COSINE,
-      };
-    }
+  private canvas2grid(dompoint: DOMPoint): GridPoint {
+    const x = (dompoint.x - this.offsetX) / this.zoomLevel;
+    const y = (dompoint.y - this.offsetY) / this.zoomLevel;
+    let point = { x, y };
+    if (this.isRotated) point = COUNTERROTATE_AROUND_ORIGIN(point);
+    return point;
   }
 
   private pointToTile(point: DOMPoint): Tile | undefined {
@@ -283,26 +275,6 @@ class CanvasRenderer {
   /*
    * Canvas transforms
    */
-  private applyCanvasTransforms(): void {
-    // Reset transforms
-    [this.tilesCtx, this.buildingsCtx].forEach((ctx) => {
-      // Start with device pixel ratio scaling
-      ctx.setTransform(
-        this.devicePixelRatio,
-        0,
-        0,
-        this.devicePixelRatio,
-        0,
-        0
-      );
-
-      // Apply our transformations
-      ctx.translate(this.offsetX, this.offsetY);
-      ctx.scale(this.zoomLevel, this.zoomLevel);
-      if (this.isRotated) ctx.rotate(ROTATION_RADS);
-    });
-  }
-
   public toggleGridRotation(): void {
     const oldCenter = this.canvas2grid(this.viewCenter);
 
@@ -317,20 +289,12 @@ class CanvasRenderer {
   public centerViewAt(point: GridPoint) {
     const center = this.viewCenter;
 
-    let transformedX, transformedY;
-    if (!this.isRotated) {
-      transformedX = point.x * this.zoomLevel;
-      transformedY = point.y * this.zoomLevel;
-    } else {
-      transformedX =
-        (point.x * SINE_COSINE - point.y * SINE_COSINE) * this.zoomLevel;
-      transformedY =
-        (point.x * SINE_COSINE + point.y * SINE_COSINE) * this.zoomLevel;
+    if (this.isRotated) {
+      point = ROTATE_AROUND_ORIGIN(point);
     }
 
-    // Calculate the offset to place the transformed point at the center
-    this.offsetX = center.x - transformedX;
-    this.offsetY = center.y - transformedY;
+    this.offsetX = center.x - point.x * this.zoomLevel;
+    this.offsetY = center.y - point.y * this.zoomLevel;
 
     this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   }
@@ -452,22 +416,21 @@ class CanvasRenderer {
    * Actual rendering methods
    */
   private render(): void {
-    let startTime = performance.now();
-
-    if (this.sectionsNeedUpdating & CanvasUpdateFlag.TRANSFORM) {
-      this.applyCanvasTransforms();
-      const transformTime = performance.now() - startTime;
-      if (transformTime > 3) {
-        //prettier-ignore
-        console.log("Transformation took", transformTime, "ms!");
-      }
-      startTime = performance.now();
+    const viewport = this.getViewport();
+    if (viewport.tiles.height < 1 || viewport.tiles.width < 1) {
+      return; //We are fully offscreen!
     }
 
-    const viewport = this.getViewport();
+    //This beauty stores all the precomputed desirability values.
+    const baseValues = this.renderContext.getBaseValues();
+
+    let startTime = performance.now();
 
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
-      this.renderTiles(viewport);
+      this.renderTiles(this.tilesCtx, viewport, baseValues);
+      if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+        this.renderTileNumbers(this.tileNumbersCtx, viewport, baseValues);
+      }
       const tilesTime = performance.now() - startTime;
       if (tilesTime > 5) {
         //prettier-ignore
@@ -477,7 +440,7 @@ class CanvasRenderer {
     }
 
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.BUILDINGS) {
-      this.renderBuildings(viewport);
+      this.renderBuildings(this.buildingsCtx, viewport, baseValues);
       const buildingsTime = performance.now() - startTime;
       if (buildingsTime > 5) {
         //prettier-ignore
@@ -493,16 +456,19 @@ class CanvasRenderer {
   /*
    * Render the tiles
    */
-  private renderTiles(viewport: Viewport) {
-    // Get visible tile range. We only need to update the stuff within visible range.
+  private renderTiles(
+    ctx: CanvasRenderingContext2D,
+    viewport: Viewport,
+    baseValues: Int16Array
+  ) {
     // We don't even need to clear the previous frame since there's no transparency anywhere, so it only matters when panning to outside the grid's edge
     // (and in that case, it merely results in the fun hall of mirrors effect that's really fun to play with, so it's almost a feature really)
-    if (viewport.tiles.height < 1 || viewport.tiles.width < 1) {
-      return; //We are fully offscreen!
-    }
 
-    //This beauty stores all the precomputed desirability values.
-    const baseValues = this.renderContext.getBaseValues();
+    // prettier-ignore
+    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    ctx.translate(this.offsetX, this.offsetY);
+    ctx.scale(this.zoomLevel, this.zoomLevel);
+    if (this.isRotated) ctx.rotate(ROTATION_RADS);
 
     /*
      * DRAW THE COLORED CELLS
@@ -533,8 +499,8 @@ class CanvasRenderer {
     // Put the image data on the temporary canvas
     tempCtx.putImageData(imageData, 0, 0);
     // Draw the scaled image
-    this.tilesCtx.imageSmoothingEnabled = false; //For some reason we need to set this each time?
-    this.tilesCtx.drawImage(
+    ctx.imageSmoothingEnabled = false; //For some reason we need to set this each time?
+    ctx.drawImage(
       tempCanvas,
       0,
       0,
@@ -550,82 +516,80 @@ class CanvasRenderer {
      * DRAW THE BLACK GRIDLINES
      */
     if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
-      this.tilesCtx.lineWidth = 1;
-      this.tilesCtx.strokeStyle = colors.pureBlack;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = colors.pureBlack;
       // Batch all line drawing into a single path
-      this.tilesCtx.beginPath();
+      ctx.beginPath();
       // Path the horizontal lines
       for (let y = viewport.tiles.startY + 1; y <= viewport.tiles.endY; y++) {
-        this.tilesCtx.moveTo(viewport.coords.startX, COORD_TO_PX(y));
-        this.tilesCtx.lineTo(viewport.coords.endX, COORD_TO_PX(y));
+        ctx.moveTo(viewport.coords.startX, COORD_TO_PX(y));
+        ctx.lineTo(viewport.coords.endX, COORD_TO_PX(y));
       }
       // Path the vertical lines
       for (let x = viewport.tiles.startX + 1; x <= viewport.tiles.endX; x++) {
-        this.tilesCtx.moveTo(COORD_TO_PX(x), viewport.coords.startY);
-        this.tilesCtx.lineTo(COORD_TO_PX(x), viewport.coords.endY);
+        ctx.moveTo(COORD_TO_PX(x), viewport.coords.startY);
+        ctx.lineTo(COORD_TO_PX(x), viewport.coords.endY);
       }
       // Execute the path!
-      this.tilesCtx.stroke();
-    }
-
-    /*
-     * DRAW THE TEXT LABELS (most of the performance hit is from here!)
-     */
-    if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-      // Save the current transform state
-      this.tilesCtx.save();
-
-      // Reset transform to identity but keep device pixel ratio
-      this.tilesCtx.setTransform(
-        this.devicePixelRatio,
-        0,
-        0,
-        this.devicePixelRatio,
-        0,
-        0
-      );
-
-      // Set text style
-      this.tilesCtx.font = 'bold 14px Arial';
-      this.tilesCtx.textAlign = 'center';
-      this.tilesCtx.textBaseline = 'middle';
-      this.tilesCtx.lineWidth = 2;
-      this.tilesCtx.strokeStyle = 'white';
-      this.tilesCtx.fillStyle = 'black';
-
-      // Draw all text without rotation
-      for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
-        for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
-          if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
-
-          const tile = new Tile(x, y);
-          const desirabilityValue = baseValues[COORD_TO_INT16(tile.x, tile.y)];
-
-          if (desirabilityValue === 0) continue;
-
-          // Get the center point of this tile in canvas space
-          const centerPoint = {
-            x: COORD_TO_PX(x) + CELL_PX / 2,
-            y: COORD_TO_PX(y) + CELL_PX / 2,
-          };
-
-          // Apply all transformations to this point to get screen coordinates
-          const screenPoint = this.grid2canvas(centerPoint);
-
-          // Draw the text at screen coordinates without any rotation
-          const valueText = desirabilityValue.toString();
-          this.tilesCtx.strokeText(valueText, screenPoint.x, screenPoint.y);
-          this.tilesCtx.fillText(valueText, screenPoint.x, screenPoint.y);
-        }
-      }
-
-      // Restore the transform
-      this.tilesCtx.restore();
+      ctx.stroke();
     }
   }
 
-  private renderBuildings(viewport: Viewport): void {
-    this.buildingsCtx.clearRect(
+  private renderTileNumbers(
+    ctx: CanvasRenderingContext2D,
+    viewport: Viewport,
+    baseValues: Int16Array
+  ) {
+    // prettier-ignore
+    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    ctx.translate(this.offsetX, this.offsetY);
+    ctx.scale(this.zoomLevel, this.zoomLevel);
+    //We intentionally do not rotate!
+
+    // Set text style
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'white';
+    ctx.fillStyle = 'black';
+
+    for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
+      for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
+        const desirabilityValue = baseValues[COORD_TO_INT16(x, y)];
+
+        if (desirabilityValue === 0) continue;
+
+        // Get the center point of this tile in canvas space
+        let centerPoint = {
+          x: COORD_TO_PX(x) + CELL_PX / 2,
+          y: COORD_TO_PX(y) + CELL_PX / 2,
+        };
+
+        if (this.isRotated) {
+          centerPoint = ROTATE_AROUND_ORIGIN(centerPoint);
+        }
+
+        // Draw the text at screen coordinates without any rotation
+        const valueText = desirabilityValue.toString();
+        ctx.strokeText(valueText, centerPoint.x, centerPoint.y);
+        ctx.fillText(valueText, centerPoint.x, centerPoint.y);
+      }
+    }
+  }
+
+  private renderBuildings(
+    ctx: CanvasRenderingContext2D,
+    viewport: Viewport,
+    baseValues: Int16Array
+  ) {
+    // prettier-ignore
+    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    ctx.translate(this.offsetX, this.offsetY);
+    ctx.scale(this.zoomLevel, this.zoomLevel);
+    if (this.isRotated) ctx.rotate(ROTATION_RADS);
+
+    ctx.clearRect(
       viewport.coords.startX,
       viewport.coords.startY,
       viewport.coords.width,
@@ -638,24 +602,16 @@ class CanvasRenderer {
       const graphic = building.graphic;
       if (!graphic) continue;
 
-      this.buildingsCtx.save();
-
-      const x = COORD_TO_PX(building.origin.x);
-      const y = COORD_TO_PX(building.origin.y);
-      this.buildingsCtx.translate(x, y);
-
       for (const pathFill of graphic.fillPaths) {
-        this.buildingsCtx.fillStyle = pathFill.fillColor;
-        this.buildingsCtx.fill(pathFill.path);
+        ctx.fillStyle = pathFill.fillColor;
+        ctx.fill(pathFill.path);
       }
       buildingOutlinesPath.addPath(graphic.outline);
-
-      this.buildingsCtx.restore();
     }
 
-    this.buildingsCtx.strokeStyle = colors.strongOutlineBlack;
-    this.buildingsCtx.lineWidth = 3;
-    this.buildingsCtx.stroke(buildingOutlinesPath);
+    ctx.strokeStyle = colors.strongOutlineBlack;
+    ctx.lineWidth = 3;
+    ctx.stroke(buildingOutlinesPath);
   }
 }
 
