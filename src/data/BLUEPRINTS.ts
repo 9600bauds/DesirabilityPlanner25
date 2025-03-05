@@ -1,27 +1,7 @@
-import BasicBlueprint from '../classes/BasicBlueprint';
-import HouseBlueprint from '../classes/HouseBlueprint';
-import BuildingBlueprint from '../types/BuildingBlueprint';
-import NewBlueprint from '../types/NewBlueprint';
+import Blueprint from '../types/Blueprint';
 import { Tile } from '../utils/geometry';
 
-export function instantiateBlueprints(): Record<string, BuildingBlueprint> {
-  const instantiatedBlueprints: Record<string, BuildingBlueprint> = {};
-  for (const [key, newBpData] of Object.entries(NEW_BLUEPRINTS)) {
-    let createdBlueprint: BuildingBlueprint;
-    if (
-      'desirabilityToEvolve' in newBpData ||
-      'desirabilityToDevolve' in newBpData
-    ) {
-      createdBlueprint = new HouseBlueprint(newBpData, key);
-    } else {
-      createdBlueprint = new BasicBlueprint(newBpData, key);
-    }
-    instantiatedBlueprints[key] = createdBlueprint;
-  }
-  return instantiatedBlueprints;
-}
-
-export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
+export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Academy: {
     label: 'Academy',
     height: 4,
@@ -903,7 +883,6 @@ export const NEW_BLUEPRINTS: Record<string, NewBlueprint> = {
     desirabilityToDevolve: 2,
     category: 'HOUSE',
   },
-
   'Rough Cottage_1x1': {
     label: 'Rough Cottage',
     height: 1,

@@ -1,9 +1,9 @@
 import { NewDesireBox } from './NewDesireBox';
 import { Tile } from '../utils/geometry';
-import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
-import { NEW_CATEGORIES } from '../data/CATEGORIES';
+import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
+import { ALL_CATEGORIES } from '../data/CATEGORIES';
 
-export interface NewBasicBlueprint {
+export interface BuildingBlueprint {
   label?: string;
   fillColor?: string;
   invisible?: boolean; //If true, this building and its children have no graphic.
@@ -14,10 +14,10 @@ export interface NewBasicBlueprint {
   employeesRequired?: number;
   desireBox?: NewDesireBox;
   children?: ChildBlueprint[];
-  category?: keyof typeof NEW_CATEGORIES;
+  category?: keyof typeof ALL_CATEGORIES;
 }
 
 export interface ChildBlueprint {
-  childKey: keyof typeof NEW_BLUEPRINTS;
+  childKey: keyof typeof ALL_BLUEPRINTS;
   relativeOrigin: Tile;
 }

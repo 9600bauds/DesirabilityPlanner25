@@ -39,17 +39,6 @@ export class Tile {
   }
 }
 
-export function offsetSetOfTiles(
-  set: Collections.Set<Tile>,
-  offset: Tile
-): Collections.Set<Tile> {
-  const newSet = new Collections.Set<Tile>();
-  set.forEach((tile) => {
-    newSet.add(tile.add(offset));
-  });
-  return newSet;
-}
-
 export class Rectangle {
   public origin: Tile;
   //Note that for all rectangle math, height and width are effectively +1:
@@ -123,15 +112,15 @@ enum dirs {
  *
  * So I just stared at an excel spreadsheet for 30 minutes and cranked out whatever grid tracing algorithm this is, instead.
  *
- * Assumes 0,0 is part of the outline or it fails.
+ * Assumes origin is part of the outline or it fails.
  * Assumes all points are connected with no holes in the middle.
  * But those are reasonable assumptions since there's only one non-rectangular building in the game
  * and this was a massive waste of time in the first place.
  */
 // prettier-ignore
-export function getOutlinePath(tiles: Collections.Set<Tile>): Path2D {
-  let pathString = 'M0,0'; //'M' means 'move to here without drawing anything'
-  const origin = new Tile(0, 0);
+export function getOutlinePath(origin: Tile, tiles: Collections.Set<Tile>): Path2D {
+  const path = new Path2D();
+  path.moveTo(COORD_TO_PX(origin.x), COORD_TO_PX(origin.y));
   let loc = origin;
   let turns = 0;
   let dir = dirs.RIGHT;
@@ -158,9 +147,9 @@ export function getOutlinePath(tiles: Collections.Set<Tile>): Path2D {
       newDir = tiles.contains(loc) ? dirs.LEFT : dirs.DOWN;
     }
     if (newDir !== dir) {
-      // We've turned! Add this point to the path
-      pathString += `L${COORD_TO_PX(loc.x)},${COORD_TO_PX(loc.y)} `; //'L' means 'draw a line to this point'
       dir = newDir;
+      // We've turned! Add this point to the path
+      path.lineTo(COORD_TO_PX(loc.x), COORD_TO_PX(loc.y));
     }
     //Move
     if (dir === dirs.UP) {
@@ -174,11 +163,12 @@ export function getOutlinePath(tiles: Collections.Set<Tile>): Path2D {
     }
     if (loc.equals(origin)) {
       //We're back home!
-      pathString += ' Z'; //This tells the path to close itself by going back to the start point
-      return new Path2D(pathString);
+      path.closePath();
+      return path;
     }
     turns++;
     if (turns > 50) {
+      console.error('Failed to draw an outline for set of points!', tiles);
       throw new Error('Failed to draw an outline for set of points!');
     }
   }

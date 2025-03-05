@@ -2,10 +2,9 @@
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
 import Subcategory from '../interfaces/Subcategory';
-import { BuildingCategory } from '../interfaces/BuildingCategory';
+import { MenuCategory } from '../interfaces/MenuCategory';
 
 interface SidebarProps {
-  populatedCategories: Record<string, BuildingCategory> | null;
   onRotateClick: () => void;
   onPanClick: () => void;
   onEraserClick: () => void;
@@ -15,7 +14,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  populatedCategories,
   onRotateClick,
   onPanClick,
   onEraserClick,
@@ -63,10 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         <i className="material-icons">zoom_out</i>
       </button>
-      <BuildingSelector
-        populatedCategories={populatedCategories}
-        selectSubcategory={selectSubcategory}
-      />
+      <BuildingSelector selectSubcategory={selectSubcategory} />
     </div>
   );
 };

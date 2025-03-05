@@ -1,12 +1,13 @@
-import { getEmptyArray, Rectangle, Tile } from '../utils/geometry';
-import PlacedBuilding from './PlacedBuilding';
+import { Tile } from '../utils/geometry';
+import Building from './Building';
 import { GRID_SIZE, COORD_TO_INT16, GRID_SIZE_BITS } from '../utils/constants';
-import BuildingBlueprint from '../types/BuildingBlueprint';
 import DesireBox from './desireBox';
+import Blueprint from '../types/Blueprint';
+import House from './House';
 
 class GridState {
   private grid: Int16Array;
-  private placedBuildings: Set<PlacedBuilding>;
+  private placedBuildings: Set<Building>; //This is effectively a list, not a set, right?
 
   constructor() {
     this.grid = new Int16Array(GRID_SIZE * GRID_SIZE);
@@ -21,7 +22,8 @@ class GridState {
     this.grid[COORD_TO_INT16(x, y)] = value;
   }
 
-  applyDesireBox(origin: Tile, dbox: DesireBox, multiplier: number = 1): void {
+  applyDesireBox(dbox: DesireBox, multiplier: number = 1): void {
+    const origin = dbox.bounds.origin;
     const rectRight = origin.x + dbox.bounds.width - 1;
     const rectBottom = origin.y + dbox.bounds.height - 1;
     const minX = Math.max(0, origin.x - dbox.maxRange);
@@ -79,23 +81,25 @@ class GridState {
     return this.placedBuildings;
   }
 
-  public placeBuilding(
-    position: Tile,
-    blueprint: BuildingBlueprint
-  ): PlacedBuilding {
-    const newBuilding = new PlacedBuilding(position, blueprint);
+  public placeBuilding(position: Tile, blueprint: Blueprint): Building {
+    let newBuilding: Building;
+    if ('desirabilityToEvolve' in blueprint) {
+      newBuilding = new House(position, blueprint);
+    } else {
+      newBuilding = new Building(position, blueprint);
+    }
 
-    for (const dbox of blueprint.desireBoxes) {
-      this.applyDesireBox(position.add(dbox.bounds.origin), dbox, 1);
+    for (const dbox of newBuilding.desireBoxes) {
+      this.applyDesireBox(dbox, 1);
     }
 
     this.placedBuildings.add(newBuilding);
     return newBuilding;
   }
 
-  public removeBuilding(building: PlacedBuilding): void {
-    for (const dbox of building.blueprint.desireBoxes) {
-      this.applyDesireBox(building.origin.add(dbox.bounds.origin), dbox, -1);
+  public removeBuilding(building: Building): void {
+    for (const dbox of building.desireBoxes) {
+      this.applyDesireBox(dbox, -1);
     }
 
     // Remove the building from the set

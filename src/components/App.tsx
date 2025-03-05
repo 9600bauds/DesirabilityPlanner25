@@ -1,13 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import GridStateManager from '../classes/GridStateManager';
-import BuildingBlueprint from '../types/BuildingBlueprint';
 import Subcategory from '../interfaces/Subcategory';
-import { populateCategories } from '../data/CATEGORIES';
-import { instantiateBlueprints } from '../data/BLUEPRINTS';
 import CanvasRenderer, { CanvasUpdateFlag } from '../classes/CanvasRenderer';
 import CursorAction from '../types/CursorAction';
-import { BuildingCategory } from '../interfaces/BuildingCategory';
+import Blueprint from '../types/Blueprint';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE =====
@@ -16,11 +13,6 @@ const App: React.FC = () => {
     useState<Subcategory | null>(null);
   const [selectedBlueprintIndex, setSelectedBlueprintIndex] =
     useState<number>(0);
-
-  const [populatedCategories, setPopulatedCategories] = useState<Record<
-    string,
-    BuildingCategory
-  > | null>(null);
 
   const gridStateManager = useRef(new GridStateManager()).current;
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -45,9 +37,6 @@ const App: React.FC = () => {
         canvasContainer.current,
         renderContext
       );
-
-      const instantiated = instantiateBlueprints();
-      setPopulatedCategories(populateCategories(instantiated));
     } catch (error) {
       console.error('Error initializing data:', error);
     }
@@ -176,7 +165,7 @@ const App: React.FC = () => {
     event.preventDefault();
   };
 
-  const getSelectedBlueprint = (): BuildingBlueprint | null => {
+  const getSelectedBlueprint = (): Blueprint | null => {
     if (!selectedSubcategory) {
       return null;
     }
@@ -217,7 +206,6 @@ const App: React.FC = () => {
         style={{ minWidth: '150px', width: '20vw', height: '100vh' }}
       >
         <Sidebar
-          populatedCategories={populatedCategories}
           onRotateClick={() => {
             if (rendererRef.current) {
               rendererRef.current.toggleGridRotation();

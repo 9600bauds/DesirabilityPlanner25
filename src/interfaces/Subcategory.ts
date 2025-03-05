@@ -1,7 +1,8 @@
-import BuildingBlueprint from '../types/BuildingBlueprint';
+import Blueprint from '../types/Blueprint';
 
 interface Subcategory {
   displayName: string;
-  blueprints: BuildingBlueprint[];
+  blueprints: Blueprint[];
 }
+
 export default Subcategory;

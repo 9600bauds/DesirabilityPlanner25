@@ -1,44 +1,34 @@
-import { BuildingCategory } from '../interfaces/BuildingCategory';
+import { MenuCategory } from '../interfaces/MenuCategory';
 import Subcategory from '../interfaces/Subcategory';
-import BuildingBlueprint from '../types/BuildingBlueprint';
-import { NEW_BLUEPRINTS } from './BLUEPRINTS';
+import { ALL_BLUEPRINTS } from './BLUEPRINTS';
 
-export function populateCategories(
-  BLUEPRINTS: Record<string, BuildingBlueprint>
-): Record<string, BuildingCategory> {
-  for (const categoryKey in NEW_CATEGORIES) {
-    const thisCategory: BuildingCategory = NEW_CATEGORIES[categoryKey];
+export function populateCategories() {
+  for (const categoryKey in ALL_CATEGORIES) {
+    const thisCategory: MenuCategory = ALL_CATEGORIES[categoryKey];
 
-    const blueprintsInThisCategory = Object.entries(NEW_BLUEPRINTS).filter(
+    const blueprintsInThisCategory = Object.entries(ALL_BLUEPRINTS).filter(
       ([_key, newBp]) => newBp.category === categoryKey
     );
 
-    for (const [key, newBpData] of blueprintsInThisCategory) {
-      if (newBpData.hidden) {
+    for (const [key, blueprint] of blueprintsInThisCategory) {
+      if (blueprint.hidden) {
         continue;
-      }
-      const theBlueprint = BLUEPRINTS[key];
-      if (!theBlueprint) {
-        throw new Error(
-          `newBlueprint with key ${key} did not correspond to any blueprint!`
-        );
       }
       const splitKey = key.split('_')[0];
       if (!thisCategory.subCategories.has(splitKey)) {
         const newSub: Subcategory = {
           displayName: splitKey,
-          blueprints: [theBlueprint],
+          blueprints: [blueprint],
         };
         thisCategory.subCategories.set(splitKey, newSub);
       } else {
-        thisCategory.subCategories.get(splitKey)?.blueprints.push(theBlueprint);
+        thisCategory.subCategories.get(splitKey)?.blueprints.push(blueprint);
       }
     }
   }
-  return NEW_CATEGORIES;
 }
 
-export const NEW_CATEGORIES: Record<string, BuildingCategory> = {
+export const ALL_CATEGORIES: Record<string, MenuCategory> = {
   HOUSE: {
     displayName: 'Housing',
     symbol: '🏠',
@@ -106,3 +96,5 @@ export const NEW_CATEGORIES: Record<string, BuildingCategory> = {
     subCategories: new Map(),
   },
 };
+
+populateCategories();

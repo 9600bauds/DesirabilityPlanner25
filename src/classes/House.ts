@@ -1,12 +1,13 @@
-import NewBlueprint from '../types/NewBlueprint';
-import BasicBlueprint from './BasicBlueprint';
+import Blueprint from '../types/Blueprint';
+import { Tile } from '../utils/geometry';
+import Building from './Building';
 
-class HouseBlueprint extends BasicBlueprint {
+class House extends Building {
   desirabilityToEvolve: number;
   desirabilityToDevolve: number;
 
-  constructor(blueprint: NewBlueprint, key: string) {
-    super(blueprint, key);
+  constructor(origin: Tile, blueprint: Blueprint) {
+    super(origin, blueprint);
     if ('desirabilityToEvolve' in blueprint) {
       this.desirabilityToEvolve = blueprint.desirabilityToEvolve;
       this.desirabilityToDevolve = blueprint.desirabilityToDevolve;
@@ -16,4 +17,4 @@ class HouseBlueprint extends BasicBlueprint {
   }
 }
 
-export default HouseBlueprint;
+export default House;

@@ -12,7 +12,7 @@ import {
   COORD_TO_INT16,
 } from '../utils/constants';
 import { Tile, Rectangle, degreesToRads } from '../utils/geometry';
-import PlacedBuilding from './PlacedBuilding';
+import Building from './Building';
 
 export enum CanvasUpdateFlag {
   NONE = 0,
@@ -580,9 +580,10 @@ class CanvasRenderer {
 
   private renderBuildings(): void {
     const buildings = this.renderContext.getBuildings();
+    const buildingOutlinesPath = new Path2D();
 
     for (const building of buildings) {
-      const graphic = building.blueprint.graphic;
+      const graphic = building.graphic;
       if (!graphic) continue;
 
       this.buildingsCtx.save();
@@ -595,12 +596,14 @@ class CanvasRenderer {
         this.buildingsCtx.fillStyle = pathFill.fillColor;
         this.buildingsCtx.fill(pathFill.path);
       }
-      this.buildingsCtx.strokeStyle = colors.strongOutlineBlack;
-      this.buildingsCtx.lineWidth = 3;
-      this.buildingsCtx.stroke(graphic.outline);
+      buildingOutlinesPath.addPath(graphic.outline);
 
       this.buildingsCtx.restore();
     }
+
+    this.buildingsCtx.strokeStyle = colors.strongOutlineBlack;
+    this.buildingsCtx.lineWidth = 3;
+    this.buildingsCtx.stroke(buildingOutlinesPath);
   }
 }
 

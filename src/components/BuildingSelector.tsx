@@ -1,18 +1,15 @@
 import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
-import { BuildingCategory } from '../interfaces/BuildingCategory';
+import { MenuCategory } from '../interfaces/MenuCategory';
 import Subcategory from '../interfaces/Subcategory';
+import { ALL_CATEGORIES } from '../data/CATEGORIES';
 
 interface BuildingSelectorProps {
-  populatedCategories: Record<string, BuildingCategory> | null;
   selectSubcategory: (subcat: Subcategory) => void;
 }
 
-const BuildingSelector = ({
-  populatedCategories,
-  selectSubcategory,
-}: BuildingSelectorProps) => {
-  const optionsToButtons = (category: BuildingCategory) => {
+const BuildingSelector = ({ selectSubcategory }: BuildingSelectorProps) => {
+  const optionsToButtons = (category: MenuCategory) => {
     const menuItems: React.ReactNode[] = []; // Create an empty array
 
     category.subCategories.forEach((subcat: Subcategory, key: string) => {
@@ -26,10 +23,9 @@ const BuildingSelector = ({
     return menuItems; // Return the array
   };
 
-  if (!populatedCategories) return;
   return (
     <div className="flex flex-wrap gap-2">
-      {Object.values(populatedCategories).map((category) => {
+      {Object.values(ALL_CATEGORIES).map((category) => {
         return (
           <Menu
             key={category.displayName}

@@ -1,13 +1,13 @@
-import PlacedBuilding from '../classes/PlacedBuilding';
-import BuildingBlueprint from '../types/BuildingBlueprint';
+import Building from '../classes/Building';
+import Blueprint from '../types/Blueprint';
 import CursorAction from '../types/CursorAction';
 import { Tile } from '../utils/geometry';
 
 interface RenderContext {
   getBaseValues: () => Int16Array;
-  getBuildings: () => Set<PlacedBuilding>;
+  getBuildings: () => Set<Building>;
   getCursorAction: () => CursorAction;
-  getSelectedBlueprint: () => BuildingBlueprint | null;
+  getSelectedBlueprint: () => Blueprint | null;
   isTileOccupied: (tile: Tile) => boolean;
 }
 

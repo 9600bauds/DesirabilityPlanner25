@@ -1,6 +1,7 @@
-import BuildingBlueprint from '../types/BuildingBlueprint';
-import { Tile, Rectangle, offsetSetOfTiles } from '../utils/geometry';
+import Blueprint from '../types/Blueprint';
+import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
+import Building from './Building';
 
 class GridStateManager {
   private activeGridState = new GridState();
@@ -31,17 +32,18 @@ class GridStateManager {
     return undefined;
   };
 
-  public canPlaceBuilding = (position: Tile, blueprint: BuildingBlueprint) => {
-    const tileArray = blueprint.tilesOccupied.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
+  public canPlaceBuilding = (position: Tile, blueprint: Blueprint) => {
+    // TODO
+    /*const tileArray = blueprint.tilesOccupied.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
     for (const tile of tileArray) {
       if (this.isTileOccupied(tile.add(position))) {
         return false;
       }
-    }
+    }*/
     return true;
   };
 
-  public tryPlaceBuilding(position: Tile, blueprint: BuildingBlueprint) {
+  public tryPlaceBuilding(position: Tile, blueprint: Blueprint) {
     if (!this.canPlaceBuilding(position, blueprint)) {
       return false;
     }

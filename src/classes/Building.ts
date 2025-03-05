@@ -1,17 +1,19 @@
-import { getOutlinePath, Rectangle, Tile } from '../utils/geometry';
-import NewBlueprint from '../types/NewBlueprint';
-import colors from '../utils/colors';
-import { NEW_CATEGORIES } from '../data/CATEGORIES';
-import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
-import DesireBox from './desireBox';
-import { COORD_TO_PX } from '../utils/constants';
+import Blueprint from '../types/Blueprint';
+import { Tile, Rectangle, getOutlinePath } from '../utils/geometry';
 import * as Collections from 'typescript-collections';
+import DesireBox from './desireBox';
 import BuildingGraphic, { fillPath } from '../interfaces/BuildingGraphic';
+import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
+import { COORD_TO_PX } from '../utils/constants';
+import { ALL_CATEGORIES } from '../data/CATEGORIES';
+import colors from '../utils/colors';
 
-class BasicBlueprint {
-  key: string;
+class Building {
+  origin: Tile;
   width: number;
   height: number;
+  rect: Rectangle;
+
   tilesOccupied: Collections.Set<Tile>;
 
   desireBoxes: DesireBox[];
@@ -22,28 +24,30 @@ class BasicBlueprint {
   baseLabel?: string;
   graphic?: BuildingGraphic;
 
-  constructor(newBp: NewBlueprint, key: string) {
-    this.key = key;
-    this.height = newBp.height;
-    this.width = newBp.width;
-    this.baseLabel = newBp.label;
-    if (newBp.cost) {
-      this.cost = newBp.cost;
-    }
-    if (newBp.employeesRequired) {
-      this.employeesRequired = newBp.employeesRequired;
-    }
+  constructor(origin: Tile, blueprint: Blueprint) {
+    this.origin = origin;
+    this.height = blueprint.height;
+    this.width = blueprint.width;
+    this.rect = new Rectangle(this.origin, this.height, this.width);
 
+    this.baseLabel = blueprint.label;
+
+    if (blueprint.cost) {
+      this.cost = blueprint.cost;
+    }
+    if (blueprint.employeesRequired) {
+      this.employeesRequired = blueprint.employeesRequired;
+    }
     this.desireBoxes = [];
-    this.recursiveAddDesireBox(newBp, new Tile(0, 0));
+    this.recursiveAddDesireBox(blueprint, this.origin);
 
     this.tilesOccupied = new Collections.Set<Tile>();
-    this.recursiveAddToTilesOccupied(newBp, new Tile(0, 0));
+    this.recursiveAddToTilesOccupied(blueprint, this.origin);
 
-    this.graphic = this.buildGraphic(newBp);
+    this.graphic = this.buildGraphic(blueprint);
   }
 
-  private recursiveAddToTilesOccupied = (data: NewBlueprint, origin: Tile) => {
+  private recursiveAddToTilesOccupied = (data: Blueprint, origin: Tile) => {
     for (let x = 0; x < data.width; x++) {
       for (let y = 0; y < data.height; y++) {
         const thisTile = new Tile(x, y).add(origin);
@@ -52,7 +56,7 @@ class BasicBlueprint {
     }
     if (data.children) {
       for (const child of data.children) {
-        const childBlueprint = NEW_BLUEPRINTS[child.childKey];
+        const childBlueprint = ALL_BLUEPRINTS[child.childKey];
         this.recursiveAddToTilesOccupied(
           childBlueprint,
           origin.add(child.relativeOrigin)
@@ -61,7 +65,7 @@ class BasicBlueprint {
     }
   };
 
-  private recursiveAddDesireBox = (data: NewBlueprint, origin: Tile) => {
+  private recursiveAddDesireBox = (data: Blueprint, origin: Tile) => {
     if (data.desireBox) {
       this.desireBoxes.push(
         new DesireBox(data.desireBox, origin, data.height, data.width)
@@ -69,7 +73,7 @@ class BasicBlueprint {
     }
     if (data.children) {
       for (const child of data.children) {
-        const childBlueprint = NEW_BLUEPRINTS[child.childKey];
+        const childBlueprint = ALL_BLUEPRINTS[child.childKey];
         this.recursiveAddDesireBox(
           childBlueprint,
           origin.add(child.relativeOrigin)
@@ -78,9 +82,9 @@ class BasicBlueprint {
     }
   };
 
-  private buildGraphic(newBp: NewBlueprint): BuildingGraphic | undefined {
+  private buildGraphic(newBp: Blueprint): BuildingGraphic | undefined {
     if (newBp.invisible) return;
-    const outline = getOutlinePath(this.tilesOccupied);
+    const outline = getOutlinePath(this.origin, this.tilesOccupied);
     const fillPaths: fillPath[] = [];
 
     this.recursiveAddFillPaths(newBp, fillPaths, new Tile(0, 0));
@@ -90,7 +94,7 @@ class BasicBlueprint {
   }
 
   private recursiveAddFillPaths = (
-    data: NewBlueprint,
+    data: Blueprint,
     fillPaths: fillPath[],
     origin: Tile
   ) => {
@@ -109,7 +113,7 @@ class BasicBlueprint {
 
     if (data.children) {
       for (const child of data.children) {
-        const childBlueprint = NEW_BLUEPRINTS[child.childKey];
+        const childBlueprint = ALL_BLUEPRINTS[child.childKey];
         this.recursiveAddFillPaths(
           childBlueprint,
           fillPaths,
@@ -119,12 +123,12 @@ class BasicBlueprint {
     }
   };
 
-  private getBpFillColor(bp: NewBlueprint): string {
+  private getBpFillColor(bp: Blueprint): string {
     if (bp.fillColor) {
       return bp.fillColor;
     }
     if (bp.category) {
-      const category = NEW_CATEGORIES[bp.category];
+      const category = ALL_CATEGORIES[bp.category];
       if (category) return category.baseColor;
     }
     return colors.backgroundWhite;
@@ -137,6 +141,14 @@ class BasicBlueprint {
           ${this.baseLabel}
         </div>`;
   }
+
+  public interceptsTile(t2: Tile) {
+    return this.tilesOccupied.contains(t2);
+  }
+
+  public interceptsRectangle(rect: Rectangle): boolean {
+    return rect.interceptsTiles(this.tilesOccupied);
+  }
 }
 
-export default BasicBlueprint;
+export default Building;
