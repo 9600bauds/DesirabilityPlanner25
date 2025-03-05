@@ -22,7 +22,8 @@ export const PX_TO_COORD = (px: number) => Math.floor(px / CELL_PX);
 export const GRID_TOTAL_PX = GRID_SIZE * CELL_PX;
 export const GRID_CENTER_PX = GRID_TOTAL_PX / 2;
 export const ROTATION_ANGLE = 45;
-export const ROTATION_RADS = (ROTATION_ANGLE * Math.PI) / 180;
+export const ROTATION_RADS = 0.785398; // PI/4
+export const SINE_COSINE = 0.7071067811865475; // sin(45) === cos(45) === sqrt(2)/2 === 0.7071067811865475
 
 export const MIN_DESIRABILITY_COLOR = -10;
 export const MAX_DESIRABILITY_COLOR = 50;
