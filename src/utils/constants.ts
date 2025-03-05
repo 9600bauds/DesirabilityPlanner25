@@ -1,4 +1,6 @@
 export const GRID_SIZE = 256;
+export const GRID_MAX_X = GRID_SIZE - 1;
+export const GRID_MAX_Y = GRID_SIZE - 1;
 export const GRID_SIZE_BITS = 8;
 
 // Convert x,y coordinates to a grid index
@@ -9,7 +11,7 @@ export function COORD_TO_INT16(x: number, y: number): number {
 // Convert grid index back to x,y coordinates
 export function INT16_TO_COORD(index: number): { x: number; y: number } {
   return {
-    x: index & (GRID_SIZE - 1), // Equivalent to index % 256 but faster
+    x: index & GRID_MAX_Y, // Equivalent to index % 256 but faster
     y: index >> GRID_SIZE_BITS, // Equivalent to Math.floor(index / 256)
   };
 }

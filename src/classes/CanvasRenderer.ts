@@ -11,6 +11,8 @@ import {
   COORD_TO_INT16,
   SINE_COSINE,
   ROTATION_RADS,
+  GRID_MAX_X,
+  GRID_MAX_Y,
 } from '../utils/constants';
 import { Tile, Rectangle } from '../utils/geometry';
 import Building from './Building';
@@ -255,8 +257,8 @@ class CanvasRenderer {
 
     const tileStartX = Math.max(0, PX_TO_COORD(minX));
     const tileStartY = Math.max(0, PX_TO_COORD(minY));
-    const tileEndX = Math.min(GRID_SIZE - 1, PX_TO_COORD(maxX) + 1);
-    const tileEndY = Math.min(GRID_SIZE - 1, PX_TO_COORD(maxY) + 1);
+    const tileEndX = Math.min(GRID_MAX_X, PX_TO_COORD(maxX) + 1);
+    const tileEndY = Math.min(GRID_MAX_Y, PX_TO_COORD(maxY) + 1);
 
     return {
       coords: {
@@ -272,8 +274,8 @@ class CanvasRenderer {
         startY: tileStartY,
         endX: tileEndX,
         endY: tileEndY,
-        width: tileEndX - tileStartX,
-        height: tileEndY - tileStartY,
+        width: tileEndX - tileStartX + 1,
+        height: tileEndY - tileStartY + 1,
       },
     };
   }
@@ -518,8 +520,8 @@ class CanvasRenderer {
 
     // Fill the image with cell colors - one pixel per cell
     let idx = 0;
-    for (let y = viewport.tiles.startY; y < viewport.tiles.endY; y++) {
-      for (let x = viewport.tiles.startX; x < viewport.tiles.endX; x++) {
+    for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
+      for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
         const rgb = getDesirabilityRGB(baseValues[COORD_TO_INT16(x, y)]);
         imageData.data[idx++] = rgb.r;
         imageData.data[idx++] = rgb.g;
@@ -553,12 +555,12 @@ class CanvasRenderer {
       // Batch all line drawing into a single path
       this.tilesCtx.beginPath();
       // Path the horizontal lines
-      for (let y = viewport.tiles.startY + 1; y < viewport.tiles.endY; y++) {
+      for (let y = viewport.tiles.startY + 1; y <= viewport.tiles.endY; y++) {
         this.tilesCtx.moveTo(viewport.coords.startX, COORD_TO_PX(y));
         this.tilesCtx.lineTo(viewport.coords.endX, COORD_TO_PX(y));
       }
       // Path the vertical lines
-      for (let x = viewport.tiles.startX + 1; x < viewport.tiles.endX; x++) {
+      for (let x = viewport.tiles.startX + 1; x <= viewport.tiles.endX; x++) {
         this.tilesCtx.moveTo(COORD_TO_PX(x), viewport.coords.startY);
         this.tilesCtx.lineTo(COORD_TO_PX(x), viewport.coords.endY);
       }
@@ -592,8 +594,8 @@ class CanvasRenderer {
       this.tilesCtx.fillStyle = 'black';
 
       // Draw all text without rotation
-      for (let x = viewport.tiles.startX; x < viewport.tiles.endX; x++) {
-        for (let y = viewport.tiles.startY; y < viewport.tiles.endY; y++) {
+      for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
+        for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
           if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) continue;
 
           const tile = new Tile(x, y);

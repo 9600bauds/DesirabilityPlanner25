@@ -1,6 +1,12 @@
 import { Tile } from '../utils/geometry';
 import Building from './Building';
-import { GRID_SIZE, COORD_TO_INT16, GRID_SIZE_BITS } from '../utils/constants';
+import {
+  GRID_SIZE,
+  COORD_TO_INT16,
+  GRID_SIZE_BITS,
+  GRID_MAX_X,
+  GRID_MAX_Y,
+} from '../utils/constants';
 import DesireBox from './desireBox';
 import Blueprint from '../types/Blueprint';
 import House from './House';
@@ -27,9 +33,9 @@ class GridState {
     const rectRight = origin.x + dbox.bounds.width - 1;
     const rectBottom = origin.y + dbox.bounds.height - 1;
     const minX = Math.max(0, origin.x - dbox.maxRange);
-    const maxX = Math.min(GRID_SIZE - 1, rectRight + dbox.maxRange);
+    const maxX = Math.min(GRID_MAX_X, rectRight + dbox.maxRange);
     const minY = Math.max(0, origin.y - dbox.maxRange);
-    const maxY = Math.min(GRID_SIZE - 1, rectBottom + dbox.maxRange);
+    const maxY = Math.min(GRID_MAX_Y, rectBottom + dbox.maxRange);
 
     // Process grid row by row for SIMD-friendly access pattern
     for (let y = minY; y <= maxY; y++) {
