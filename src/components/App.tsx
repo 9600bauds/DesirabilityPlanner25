@@ -26,17 +26,19 @@ const App: React.FC = () => {
       );
     }
     try {
-      const renderContext = {
-        getBaseValues: gridStateManager.getBaseValues,
-        getBuildings: gridStateManager.getBuildings,
-        getCursorAction: () => cursorAction,
-        getSelectedBlueprint: getSelectedBlueprint,
-        isTileOccupied: gridStateManager.isTileOccupied,
-      };
-      rendererRef.current = new CanvasRenderer(
-        canvasContainer.current,
-        renderContext
-      );
+      if (!rendererRef.current) {
+        const renderContext = {
+          getBaseValues: gridStateManager.getBaseValues,
+          getBuildings: gridStateManager.getBuildings,
+          getCursorAction: () => cursorAction,
+          getSelectedBlueprint: getSelectedBlueprint,
+          isTileOccupied: gridStateManager.isTileOccupied,
+        };
+        rendererRef.current = new CanvasRenderer(
+          canvasContainer.current,
+          renderContext
+        );
+      }
     } catch (error) {
       console.error('Error initializing data:', error);
     }
@@ -44,7 +46,7 @@ const App: React.FC = () => {
     // Clean up on unmount
     return () => {
       if (rendererRef.current) {
-        //rendererRef.current.destroy();
+        rendererRef.current.destroy();
         rendererRef.current = null;
       }
     };

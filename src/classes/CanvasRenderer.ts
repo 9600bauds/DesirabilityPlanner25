@@ -128,6 +128,11 @@ class CanvasRenderer {
     this.scheduleRender(CanvasUpdateFlag.ALL);
   }
 
+  public destroy() {
+    this.parentContainer.removeChild(this.tilesCanvas);
+    this.parentContainer.removeChild(this.buildingsCanvas);
+  }
+
   /*
    * Public methods
    */
