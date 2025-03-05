@@ -154,7 +154,7 @@ class CanvasRenderer {
     this.clientHeight = this.parentContainer.clientHeight;
 
     // Resize all canvases
-    [this.tilesCanvas].forEach((canvas) => {
+    [this.tilesCanvas, this.buildingsCanvas].forEach((canvas) => {
       canvas.width = this.clientWidth * this.devicePixelRatio;
       canvas.height = this.clientHeight * this.devicePixelRatio;
       canvas.style.width = this.clientWidth + 'px';
