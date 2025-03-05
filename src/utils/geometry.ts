@@ -129,8 +129,8 @@ enum dirs {
  * and this was a massive waste of time in the first place.
  */
 // prettier-ignore
-export function getOutlinePath(tiles: Collections.Set<Tile>) {
-  let pathData = 'M0,0'; //'M' means 'move to here without drawing anything'
+export function getOutlinePath(tiles: Collections.Set<Tile>): Path2D {
+  let pathString = 'M0,0'; //'M' means 'move to here without drawing anything'
   const origin = new Tile(0, 0);
   let loc = origin;
   let turns = 0;
@@ -159,7 +159,7 @@ export function getOutlinePath(tiles: Collections.Set<Tile>) {
     }
     if (newDir !== dir) {
       // We've turned! Add this point to the path
-      pathData += `L${COORD_TO_PX(loc.x)},${COORD_TO_PX(loc.y)} `; //'L' means 'draw a line to this point'
+      pathString += `L${COORD_TO_PX(loc.x)},${COORD_TO_PX(loc.y)} `; //'L' means 'draw a line to this point'
       dir = newDir;
     }
     //Move
@@ -174,8 +174,8 @@ export function getOutlinePath(tiles: Collections.Set<Tile>) {
     }
     if (loc.equals(origin)) {
       //We're back home!
-      pathData += ' Z'; //This tells the path to close itself by going back to the start point
-      return pathData;
+      pathString += ' Z'; //This tells the path to close itself by going back to the start point
+      return new Path2D(pathString);
     }
     turns++;
     if (turns > 50) {

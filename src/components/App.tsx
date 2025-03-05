@@ -6,7 +6,6 @@ import Subcategory from '../interfaces/Subcategory';
 import { populateCategories } from '../data/CATEGORIES';
 import { instantiateBlueprints } from '../data/BLUEPRINTS';
 import CanvasRenderer, { CanvasUpdateFlag } from '../classes/CanvasRenderer';
-import { Svg, SVG } from '@svgdotjs/svg.js';
 import CursorAction from '../types/CursorAction';
 import { BuildingCategory } from '../interfaces/BuildingCategory';
 
@@ -26,7 +25,6 @@ const App: React.FC = () => {
   const gridStateManager = useRef(new GridStateManager()).current;
   const canvasContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
-  const svgCanvasRef = useRef<Svg | null>(null);
 
   // ===== INITIALIZATION =====
   useEffect(() => {
@@ -36,8 +34,6 @@ const App: React.FC = () => {
       );
     }
     try {
-      svgCanvasRef.current = SVG();
-
       const renderContext = {
         getBaseValues: gridStateManager.getBaseValues,
         getBuildings: gridStateManager.getBuildings,
@@ -50,7 +46,7 @@ const App: React.FC = () => {
         renderContext
       );
 
-      const instantiated = instantiateBlueprints(svgCanvasRef.current);
+      const instantiated = instantiateBlueprints();
       setPopulatedCategories(populateCategories(instantiated));
     } catch (error) {
       console.error('Error initializing data:', error);

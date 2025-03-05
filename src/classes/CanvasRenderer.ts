@@ -18,6 +18,7 @@ export enum CanvasUpdateFlag {
   NONE = 0,
   TRANSFORM = 1 << 0,
   TILES = 1 << 1,
+  BUILDINGS = 1 << 2,
   ALL = ~0, // All bits set to 1
 }
 
@@ -27,12 +28,29 @@ export interface GridPoint {
 }
 
 class CanvasRenderer {
+  // Settings
+  private transparentBuildings: boolean = false;
+  private readonly GRID_TEXT_THRESHOLD = 0.6; // Zoom threshold to draw
+  private readonly GRID_LINES_THRESHOLD = 0.1; // Zoom threshold to draw
+
+  // Rendering system
+  private sectionsNeedUpdating: number = CanvasUpdateFlag.NONE; //Uses a bitflag system
+  private pendingFrame: number | null = null;
+  private renderContext: RenderContext;
+
   // DOM elements
   private parentContainer: HTMLDivElement;
+
+  // Size variables
+  private clientWidth: number;
+  private clientHeight: number;
+  private devicePixelRatio: number;
 
   // Canvas elements
   private tilesCanvas: HTMLCanvasElement;
   private tilesCtx: CanvasRenderingContext2D;
+  private buildingsCanvas: HTMLCanvasElement;
+  private buildingsCtx: CanvasRenderingContext2D;
 
   // Transform state
   private currentRotation: number = 0;
@@ -50,22 +68,6 @@ class CanvasRenderer {
   private isDragging: boolean = false;
   private dragStartTile?: Tile;
   private dragBox?: Rectangle;
-
-  // Rendering system
-  private sectionsNeedUpdating: number = CanvasUpdateFlag.NONE; //Uses a bitflag system
-  private pendingFrame: number | null = null;
-  private renderContext: RenderContext;
-
-  // Building rendering
-  private transparentBuildings: boolean = false;
-
-  // Text rendering zoom threshold
-  private readonly TEXT_ZOOM_THRESHOLD = 0.6;
-
-  // Size variables
-  private clientWidth: number;
-  private clientHeight: number;
-  private devicePixelRatio: number;
 
   get viewCenter(): DOMPoint {
     return new DOMPoint(this.clientWidth / 2, this.clientHeight / 2);
@@ -107,6 +109,16 @@ class CanvasRenderer {
       alpha: false,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
+
+    this.buildingsCanvas = createCanvas('buildings-canvas', 2);
+    this.buildingsCtx = this.buildingsCanvas.getContext('2d', {
+      alpha: true,
+      desynchronized: true,
+    }) as CanvasRenderingContext2D;
+
+    // Todo: React can probably do this better. Also todo: Debounce this
+    const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
+    resizeObserver.observe(parentContainer);
 
     // Center view
     this.centerViewAt({ x: GRID_CENTER_PX, y: GRID_CENTER_PX });
@@ -232,7 +244,7 @@ class CanvasRenderer {
    */
   private applyCanvasTransforms(): void {
     // Reset transforms
-    [this.tilesCtx].forEach((ctx) => {
+    [this.tilesCtx, this.buildingsCtx].forEach((ctx) => {
       // Start with device pixel ratio scaling
       ctx.setTransform(
         this.devicePixelRatio,
@@ -420,6 +432,16 @@ class CanvasRenderer {
       startTime = performance.now();
     }
 
+    if (this.sectionsNeedUpdating & CanvasUpdateFlag.BUILDINGS) {
+      this.renderBuildings();
+      const buildingsTime = performance.now() - startTime;
+      if (buildingsTime > 5) {
+        //prettier-ignore
+        console.log("Rendering buildings took", buildingsTime, "ms!");
+      }
+      startTime = performance.now();
+    }
+
     this.pendingFrame = null;
     this.sectionsNeedUpdating = CanvasUpdateFlag.NONE;
   }
@@ -465,7 +487,7 @@ class CanvasRenderer {
     // Put the image data on the temporary canvas
     tempCtx.putImageData(imageData, 0, 0);
     // Draw the scaled image
-    this.tilesCtx.imageSmoothingEnabled = false;
+    this.tilesCtx.imageSmoothingEnabled = false; //For some reason we need to set this each time?
     this.tilesCtx.drawImage(
       tempCanvas,
       0,
@@ -481,27 +503,29 @@ class CanvasRenderer {
     /*
      * DRAW THE BLACK GRIDLINES
      */
-    this.tilesCtx.lineWidth = 1;
-    this.tilesCtx.strokeStyle = colors.pureBlack;
-    // Batch all line drawing into a single path
-    this.tilesCtx.beginPath();
-    // Path the horizontal lines
-    for (let y = viewport.startY + 1; y < viewport.endY; y++) {
-      this.tilesCtx.moveTo(COORD_TO_PX(viewport.startX), COORD_TO_PX(y));
-      this.tilesCtx.lineTo(COORD_TO_PX(viewport.endX), COORD_TO_PX(y));
+    if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
+      this.tilesCtx.lineWidth = 1;
+      this.tilesCtx.strokeStyle = colors.pureBlack;
+      // Batch all line drawing into a single path
+      this.tilesCtx.beginPath();
+      // Path the horizontal lines
+      for (let y = viewport.startY + 1; y < viewport.endY; y++) {
+        this.tilesCtx.moveTo(COORD_TO_PX(viewport.startX), COORD_TO_PX(y));
+        this.tilesCtx.lineTo(COORD_TO_PX(viewport.endX), COORD_TO_PX(y));
+      }
+      // Path the vertical lines
+      for (let x = viewport.startX + 1; x < viewport.endX; x++) {
+        this.tilesCtx.moveTo(COORD_TO_PX(x), COORD_TO_PX(viewport.startY));
+        this.tilesCtx.lineTo(COORD_TO_PX(x), COORD_TO_PX(viewport.endY));
+      }
+      // Execute the path!
+      this.tilesCtx.stroke();
     }
-    // Path the vertical lines
-    for (let x = viewport.startX + 1; x < viewport.endX; x++) {
-      this.tilesCtx.moveTo(COORD_TO_PX(x), COORD_TO_PX(viewport.startY));
-      this.tilesCtx.lineTo(COORD_TO_PX(x), COORD_TO_PX(viewport.endY));
-    }
-    // Execute the path!
-    this.tilesCtx.stroke();
 
     /*
      * DRAW THE TEXT LABELS (most of the performance hit is from here!)
      */
-    if (this.zoomLevel > this.TEXT_ZOOM_THRESHOLD) {
+    if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
       // Save the current transform state
       this.tilesCtx.save();
 
@@ -551,6 +575,31 @@ class CanvasRenderer {
 
       // Restore the transform
       this.tilesCtx.restore();
+    }
+  }
+
+  private renderBuildings(): void {
+    const buildings = this.renderContext.getBuildings();
+
+    for (const building of buildings) {
+      const graphic = building.blueprint.graphic;
+      if (!graphic) continue;
+
+      this.buildingsCtx.save();
+
+      const x = COORD_TO_PX(building.origin.x);
+      const y = COORD_TO_PX(building.origin.y);
+      this.buildingsCtx.translate(x, y);
+
+      for (const pathFill of graphic.fillPaths) {
+        this.buildingsCtx.fillStyle = pathFill.fillColor;
+        this.buildingsCtx.fill(pathFill.path);
+      }
+      this.buildingsCtx.strokeStyle = colors.strongOutlineBlack;
+      this.buildingsCtx.lineWidth = 3;
+      this.buildingsCtx.stroke(graphic.outline);
+
+      this.buildingsCtx.restore();
     }
   }
 }

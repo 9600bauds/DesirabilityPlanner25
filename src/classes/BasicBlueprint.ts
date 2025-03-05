@@ -4,9 +4,9 @@ import colors from '../utils/colors';
 import { NEW_CATEGORIES } from '../data/CATEGORIES';
 import { NEW_BLUEPRINTS } from '../data/BLUEPRINTS';
 import DesireBox from './desireBox';
-import { Svg, Symbol } from '@svgdotjs/svg.js';
 import { COORD_TO_PX } from '../utils/constants';
 import * as Collections from 'typescript-collections';
+import BuildingGraphic, { fillPath } from '../interfaces/BuildingGraphic';
 
 class BasicBlueprint {
   key: string;
@@ -18,12 +18,11 @@ class BasicBlueprint {
 
   cost: number[] = [0, 0, 0, 0, 0]; //Array of 5 costs: v.easy, easy, normal, hard, v.hard
   employeesRequired: number = 0;
+
   baseLabel?: string;
+  graphic?: BuildingGraphic;
 
-  baseGraphic?: Symbol;
-  path: string;
-
-  constructor(newBp: NewBlueprint, key: string, svgCanvas: Svg) {
+  constructor(newBp: NewBlueprint, key: string) {
     this.key = key;
     this.height = newBp.height;
     this.width = newBp.width;
@@ -41,8 +40,7 @@ class BasicBlueprint {
     this.tilesOccupied = new Collections.Set<Tile>();
     this.recursiveAddToTilesOccupied(newBp, new Tile(0, 0));
 
-    this.path = getOutlinePath(this.tilesOccupied);
-    this.baseGraphic = this.buildSymbol(svgCanvas, newBp);
+    this.graphic = this.buildGraphic(newBp);
   }
 
   private recursiveAddToTilesOccupied = (data: NewBlueprint, origin: Tile) => {
@@ -80,41 +78,41 @@ class BasicBlueprint {
     }
   };
 
-  private buildSymbol(svgCanvas: Svg, newBp: NewBlueprint): Symbol | undefined {
+  private buildGraphic(newBp: NewBlueprint): BuildingGraphic | undefined {
     if (newBp.invisible) return;
-    const symbol = svgCanvas.symbol().attr('id', `${this.key}-base`);
-    symbol.css('overflow', 'visible'); //Necessary for outlines and buildings with negative coord graphics. Todo: Does this impact performance much?
+    const outline = getOutlinePath(this.tilesOccupied);
+    const fillPaths: fillPath[] = [];
 
-    this.recursiveAddToSymbol(newBp, symbol, new Tile(0, 0));
+    this.recursiveAddFillPaths(newBp, fillPaths, new Tile(0, 0));
 
-    const path = symbol
-      .path()
-      .fill('none')
-      .stroke({ color: colors.strongOutlineBlack, opacity: 1, width: 3 });
-
-    path.plot(this.path);
-    return symbol;
+    const graphic = { outline, fillPaths };
+    return graphic;
   }
 
-  private recursiveAddToSymbol = (
+  private recursiveAddFillPaths = (
     data: NewBlueprint,
-    symbol: Symbol,
+    fillPaths: fillPath[],
     origin: Tile
   ) => {
     if (data.invisible) {
       return;
     }
     const fillColor = this.getBpFillColor(data);
-    symbol
-      .rect(COORD_TO_PX(data.width), COORD_TO_PX(data.height))
-      .fill(fillColor)
-      .move(COORD_TO_PX(origin.x), COORD_TO_PX(origin.y));
+    const x = COORD_TO_PX(origin.x);
+    const y = COORD_TO_PX(origin.y);
+    const width = COORD_TO_PX(data.width);
+    const height = COORD_TO_PX(data.height);
+
+    const path = new Path2D();
+    path.rect(x, y, width, height);
+    fillPaths.push({ path, fillColor });
+
     if (data.children) {
       for (const child of data.children) {
         const childBlueprint = NEW_BLUEPRINTS[child.childKey];
-        this.recursiveAddToSymbol(
+        this.recursiveAddFillPaths(
           childBlueprint,
-          symbol,
+          fillPaths,
           origin.add(child.relativeOrigin)
         );
       }

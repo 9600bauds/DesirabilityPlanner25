@@ -1,4 +1,3 @@
-import { Svg } from '@svgdotjs/svg.js';
 import NewBlueprint from '../types/NewBlueprint';
 import BasicBlueprint from './BasicBlueprint';
 
@@ -6,8 +5,8 @@ class HouseBlueprint extends BasicBlueprint {
   desirabilityToEvolve: number;
   desirabilityToDevolve: number;
 
-  constructor(blueprint: NewBlueprint, key: string, svgCanvas: Svg) {
-    super(blueprint, key, svgCanvas);
+  constructor(blueprint: NewBlueprint, key: string) {
+    super(blueprint, key);
     if ('desirabilityToEvolve' in blueprint) {
       this.desirabilityToEvolve = blueprint.desirabilityToEvolve;
       this.desirabilityToDevolve = blueprint.desirabilityToDevolve;
