@@ -83,13 +83,10 @@ class CanvasRenderer {
       canvas.height = this.clientHeight * this.devicePixelRatio;
 
       // Set display size via CSS
-      canvas.style.position = 'absolute';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
+      canvas.className = 'canvasLayer';
       canvas.style.width = this.clientWidth + 'px';
       canvas.style.height = this.clientHeight + 'px';
       canvas.style.zIndex = zIndex.toString();
-      canvas.style.pointerEvents = 'none';
 
       this.parentContainer.appendChild(canvas);
       return canvas;
@@ -112,6 +109,7 @@ class CanvasRenderer {
 
     this.tileNumbersCanvas = createCanvas('tile-numbers-canvas', 2);
     this.tileNumbersCtx = this.tilesCanvas.getContext('2d', {
+    this.tileNumbersCtx = this.tileNumbersCanvas.getContext('2d', {
       alpha: true,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
@@ -429,7 +427,10 @@ class CanvasRenderer {
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
       this.renderTiles(this.tilesCtx, viewport, baseValues);
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+        this.tileNumbersCanvas.style.display = 'initial';
         this.renderTileNumbers(this.tileNumbersCtx, viewport, baseValues);
+      } else {
+        this.tileNumbersCanvas.style.display = 'none';
       }
       const tilesTime = performance.now() - startTime;
       if (tilesTime > 5) {
@@ -545,6 +546,13 @@ class CanvasRenderer {
     ctx.translate(this.offsetX, this.offsetY);
     ctx.scale(this.zoomLevel, this.zoomLevel);
     //We intentionally do not rotate!
+
+    ctx.clearRect(
+      viewport.coords.startX,
+      viewport.coords.startY,
+      viewport.coords.width,
+      viewport.coords.height
+    );
 
     // Set text style
     ctx.font = 'bold 14px Arial';
