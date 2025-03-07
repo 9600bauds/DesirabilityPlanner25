@@ -543,16 +543,10 @@ class CanvasRenderer {
   ) {
     // prettier-ignore
     ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
     ctx.translate(this.offsetX, this.offsetY);
     ctx.scale(this.zoomLevel, this.zoomLevel);
     //We intentionally do not rotate!
-
-    ctx.clearRect(
-      viewport.coords.startX,
-      viewport.coords.startY,
-      viewport.coords.width,
-      viewport.coords.height
-    );
 
     // Set text style
     ctx.font = 'bold 14px Arial';
