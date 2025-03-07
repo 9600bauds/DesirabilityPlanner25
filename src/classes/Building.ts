@@ -9,6 +9,7 @@ import { ALL_CATEGORIES } from '../data/CATEGORIES';
 import colors from '../utils/colors';
 
 class Building {
+  id: string;
   origin: Tile;
   width: number;
   height: number;
@@ -25,6 +26,16 @@ class Building {
   graphic?: BuildingGraphic;
 
   constructor(origin: Tile, blueprint: Blueprint) {
+    //Todo: Assigning key should probably be done in-situ for ALL_BLUEPRINTS
+    const key = Object.keys(ALL_BLUEPRINTS).find(
+      (key) => ALL_BLUEPRINTS[key] === blueprint
+    );
+    if (!key) {
+      throw new Error(
+        'Building blueprint did not have a key in the blueprints lookup!'
+      );
+    }
+    this.id = `${key}-(${origin.x},${origin.y})`;
     this.origin = origin;
     this.height = blueprint.height;
     this.width = blueprint.width;
@@ -135,11 +146,7 @@ class Building {
   }
 
   public getLabel(maxDesirability?: number) {
-    const labelHeight = COORD_TO_PX(this.height);
-    const labelWidth = COORD_TO_PX(this.width);
-    return `<div class="buildingLabel" style="width: ${labelWidth}px; height: ${labelHeight}px">
-          ${this.baseLabel}
-        </div>`;
+    return this.baseLabel;
   }
 
   public interceptsTile(t2: Tile) {

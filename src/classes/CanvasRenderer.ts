@@ -38,6 +38,7 @@ class CanvasRenderer {
 
   // DOM elements
   private parentContainer: HTMLDivElement;
+  private labelContainer: HTMLDivElement;
 
   // Size variables
   private clientWidth: number;
@@ -100,23 +101,27 @@ class CanvasRenderer {
     this.clientWidth = parentContainer.clientWidth;
     this.clientHeight = parentContainer.clientHeight;
 
+    // Create the building label container
+    this.labelContainer = document.createElement('div');
+    this.labelContainer.className = 'building-labels-container';
+    this.parentContainer.appendChild(this.labelContainer);
+
     // Create canvas elements - all sized to fit the viewport
-    this.tilesCanvas = createCanvas('tiles-canvas', 1);
-    this.tilesCtx = this.tilesCanvas.getContext('2d', {
-      alpha: false,
+    this.buildingsCanvas = createCanvas('buildings-canvas', 3);
+    this.buildingsCtx = this.buildingsCanvas.getContext('2d', {
+      alpha: true,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
 
     this.tileNumbersCanvas = createCanvas('tile-numbers-canvas', 2);
-    this.tileNumbersCtx = this.tilesCanvas.getContext('2d', {
     this.tileNumbersCtx = this.tileNumbersCanvas.getContext('2d', {
       alpha: true,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
 
-    this.buildingsCanvas = createCanvas('buildings-canvas', 3);
-    this.buildingsCtx = this.buildingsCanvas.getContext('2d', {
-      alpha: true,
+    this.tilesCanvas = createCanvas('tiles-canvas', 1);
+    this.tilesCtx = this.tilesCanvas.getContext('2d', {
+      alpha: false,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
 
@@ -132,6 +137,7 @@ class CanvasRenderer {
   }
 
   public destroy() {
+    this.parentContainer.removeChild(this.labelContainer);
     this.parentContainer.removeChild(this.tilesCanvas);
     this.parentContainer.removeChild(this.tileNumbersCanvas);
     this.parentContainer.removeChild(this.buildingsCanvas);
@@ -176,8 +182,8 @@ class CanvasRenderer {
   private grid2canvas(point: GridPoint): DOMPoint {
     if (this.isRotated) point = ROTATE_AROUND_ORIGIN(point);
     return new DOMPoint(
-      point.x * this.zoomLevel + this.offsetX,
-      point.y * this.zoomLevel + this.offsetY
+      COORD_TO_PX(point.x) * this.zoomLevel + this.offsetX,
+      COORD_TO_PX(point.y) * this.zoomLevel + this.offsetY
     );
   }
 
@@ -597,8 +603,10 @@ class CanvasRenderer {
       viewport.coords.width,
       viewport.coords.height
     );
+
     const buildings = this.renderContext.getBuildings();
     const buildingOutlinesPath = new Path2D();
+    const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
 
     for (const building of buildings) {
       const graphic = building.graphic;
@@ -609,11 +617,34 @@ class CanvasRenderer {
         ctx.fill(pathFill.path);
       }
       buildingOutlinesPath.addPath(graphic.outline);
+
+      const innerLabel = building.getLabel(0);
+      if (innerLabel) {
+        const labelOrigin = this.grid2canvas(building.origin);
+        const labelHeight = COORD_TO_PX(building.height);
+        const labelWidth = COORD_TO_PX(building.width);
+        const labelHTML = `
+          <div
+            id='label-${building.id}'
+            class='building-label'
+            style="
+            left: ${labelOrigin.x}px;
+            top: ${labelOrigin.y}px;
+            width: ${labelWidth}px;
+            height: ${labelHeight}px
+            "
+          >
+            ${innerLabel}
+          </div>`;
+        labelsHTML.push(labelHTML);
+      }
     }
 
     ctx.strokeStyle = colors.strongOutlineBlack;
     ctx.lineWidth = 3;
     ctx.stroke(buildingOutlinesPath);
+
+    this.labelContainer.innerHTML = labelsHTML.join('');
   }
 }
 
