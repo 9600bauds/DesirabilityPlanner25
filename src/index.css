@@ -21,6 +21,11 @@
   contain: content;
   position: absolute;
   pointer-events: none;
-  font-size: 12px;
   z-index: 100;
+  display: flex;
+  align-items: center ;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+  padding: 2px;
 }

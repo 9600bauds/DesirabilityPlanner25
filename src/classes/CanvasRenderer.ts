@@ -620,18 +620,25 @@ class CanvasRenderer {
 
       const innerLabel = building.getLabel(0);
       if (innerLabel) {
-        const labelOrigin = this.grid2canvas(building.origin);
-        const labelHeight = COORD_TO_PX(building.height);
-        const labelWidth = COORD_TO_PX(building.width);
+        let labelOrigin = this.grid2canvas(building.origin);
+        const labelHeight = COORD_TO_PX(building.height) * this.zoomLevel;
+        const labelWidth = COORD_TO_PX(building.width) * this.zoomLevel;
+        if (this.isRotated) {
+          labelOrigin = ROTATE_AROUND_ORIGIN(labelOrigin);
+        }
+        const fontSize = Math.floor(
+          Math.sqrt((labelWidth * labelHeight) / (innerLabel.length * 2))
+        );
         const labelHTML = `
           <div
             id='label-${building.id}'
             class='building-label'
             style="
-            left: ${labelOrigin.x}px;
-            top: ${labelOrigin.y}px;
-            width: ${labelWidth}px;
-            height: ${labelHeight}px
+              left: ${labelOrigin.x}px;
+              top: ${labelOrigin.y}px;
+              width: ${labelWidth}px;
+              height: ${labelHeight}px;
+              font-size: ${fontSize}px;
             "
           >
             ${innerLabel}
