@@ -21,7 +21,8 @@ import Building from './Building';
 export enum CanvasUpdateFlag {
   NONE = 0,
   TILES = 1 << 0,
-  BUILDINGS = 1 << 1,
+  GRIDLINES = 1 << 1,
+  BUILDINGS = 1 << 2,
   ALL = ~0, // All bits set to 1
 }
 
@@ -50,6 +51,8 @@ class CanvasRenderer {
   private tilesCtx: CanvasRenderingContext2D;
   private tileNumbersCanvas: HTMLCanvasElement;
   private tileNumbersCtx: CanvasRenderingContext2D;
+  private gridLinesCanvas: HTMLCanvasElement;
+  private gridLinesCtx: CanvasRenderingContext2D;
   private buildingsCanvas: HTMLCanvasElement;
   private buildingsCtx: CanvasRenderingContext2D;
 
@@ -104,22 +107,29 @@ class CanvasRenderer {
     // Create the building label container
     this.labelContainer = document.createElement('div');
     this.labelContainer.id = 'building-labels-container';
+    this.labelContainer.style.zIndex = '500';
     this.parentContainer.appendChild(this.labelContainer);
 
     // Create canvas elements - all sized to fit the viewport
-    this.buildingsCanvas = createCanvas('buildings-canvas', 3);
+    this.buildingsCanvas = createCanvas('buildings-canvas', 400);
     this.buildingsCtx = this.buildingsCanvas.getContext('2d', {
       alpha: true,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
 
-    this.tileNumbersCanvas = createCanvas('tile-numbers-canvas', 2);
+    this.gridLinesCanvas = createCanvas('tile-numbers-canvas', 300);
+    this.gridLinesCtx = this.gridLinesCanvas.getContext('2d', {
+      alpha: true,
+      desynchronized: true,
+    }) as CanvasRenderingContext2D;
+
+    this.tileNumbersCanvas = createCanvas('tile-numbers-canvas', 200);
     this.tileNumbersCtx = this.tileNumbersCanvas.getContext('2d', {
       alpha: true,
       desynchronized: true,
     }) as CanvasRenderingContext2D;
 
-    this.tilesCanvas = createCanvas('tiles-canvas', 1);
+    this.tilesCanvas = createCanvas('tiles-canvas', 100);
     this.tilesCtx = this.tilesCanvas.getContext('2d', {
       alpha: false,
       desynchronized: true,
@@ -140,6 +150,7 @@ class CanvasRenderer {
     this.parentContainer.removeChild(this.labelContainer);
     this.parentContainer.removeChild(this.tilesCanvas);
     this.parentContainer.removeChild(this.tileNumbersCanvas);
+    this.parentContainer.removeChild(this.gridLinesCanvas);
     this.parentContainer.removeChild(this.buildingsCanvas);
   }
 
@@ -157,14 +168,17 @@ class CanvasRenderer {
     this.clientHeight = this.parentContainer.clientHeight;
 
     // Resize all canvases
-    [this.tilesCanvas, this.tileNumbersCanvas, this.buildingsCanvas].forEach(
-      (canvas) => {
-        canvas.width = this.clientWidth * this.devicePixelRatio;
-        canvas.height = this.clientHeight * this.devicePixelRatio;
-        canvas.style.width = this.clientWidth + 'px';
-        canvas.style.height = this.clientHeight + 'px';
-      }
-    );
+    [
+      this.tilesCanvas,
+      this.tileNumbersCanvas,
+      this.gridLinesCanvas,
+      this.buildingsCanvas,
+    ].forEach((canvas) => {
+      canvas.width = this.clientWidth * this.devicePixelRatio;
+      canvas.height = this.clientHeight * this.devicePixelRatio;
+      canvas.style.width = this.clientWidth + 'px';
+      canvas.style.height = this.clientHeight + 'px';
+    });
 
     this.scheduleRender(CanvasUpdateFlag.ALL);
   }
@@ -474,9 +488,24 @@ class CanvasRenderer {
         this.tileNumbersCanvas.style.display = 'none';
       }
       const tilesTime = performance.now() - startTime;
-      if (tilesTime > 5) {
+      if (tilesTime > 4) {
         //prettier-ignore
         console.log("Tile rendering took", tilesTime, "ms!");
+      }
+      startTime = performance.now();
+    }
+
+    if (this.sectionsNeedUpdating & CanvasUpdateFlag.GRIDLINES) {
+      if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
+        this.gridLinesCanvas.style.display = 'initial';
+        this.renderGridlines(this.gridLinesCtx, viewport);
+      } else {
+        this.gridLinesCanvas.style.display = 'none';
+      }
+      const gridLinesTime = performance.now() - startTime;
+      if (gridLinesTime > 3) {
+        //prettier-ignore
+        console.log("Gridline rendering took", gridLinesTime, "ms!");
       }
       startTime = performance.now();
     }
@@ -490,7 +519,7 @@ class CanvasRenderer {
       );
       this.renderBuildingLabels(viewport, modifiedValues);
       const buildingsTime = performance.now() - startTime;
-      if (buildingsTime > 5) {
+      if (buildingsTime > 3) {
         //prettier-ignore
         console.log("Rendering buildings took", buildingsTime, "ms!");
       }
@@ -559,28 +588,32 @@ class CanvasRenderer {
       COORD_TO_PX(viewport.tiles.width),
       COORD_TO_PX(viewport.tiles.height)
     );
+  }
 
-    /*
-     * DRAW THE BLACK GRIDLINES
-     */
-    if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = colors.pureBlack;
-      // Batch all line drawing into a single path
-      ctx.beginPath();
-      // Path the horizontal lines
-      for (let y = viewport.tiles.startY + 1; y <= viewport.tiles.endY; y++) {
-        ctx.moveTo(viewport.coords.startX, COORD_TO_PX(y));
-        ctx.lineTo(viewport.coords.endX, COORD_TO_PX(y));
-      }
-      // Path the vertical lines
-      for (let x = viewport.tiles.startX + 1; x <= viewport.tiles.endX; x++) {
-        ctx.moveTo(COORD_TO_PX(x), viewport.coords.startY);
-        ctx.lineTo(COORD_TO_PX(x), viewport.coords.endY);
-      }
-      // Execute the path!
-      ctx.stroke();
+  private renderGridlines(ctx: CanvasRenderingContext2D, viewport: Viewport) {
+    // prettier-ignore
+    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
+    ctx.translate(this.offsetX, this.offsetY);
+    ctx.scale(this.zoomLevel, this.zoomLevel);
+    if (this.isRotated) ctx.rotate(ROTATION_RADS);
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = colors.pureBlack;
+    // Batch all line drawing into a single path
+    ctx.beginPath();
+    // Path the horizontal lines
+    for (let y = viewport.tiles.startY + 1; y <= viewport.tiles.endY; y++) {
+      ctx.moveTo(viewport.coords.startX, COORD_TO_PX(y));
+      ctx.lineTo(viewport.coords.endX, COORD_TO_PX(y));
     }
+    // Path the vertical lines
+    for (let x = viewport.tiles.startX + 1; x <= viewport.tiles.endX; x++) {
+      ctx.moveTo(COORD_TO_PX(x), viewport.coords.startY);
+      ctx.lineTo(COORD_TO_PX(x), viewport.coords.endY);
+    }
+    // Execute the path!
+    ctx.stroke();
   }
 
   private renderTileNumbers(
