@@ -1,4 +1,5 @@
 import { NewDesireBox } from '../interfaces/NewDesireBox';
+import { GRID_MAX_X, GRID_MAX_Y, GRID_SIZE_BITS } from '../utils/constants';
 import { Rectangle, Tile } from '../utils/geometry';
 
 class DesireBox {
@@ -29,6 +30,56 @@ class DesireBox {
 
     this.bounds = new Rectangle(origin, height, width);
     this.maxRange = data.maxRange;
+  }
+
+  public apply(grid: Int16Array, multiplier: number = 1): void {
+    const origin = this.bounds.origin;
+    const rectRight = origin.x + this.bounds.width - 1;
+    const rectBottom = origin.y + this.bounds.height - 1;
+    const minX = Math.max(0, origin.x - this.maxRange);
+    const maxX = Math.min(GRID_MAX_X, rectRight + this.maxRange);
+    const minY = Math.max(0, origin.y - this.maxRange);
+    const maxY = Math.min(GRID_MAX_Y, rectBottom + this.maxRange);
+
+    // Process grid row by row for SIMD-friendly access pattern
+    for (let y = minY; y <= maxY; y++) {
+      const isAboveRect = y < origin.y;
+      const isBelowRect = y > rectBottom;
+
+      // Pre-compute vertical distance once per row
+      let distY = 0;
+      if (isAboveRect) {
+        distY = origin.y - y;
+      } else if (isBelowRect) {
+        distY = y - rectBottom;
+      }
+
+      // Pre-compute row offset for faster indexing
+      const rowOffset = y << GRID_SIZE_BITS;
+      // Process each cell in the row
+      for (let x = minX; x <= maxX; x++) {
+        const isLeftOfRect = x < origin.x;
+        const isRightOfRect = x > rectRight;
+
+        const isInsideRect =
+          !isAboveRect && !isBelowRect && !isLeftOfRect && !isRightOfRect;
+        if (isInsideRect) {
+          continue;
+        }
+
+        // Gotta calculate horizontal distance for each one individually
+        let distX = 0;
+        if (isLeftOfRect) {
+          distX = origin.x - x;
+        } else if (isRightOfRect) {
+          distX = x - rectRight;
+        }
+
+        const chebyshevDist = distX > distY ? distX : distY;
+
+        grid[rowOffset | x] += this.effectPerRange[chebyshevDist] * multiplier;
+      }
+    }
   }
 }
 
