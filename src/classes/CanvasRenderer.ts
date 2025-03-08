@@ -143,13 +143,6 @@ class CanvasRenderer {
     this.parentContainer.removeChild(this.buildingsCanvas);
   }
 
-  /*
-   * Public methods
-   */
-  public selectedBlueprintChanged() {
-    //Todo: Update virtual building
-  }
-
   public scheduleRender(updateFlags: number): void {
     this.sectionsNeedUpdating |= updateFlags; //Add the flags of the parts that need updating via bitwise OR
 
@@ -196,6 +189,15 @@ class CanvasRenderer {
   }
 
   private pointToTile(point: DOMPoint): Tile | undefined {
+    if (
+      point.x < 0 ||
+      point.y < 0 ||
+      point.x >= this.clientWidth ||
+      point.y >= this.clientHeight
+    ) {
+      return undefined; //This is outside our viewport!
+    }
+
     const gridPt = this.canvas2grid(point);
 
     // Convert to tile coordinates
@@ -350,13 +352,15 @@ class CanvasRenderer {
   }
 
   // Drag handling
-  public startDragging(event: MouseEvent) {
-    const thisTile = this.getMouseCoords(event);
-    if (!thisTile) return;
-
+  public startDragging() {
     this.isDragging = true;
-    this.dragStartTile = thisTile;
-    this.updateDragBox(thisTile);
+    this.dragStartTile = this.lastMouseoverTile;
+    this.updateDragBox(this.lastMouseoverTile);
+  }
+
+  public handleDragging() {
+    if (!this.isDragging) return;
+    this.updateDragBox(this.lastMouseoverTile);
   }
 
   private updateDragBox(newPos: Tile | undefined) {
@@ -377,36 +381,34 @@ class CanvasRenderer {
     return returnBox;
   }
 
-  // Mouse handling
-  public handleMouseMove(event: MouseEvent) {
-    const previousTile = this.lastMouseoverTile;
-    const thisTile = this.getMouseCoords(event);
-    this.lastMouseoverTile = thisTile;
-
-    if (
-      (thisTile && previousTile && thisTile.equals(previousTile)) ||
-      (!thisTile && !previousTile)
-    ) {
-      return;
-    }
-
-    const cursorAction = this.renderContext.getCursorAction();
-
-    if (this.isDragging) {
-      if (event.buttons !== 1) {
-        this.stopDragging();
-      } else {
-        this.updateDragBox(thisTile);
-      }
-    } else if (cursorAction === 'placing') {
-      //Todo: Update virtual building here
-    }
+  // Placement preview
+  public handlePlacementPreview() {
+    console.log('handling preview...');
+    return; //Todo
   }
 
-  public handleMouseLeave() {
-    this.lastMouseoverTile = undefined;
+  // Mouse handling
+  public checkForTileChange(event?: MouseEvent) {
+    const previousTile = this.lastMouseoverTile;
+    const newTile = event && this.getMouseCoords(event);
+    let tileChanged: boolean;
 
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: This shouldn't need a rerender but I'll deal with it later
+    if (!newTile) {
+      if (previousTile) {
+        tileChanged = true; //We went from something to nothing, thus, change
+      } else {
+        tileChanged = false; //We went from nothing to nothing, thus, no change
+      }
+    } else {
+      if (!previousTile) {
+        tileChanged = true; //We went from nothing to something, thus, change
+      } else {
+        tileChanged = !newTile.equals(previousTile); //We change only if the new tile is not the same as the previous one
+      }
+    }
+
+    this.lastMouseoverTile = newTile;
+    return tileChanged;
   }
 
   // Building transparency

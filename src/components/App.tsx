@@ -30,7 +30,6 @@ const App: React.FC = () => {
         const renderContext = {
           getBaseValues: gridStateManager.getBaseValues,
           getBuildings: gridStateManager.getBuildings,
-          getCursorAction: () => cursorAction,
           getSelectedBlueprint: getSelectedBlueprint,
           isTileOccupied: gridStateManager.isTileOccupied,
         };
@@ -55,7 +54,9 @@ const App: React.FC = () => {
   // Notify our renderer when the selected blueprint changes
   useEffect(() => {
     if (rendererRef.current) {
-      rendererRef.current.selectedBlueprintChanged();
+      if (cursorAction === 'placing') {
+        rendererRef.current.handlePlacementPreview();
+      }
     }
 
     // ...We also need to re-apply these events every single time we change our selected blueprint because React caches the current values or something.
@@ -94,7 +95,8 @@ const App: React.FC = () => {
   }, [selectedSubcategory, selectedBlueprintIndex]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!rendererRef.current) return;
+    const renderer = rendererRef.current;
+    if (!renderer) return;
 
     if (event.button === 2) {
       // Right click
@@ -103,40 +105,39 @@ const App: React.FC = () => {
         deselectSubcategory();
       } else if (cursorAction === 'erasing') {
         setCursorAction('panning');
-        rendererRef.current.stopDragging();
+        renderer.stopDragging();
       }
     } else if (event.button === 0) {
       // Left click
       if (cursorAction === 'panning') {
-        rendererRef.current.startPanning(event.nativeEvent);
+        renderer.startPanning(event.nativeEvent);
       } else if (cursorAction === 'erasing') {
-        rendererRef.current.startDragging(event.nativeEvent);
+        renderer.startDragging();
       }
     }
   };
 
   const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!rendererRef.current) return;
+    const renderer = rendererRef.current;
+    if (!renderer) return;
 
     if (event.button === 0) {
       //Left click
-      rendererRef.current.stopPanning();
+      renderer.stopPanning();
       if (cursorAction === 'erasing') {
-        const erasedRect = rendererRef.current.stopDragging();
+        const erasedRect = renderer.stopDragging();
         if (erasedRect) {
           if (gridStateManager.eraseRect(erasedRect)) {
-            rendererRef.current.scheduleRender(CanvasUpdateFlag.ALL);
+            renderer.scheduleRender(CanvasUpdateFlag.ALL);
           }
         }
       } else if (cursorAction === 'placing') {
-        rendererRef.current.stopPanning();
-        const tile = rendererRef.current.getMouseCoords(event.nativeEvent);
+        const tile = renderer.getMouseCoords(event.nativeEvent);
         if (tile) {
           const blueprint = getSelectedBlueprint();
           if (blueprint) {
-            rendererRef.current.stopPanning();
             if (gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              rendererRef.current.scheduleRender(CanvasUpdateFlag.ALL);
+              renderer.scheduleRender(CanvasUpdateFlag.ALL);
             }
           }
         }
@@ -145,21 +146,40 @@ const App: React.FC = () => {
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!rendererRef.current) return;
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+
+    const tileChanged = renderer.checkForTileChange(event.nativeEvent);
 
     if (cursorAction === 'panning') {
-      rendererRef.current.handlePanning(event.nativeEvent);
-    } else {
-      rendererRef.current.handleMouseMove(event.nativeEvent);
+      renderer.handlePanning(event.nativeEvent);
+    }
+    if (tileChanged) {
+      handleTileChange();
     }
   };
 
-  const handleMouseLeave = () => {
-    if (!rendererRef.current) return;
+  const handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+
+    const tileChanged = renderer.checkForTileChange(event.nativeEvent);
     if (cursorAction === 'panning') {
-      rendererRef.current.stopPanning();
-    } else {
-      rendererRef.current.handleMouseLeave();
+      renderer.stopPanning();
+    }
+    if (tileChanged) {
+      handleTileChange();
+    }
+  };
+
+  const handleTileChange = () => {
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+
+    if (cursorAction === 'erasing') {
+      renderer.handleDragging();
+    } else if (cursorAction === 'placing') {
+      renderer.handlePlacementPreview();
     }
   };
 
@@ -176,8 +196,8 @@ const App: React.FC = () => {
 
   const selectSubcategory = (subcat: Subcategory) => {
     deselectSubcategory();
-    setSelectedSubcategory(subcat);
     setCursorAction('placing');
+    setSelectedSubcategory(subcat);
   };
 
   const deselectSubcategory = () => {
