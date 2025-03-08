@@ -374,6 +374,7 @@ class CanvasRenderer {
     if (!this.isDragging) return;
 
     const returnBox = this.dragBox;
+    this.dragBox = undefined;
     this.isDragging = false;
 
     this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
@@ -383,8 +384,8 @@ class CanvasRenderer {
 
   // Placement preview
   public handlePlacementPreview() {
-    console.log('handling preview...');
-    return; //Todo
+    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: More optimized version if needed
+    return;
   }
 
   // Mouse handling
@@ -427,16 +428,48 @@ class CanvasRenderer {
       return; //We are fully offscreen!
     }
 
-    //This beauty stores all the precomputed desirability values.
+    const selectedBlueprint = this.renderContext.getSelectedBlueprint();
+    const placedBuildings = this.renderContext.getBuildings();
+    // These are the precomputed desirability values from the "true" gridstate.
     const baseValues = this.renderContext.getBaseValues();
+    // Let's clone them so we can do our own calculations (such as applying the changes from previews)
+    const modifiedValues = new Int16Array(baseValues);
+
+    // These sets are not persistent. We recalculate them each time. This is potentially inefficient,
+    // but probably only to a marginal degree - so I'm not prematurely optimizing them yet.
+    const buildingsBeingAdded: Set<Building> = new Set();
+    if (this.lastMouseoverTile && selectedBlueprint) {
+      // Yes, we re-create this building each time too.
+      buildingsBeingAdded.add(
+        new Building(this.lastMouseoverTile, selectedBlueprint)
+      );
+    }
+    for (const building of buildingsBeingAdded) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(modifiedValues);
+      }
+    }
+
+    const buildingsBeingRemoved: Set<Building> = new Set();
+    if (this.isDragging && this.dragBox) {
+      for (const building of placedBuildings) {
+        if (building.interceptsRectangle(this.dragBox)) {
+          buildingsBeingRemoved.add(building);
+        }
+      }
+    }
+    for (const building of buildingsBeingRemoved) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(modifiedValues, -1);
+      }
+    }
 
     let startTime = performance.now();
-
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
-      this.renderTiles(this.tilesCtx, viewport, baseValues);
+      this.renderTiles(this.tilesCtx, viewport, modifiedValues);
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
         this.tileNumbersCanvas.style.display = 'initial';
-        this.renderTileNumbers(this.tileNumbersCtx, viewport, baseValues);
+        this.renderTileNumbers(this.tileNumbersCtx, viewport, modifiedValues);
       } else {
         this.tileNumbersCanvas.style.display = 'none';
       }
@@ -449,8 +482,13 @@ class CanvasRenderer {
     }
 
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.BUILDINGS) {
-      this.renderBuildings(this.buildingsCtx, viewport, baseValues);
-      this.renderBuildingLabels(viewport, baseValues);
+      this.renderBuildings(
+        this.buildingsCtx,
+        viewport,
+        modifiedValues,
+        placedBuildings
+      );
+      this.renderBuildingLabels(viewport, modifiedValues);
       const buildingsTime = performance.now() - startTime;
       if (buildingsTime > 5) {
         //prettier-ignore
@@ -469,7 +507,7 @@ class CanvasRenderer {
   private renderTiles(
     ctx: CanvasRenderingContext2D,
     viewport: Viewport,
-    baseValues: Int16Array
+    tileValues: Int16Array
   ) {
     // We don't even need to clear the previous frame since there's no transparency anywhere, so it only matters when panning to outside the grid's edge
     // (and in that case, it merely results in the fun hall of mirrors effect that's really fun to play with, so it's almost a feature really)
@@ -498,7 +536,7 @@ class CanvasRenderer {
     let idx = 0;
     for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
       for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
-        const rgb = getDesirabilityRGB(baseValues[COORD_TO_INT16(x, y)]);
+        const rgb = getDesirabilityRGB(tileValues[COORD_TO_INT16(x, y)]);
         imageData.data[idx++] = rgb.r;
         imageData.data[idx++] = rgb.g;
         imageData.data[idx++] = rgb.b;
@@ -548,7 +586,7 @@ class CanvasRenderer {
   private renderTileNumbers(
     ctx: CanvasRenderingContext2D,
     viewport: Viewport,
-    baseValues: Int16Array
+    tileValues: Int16Array
   ) {
     // prettier-ignore
     ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
@@ -567,7 +605,7 @@ class CanvasRenderer {
 
     for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
       for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
-        const desirabilityValue = baseValues[COORD_TO_INT16(x, y)];
+        const desirabilityValue = tileValues[COORD_TO_INT16(x, y)];
 
         if (desirabilityValue === 0) continue;
 
@@ -592,7 +630,8 @@ class CanvasRenderer {
   private renderBuildings(
     ctx: CanvasRenderingContext2D,
     viewport: Viewport,
-    baseValues: Int16Array
+    tileValues: Int16Array,
+    placedBuildings: Set<Building>
   ) {
     // prettier-ignore
     ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
@@ -607,10 +646,9 @@ class CanvasRenderer {
       viewport.coords.height
     );
 
-    const buildings = this.renderContext.getBuildings();
     const buildingOutlinesPath = new Path2D();
 
-    for (const building of buildings) {
+    for (const building of placedBuildings) {
       const graphic = building.graphic;
       if (!graphic) continue;
 
