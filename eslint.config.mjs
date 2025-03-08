@@ -23,7 +23,7 @@ export default tseslint.config({
   },
   ignores: ["build/*"],
   rules: {
-    '@stylistic/semi': 'error',
+    '@stylistic/semi': 'warn',
     '@typescript-eslint/no-unsafe-assignment': 'error',
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',

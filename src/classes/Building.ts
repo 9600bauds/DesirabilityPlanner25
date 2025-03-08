@@ -13,7 +13,6 @@ class Building {
   origin: Tile;
   width: number;
   height: number;
-  rect: Rectangle;
 
   tilesOccupied: Collections.Set<Tile>;
 
@@ -39,7 +38,6 @@ class Building {
     this.origin = origin;
     this.height = blueprint.height;
     this.width = blueprint.width;
-    this.rect = new Rectangle(this.origin, this.height, this.width);
 
     this.baseLabel = blueprint.label;
 

@@ -7,12 +7,11 @@ import CursorAction from '../types/CursorAction';
 import Blueprint from '../types/Blueprint';
 
 const App: React.FC = () => {
-  // ===== APPLICATION STATE =====
+  // ===== APPLICATION STATE (or refs, I guess?) =====
+  const selectedSubcategoryRef = useRef<Subcategory | null>(null);
+  const selectedBlueprintIndexRef = useRef<number>(0);
+
   const [cursorAction, setCursorAction] = useState<CursorAction>('panning');
-  const [selectedSubcategory, setSelectedSubcategory] =
-    useState<Subcategory | null>(null);
-  const [selectedBlueprintIndex, setSelectedBlueprintIndex] =
-    useState<number>(0);
 
   const gridStateManager = useRef(new GridStateManager()).current;
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -38,6 +37,8 @@ const App: React.FC = () => {
           renderContext
         );
       }
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
     } catch (error) {
       console.error('Error initializing data:', error);
     }
@@ -48,51 +49,17 @@ const App: React.FC = () => {
         rendererRef.current.destroy();
         rendererRef.current = null;
       }
-    };
-  }, []);
-
-  // Notify our renderer when the selected blueprint changes
-  useEffect(() => {
-    if (rendererRef.current) {
-      if (cursorAction === 'placing') {
-        rendererRef.current.handlePlacementPreview();
-      }
-    }
-
-    // ...We also need to re-apply these events every single time we change our selected blueprint because React caches the current values or something.
-    // I don't entirely understand what's going on here. But the performance hit is undetectable so whatever.
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Handle 'r' key for blueprint rotation
-      if (
-        (event.key === 'r' || event.key === 'R') &&
-        !event.repeat &&
-        selectedSubcategory
-      ) {
-        setSelectedBlueprintIndex(
-          (prev) => (prev + 1) % selectedSubcategory.blueprints.length
-        );
-      }
-
-      // Handle Control key for building transparency
-      if (event.key === 'Control' && !event.repeat && rendererRef.current) {
-        rendererRef.current.setBuildingTransparency(true);
-      }
-    };
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'Control' && rendererRef.current) {
-        rendererRef.current.setBuildingTransparency(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-
-    return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
-  }, [selectedSubcategory, selectedBlueprintIndex]);
+  }, []);
+
+  //Deselect the subcategory entirely whenever our cursoraction is set to anything except placing
+  useEffect(() => {
+    if (cursorAction !== 'placing') {
+      deselectSubcategory();
+    }
+  }, [cursorAction]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     const renderer = rendererRef.current;
@@ -102,7 +69,6 @@ const App: React.FC = () => {
       // Right click
       if (cursorAction === 'placing') {
         setCursorAction('panning');
-        deselectSubcategory();
       } else if (cursorAction === 'erasing') {
         setCursorAction('panning');
         renderer.stopDragging();
@@ -183,26 +149,64 @@ const App: React.FC = () => {
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    // Handle 'r' key for blueprint rotation
+    if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
+      const subcategory = selectedSubcategoryRef.current;
+      if (subcategory) {
+        selectedBlueprintIndexRef.current =
+          (selectedBlueprintIndexRef.current + 1) %
+          subcategory.blueprints.length;
+
+        // Since changing a ref doesn't trigger re-renders, manually notify the renderer
+        if (rendererRef.current && cursorAction === 'placing') {
+          rendererRef.current.handlePlacementPreview();
+        }
+      }
+    }
+
+    // Handle Control key for building transparency
+    if (event.key === 'Control' && !event.repeat && rendererRef.current) {
+      rendererRef.current.setBuildingTransparency(true);
+    }
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Control' && rendererRef.current) {
+      rendererRef.current.setBuildingTransparency(false);
+    }
+  };
+
   const preventRightclickMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
 
-  const getSelectedBlueprint = (): Blueprint | null => {
-    if (!selectedSubcategory) {
-      return null;
-    }
-    return selectedSubcategory.blueprints[selectedBlueprintIndex];
-  };
-
   const selectSubcategory = (subcat: Subcategory) => {
-    deselectSubcategory();
     setCursorAction('placing');
-    setSelectedSubcategory(subcat);
+    selectedSubcategoryRef.current = subcat;
+    selectedBlueprintIndexRef.current = 0;
+    // Notify renderer if needed
+    if (rendererRef.current) {
+      rendererRef.current.handlePlacementPreview();
+    }
   };
 
   const deselectSubcategory = () => {
-    setSelectedSubcategory(null);
-    setSelectedBlueprintIndex(0);
+    selectedSubcategoryRef.current = null;
+    selectedBlueprintIndexRef.current = 0;
+    // Notify renderer if needed
+    if (rendererRef.current) {
+      rendererRef.current.handlePlacementPreview();
+    }
+  };
+
+  const getSelectedBlueprint = (): Blueprint | null => {
+    if (!selectedSubcategoryRef.current) {
+      return null;
+    }
+    return selectedSubcategoryRef.current.blueprints[
+      selectedBlueprintIndexRef.current
+    ];
   };
 
   return (

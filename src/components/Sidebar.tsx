@@ -2,7 +2,6 @@
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
 import Subcategory from '../interfaces/Subcategory';
-import { MenuCategory } from '../interfaces/MenuCategory';
 
 interface SidebarProps {
   onRotateClick: () => void;
