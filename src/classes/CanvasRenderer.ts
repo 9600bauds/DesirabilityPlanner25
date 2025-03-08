@@ -7,7 +7,6 @@ import {
   GRID_SIZE,
   COORD_TO_PX,
   PX_TO_COORD,
-  CELL_PX,
   COORD_TO_INT16,
   ROTATION_RADS,
   GRID_MAX_X,
@@ -15,6 +14,7 @@ import {
   ROTATE_AROUND_ORIGIN,
   COUNTERROTATE_AROUND_ORIGIN,
 } from '../utils/constants';
+import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, GridPoint } from '../utils/geometry';
 import Building from './Building';
 
@@ -103,7 +103,7 @@ class CanvasRenderer {
 
     // Create the building label container
     this.labelContainer = document.createElement('div');
-    this.labelContainer.className = 'building-labels-container';
+    this.labelContainer.id = 'building-labels-container';
     this.parentContainer.appendChild(this.labelContainer);
 
     // Create canvas elements - all sized to fit the viewport
@@ -179,19 +179,19 @@ class CanvasRenderer {
   /*
    * Coordinate transformations
    */
-  private grid2canvas(point: GridPoint): DOMPoint {
-    if (this.isRotated) point = ROTATE_AROUND_ORIGIN(point);
+  private grid2canvas(point: GridPoint, rotate = this.isRotated): DOMPoint {
+    if (rotate) point = ROTATE_AROUND_ORIGIN(point);
     return new DOMPoint(
       COORD_TO_PX(point.x) * this.zoomLevel + this.offsetX,
       COORD_TO_PX(point.y) * this.zoomLevel + this.offsetY
     );
   }
 
-  private canvas2grid(dompoint: DOMPoint): GridPoint {
+  private canvas2grid(dompoint: DOMPoint, rotate = this.isRotated): GridPoint {
     const x = (dompoint.x - this.offsetX) / this.zoomLevel;
     const y = (dompoint.y - this.offsetY) / this.zoomLevel;
     let point = { x, y };
-    if (this.isRotated) point = COUNTERROTATE_AROUND_ORIGIN(point);
+    if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
     return point;
   }
 
@@ -448,6 +448,7 @@ class CanvasRenderer {
 
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.BUILDINGS) {
       this.renderBuildings(this.buildingsCtx, viewport, baseValues);
+      this.renderBuildingLabels(viewport, baseValues);
       const buildingsTime = performance.now() - startTime;
       if (buildingsTime > 5) {
         //prettier-ignore
@@ -570,8 +571,8 @@ class CanvasRenderer {
 
         // Get the center point of this tile in canvas space
         let centerPoint = {
-          x: COORD_TO_PX(x) + CELL_PX / 2,
-          y: COORD_TO_PX(y) + CELL_PX / 2,
+          x: COORD_TO_PX(x + 0.5),
+          y: COORD_TO_PX(y + 0.5),
         };
 
         if (this.isRotated) {
@@ -606,7 +607,6 @@ class CanvasRenderer {
 
     const buildings = this.renderContext.getBuildings();
     const buildingOutlinesPath = new Path2D();
-    const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
 
     for (const building of buildings) {
       const graphic = building.graphic;
@@ -617,40 +617,71 @@ class CanvasRenderer {
         ctx.fill(pathFill.path);
       }
       buildingOutlinesPath.addPath(graphic.outline);
-
-      const innerLabel = building.getLabel(0);
-      if (innerLabel) {
-        let labelOrigin = this.grid2canvas(building.origin);
-        const labelHeight = COORD_TO_PX(building.height) * this.zoomLevel;
-        const labelWidth = COORD_TO_PX(building.width) * this.zoomLevel;
-        if (this.isRotated) {
-          labelOrigin = ROTATE_AROUND_ORIGIN(labelOrigin);
-        }
-        const fontSize = Math.floor(
-          Math.sqrt((labelWidth * labelHeight) / (innerLabel.length * 2))
-        );
-        const labelHTML = `
-          <div
-            id='label-${building.id}'
-            class='building-label'
-            style="
-              left: ${labelOrigin.x}px;
-              top: ${labelOrigin.y}px;
-              width: ${labelWidth}px;
-              height: ${labelHeight}px;
-              font-size: ${fontSize}px;
-            "
-          >
-            ${innerLabel}
-          </div>`;
-        labelsHTML.push(labelHTML);
-      }
     }
-
-    ctx.strokeStyle = colors.strongOutlineBlack;
+    ctx.strokeStyle = colors.pureBlack;
     ctx.lineWidth = 3;
     ctx.stroke(buildingOutlinesPath);
+  }
 
+  private renderBuildingLabels(viewport: Viewport, baseValues: Int16Array) {
+    const buildings = this.renderContext.getBuildings();
+    const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
+
+    for (const building of buildings) {
+      const innerLabel = building.getLabel(0);
+      if (!innerLabel) continue;
+
+      let labelHeight = COORD_TO_PX(building.height) * this.zoomLevel;
+      let labelWidth = COORD_TO_PX(building.width) * this.zoomLevel;
+
+      let labelOrigin;
+      if (!this.isRotated) {
+        labelOrigin = this.grid2canvas(building.origin);
+      } else {
+        const buildingCenter = {
+          x: building.origin.x + building.width / 2,
+          y: building.origin.y + building.height / 2,
+        };
+        labelOrigin = this.grid2canvas(buildingCenter);
+        labelHeight -= labelHeight * 0.2;
+        labelWidth += labelWidth * 0.2;
+        labelOrigin.x -= labelWidth / 2;
+        labelOrigin.y -= labelHeight / 2;
+      }
+      const widthSpace = labelWidth / (1.4 * Math.sqrt(innerLabel.length));
+      const heightSpace = labelHeight / (1.5 * Math.sqrt(innerLabel.length));
+      let fontSize = 4 + Math.min(widthSpace, heightSpace);
+
+      //prettier-ignore
+      const fontWithBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, true);
+      //prettier-ignore
+      const fontWithoutBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, false);
+
+      if (fontWithoutBreaks >= 8) {
+        fontSize = fontWithoutBreaks;
+      } else if (fontWithBreaks >= 6) {
+        fontSize = fontWithBreaks;
+      } else {
+        continue;
+      }
+
+      const labelHTML = `
+        <div
+          id='label-${building.id}'
+          class='building-label'
+          style="
+            left: ${labelOrigin.x}px;
+            top: ${labelOrigin.y}px;
+            width: ${labelWidth}px;
+            height: ${labelHeight}px;
+            padding: 3px;
+            font-size: ${fontSize}px;
+          "
+        >
+          ${innerLabel}
+        </div>`;
+      labelsHTML.push(labelHTML);
+    }
     this.labelContainer.innerHTML = labelsHTML.join('');
   }
 }

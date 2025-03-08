@@ -12,7 +12,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
   Apothecary: {
-    label: 'Apothecary',
+    label: 'Apothe&#8203;cary',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -21,7 +21,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HEALTH',
   },
   Architect: {
-    label: 'Architect',
+    label: 'Archi&#8203;tect',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -39,7 +39,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'STORAGE',
   },
   Brewery: {
-    label: 'Brewery',
+    label: 'Brewe&#8203;ry',
     height: 2,
     width: 2,
     cost: [15, 60, 75, 90, 112],
@@ -48,7 +48,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Brickworks: {
-    label: 'Brickworks',
+    label: 'Brick&#8203;works',
     height: 2,
     width: 2,
     cost: [12, 48, 60, 72, 90],
@@ -84,7 +84,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Conservatory: {
-    label: 'Conservatory',
+    label: 'Conserva&#8203;tory',
     height: 3,
     width: 3,
     cost: [20, 80, 100, 120, 150],
@@ -93,7 +93,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'FUN',
   },
   Courthouse: {
-    label: 'Courthouse',
+    label: 'Court&#8203;house',
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
@@ -111,7 +111,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'FUN',
   },
   Dentist: {
-    label: 'Dentist',
+    label: 'Den&#8203;tist',
     height: 1,
     width: 1,
     cost: [10, 40, 50, 60, 75],
@@ -138,7 +138,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'GOVT',
   },
   'Festival Pavilion': {
-    label: 'Festival Pavilion',
+    label: 'Festi&#8203;val Pavi&#8203;lion',
     height: 5,
     width: 5,
     cost: [100, 400, 500, 600, 750],
@@ -147,7 +147,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'RELIGION',
   },
   Firehouse: {
-    label: 'Fire House',
+    label: 'Fire&#8203;house',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -156,7 +156,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'GOVT',
   },
   'Fishing Wharf': {
-    label: 'Fishing Wharf',
+    label: 'Fi&#8203;shing Wharf',
     height: 2,
     width: 2,
     cost: [12, 48, 60, 72, 90],
@@ -174,7 +174,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'BEAUTY',
   },
   Gatehouse_1: {
-    label: 'Gatehouse',
+    label: 'Gate&#8203;house',
     height: 2,
     width: 5,
     cost: [80, 320, 400, 480, 600],
@@ -183,7 +183,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
   Gatehouse_2: {
-    label: 'Gatehouse',
+    label: 'Gate&#8203;house',
     height: 5,
     width: 2,
     cost: [80, 320, 400, 480, 600],
@@ -192,7 +192,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
   Granary: {
-    label: 'Granary',
+    label: 'Gra&#8203;na&#8203;ry',
     height: 4,
     width: 4,
     cost: [50, 200, 250, 300, 375],
@@ -201,7 +201,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'STORAGE',
   },
   'Hunting Lodge': {
-    label: 'Hunting Lodge',
+    label: 'Hun&#8203;ting Lodge',
     height: 2,
     width: 2,
     cost: [5, 20, 25, 30, 37],
@@ -210,7 +210,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'FOOD',
   },
   Jeweler: {
-    label: 'Jeweler',
+    label: 'Jewe&#8203;ler',
     height: 2,
     width: 2,
     cost: [18, 75, 90, 110, 135],
@@ -219,7 +219,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   'Juggler School': {
-    label: 'Juggler School',
+    label: 'Jugg&#8203;ler School',
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -246,7 +246,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'EDUCATION',
   },
   'Mansion, Personal': {
-    label: 'Personal Mansion',
+    label: 'Perso&#8203;nal Man&#8203;sion',
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
@@ -255,7 +255,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'GOVT',
   },
   'Mansion, Family': {
-    label: 'Family Mansion',
+    label: 'Fami&#8203;ly Man&#8203;sion',
     height: 4,
     width: 4,
     cost: [80, 320, 400, 480, 600],
@@ -264,7 +264,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'GOVT',
   },
   'Mansion, Dynasty': {
-    label: 'Dynasty Mansion',
+    label: 'Dynas&#8203;ty Man&#8203;sion',
     height: 5,
     width: 5,
     cost: [140, 560, 700, 840, 1050],
@@ -282,7 +282,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   'Mine, Gemstone': {
-    label: 'Gemstone Mine',
+    label: 'Gem&#8203;stone Mine',
     height: 2,
     width: 2,
     cost: [80, 320, 400, 480, 600],
@@ -300,7 +300,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   'Monument Construction_Bricklayer': {
-    label: "Bricklayer's Guild",
+    label: "Brick&#8203;layer's Guild",
     height: 2,
     width: 2,
     cost: [20, 80, 100, 120, 150],
@@ -309,7 +309,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   'Monument Construction_Carpenter': {
-    label: "Carpenter's Guild",
+    label: "Carpen&#8203;ter's Guild",
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -318,7 +318,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   'Monument Construction_Stonemason': {
-    label: "Stonemason's Guild",
+    label: "Stone&#8203;mason's Guild",
     height: 2,
     width: 2,
     cost: [30, 120, 150, 180, 225],
@@ -327,7 +327,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   'Monument Construction_Artisan': {
-    label: "Artisan's Guild",
+    label: "Arti&#8203;san's Guild",
     height: 2,
     width: 2,
     cost: [30, 120, 150, 180, 225],
@@ -336,7 +336,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Mortuary: {
-    label: 'Mortuary',
+    label: 'Mor&#8203;tuary',
     height: 2,
     width: 2,
     cost: [20, 80, 100, 120, 150],
@@ -390,7 +390,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Physician: {
-    label: 'Physician',
+    label: 'Physi&#8203;cian',
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -399,7 +399,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HEALTH',
   },
   Plaza: {
-    label: 'Plaza',
+    label: 'Pla&#8203;za',
     height: 1,
     width: 1,
     cost: [3, 12, 15, 18, 22],
@@ -408,7 +408,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'BEAUTY',
   },
   'Police Station': {
-    label: 'Police Station',
+    label: 'Po&#8203;lice Sta&#8203;tion',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -435,7 +435,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Quarry_Limestone: {
-    label: 'Limestone Quarry',
+    label: 'Lime&#8203;stone Quarry',
     height: 2,
     width: 2,
     cost: [15, 60, 75, 90, 112],
@@ -453,7 +453,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Quarry_Sandstone: {
-    label: 'Sandstone Quarry',
+    label: 'Sand&#8203;stone Quarry',
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -462,7 +462,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'INDUSTRY',
   },
   Recruiter: {
-    label: 'Recruiter',
+    label: 'Re&#8203;cruiter',
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
@@ -471,7 +471,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
   'Reed Gatherer': {
-    label: 'Reed Gatherer',
+    label: 'Reed Gathe&#8203;rer',
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -487,7 +487,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     employeesRequired: 0,
   },
   Roadblock: {
-    label: 'Roadblock',
+    label: 'Road&#8203;block',
     height: 1,
     width: 1,
     cost: [1, 4, 4, 5, 6],
@@ -513,7 +513,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'FUN',
   },
   Shipwright: {
-    label: 'Shipwright',
+    label: 'Ship&#8203;wright',
     height: 3,
     width: 3,
     cost: [70, 280, 350, 420, 525],
@@ -558,7 +558,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'BEAUTY',
   },
   'Tax Collector': {
-    label: 'Tax Collector',
+    label: 'Tax Co&#8203;llector',
     height: 2,
     width: 2,
     cost: [15, 60, 75, 90, 112],
@@ -585,7 +585,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
   'Transport Wharf': {
-    label: 'Transport Wharf',
+    label: 'Trans&#8203;port Wharf',
     height: 2,
     width: 2,
     cost: [40, 160, 200, 240, 300],
@@ -602,7 +602,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
   'Warship Wharf': {
-    label: 'Warship Wharf',
+    label: 'War&#8203;ship Wharf',
     height: 3,
     width: 3,
     cost: [120, 480, 600, 720, 900],
@@ -629,7 +629,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HEALTH',
   },
   Weaponsmith: {
-    label: 'Weaponsmith',
+    label: 'Weapon&#8203;smith',
     height: 2,
     width: 2,
     cost: [24, 100, 120, 145, 180],
@@ -683,7 +683,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'FUN',
   },
   'Storage Yard': {
-    label: 'Storage Yard',
+    label: 'Sto&#8203;rage Yard',
     height: 3,
     width: 3,
     cost: [14, 56, 70, 84, 105],

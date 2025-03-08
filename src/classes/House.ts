@@ -15,6 +15,10 @@ class House extends Building {
       throw new Error('House blueprint got an incomplete interface object!');
     }
   }
+
+  public getLabel(maxDesirability?: number) {
+    return this.baseLabel! + '<br>Devolving: 77/150'; //Todo
+  }
 }
 
 export default House;

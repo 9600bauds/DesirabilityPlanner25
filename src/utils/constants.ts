@@ -39,6 +39,19 @@ export function ROTATE_AROUND_ORIGIN(point: GridPoint): {
   };
 }
 
+export function ROTATE_AROUND_CENTER(
+  point: GridPoint,
+  center: GridPoint
+): {
+  x: number;
+  y: number;
+} {
+  return {
+    x: (point.x - center.x) * SINE_COSINE - (point.y - center.y) * SINE_COSINE,
+    y: (point.x - center.x) * SINE_COSINE + (point.y - center.y) * SINE_COSINE,
+  };
+}
+
 export function COUNTERROTATE_AROUND_ORIGIN(point: GridPoint): {
   x: number;
   y: number;

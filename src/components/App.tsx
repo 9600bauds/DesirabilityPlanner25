@@ -190,13 +190,6 @@ const App: React.FC = () => {
       <div
         ref={canvasContainer}
         id="canvas-container"
-        className="bg-white"
-        style={{
-          position: 'relative',
-          width: '80vw',
-          height: '100vh',
-          overflow: 'hidden',
-        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
