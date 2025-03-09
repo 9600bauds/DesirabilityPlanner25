@@ -549,9 +549,6 @@ class CanvasRenderer {
     ctx.scale(this.zoomLevel, this.zoomLevel);
     if (this.isRotated) ctx.rotate(ROTATION_RADS);
 
-    /*
-     * DRAW THE COLORED CELLS
-     */
     // We make use of a temporary canvas here. We draw each tile as 1 pixel big. Then we expand it to cover the entire canvas.
     // This is more efficient, but we need this ugly temporary canvas to do it, because bitmap creation is asynchronous and I don't want to deal with that.
     const tempCanvas = document.createElement('canvas');
@@ -713,25 +710,24 @@ class CanvasRenderer {
       if (!this.isRotated) {
         labelOrigin = this.grid2canvas(building.origin);
       } else {
+        // Because I couldn't figure out rotation, we do this thing where we position ourselves on the center of the building, rotate, and then go back.
+        // We also make ourselves a bit wider and a bit shorter because it looks better with rotated buildings.
+        labelHeight -= labelHeight * 0.2;
+        labelWidth += labelWidth * 0.2;
         const buildingCenter = {
           x: building.origin.x + building.width / 2,
           y: building.origin.y + building.height / 2,
         };
         labelOrigin = this.grid2canvas(buildingCenter);
-        labelHeight -= labelHeight * 0.2;
-        labelWidth += labelWidth * 0.2;
         labelOrigin.x -= labelWidth / 2;
         labelOrigin.y -= labelHeight / 2;
       }
-      const widthSpace = labelWidth / (1.4 * Math.sqrt(innerLabel.length));
-      const heightSpace = labelHeight / (1.5 * Math.sqrt(innerLabel.length));
-      let fontSize = 4 + Math.min(widthSpace, heightSpace);
 
+      let fontSize;
       //prettier-ignore
       const fontWithBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, true);
       //prettier-ignore
       const fontWithoutBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, false);
-
       if (fontWithoutBreaks >= 8) {
         fontSize = fontWithoutBreaks;
       } else if (fontWithBreaks >= 6) {
