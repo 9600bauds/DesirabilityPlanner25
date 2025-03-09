@@ -538,11 +538,13 @@ class CanvasRenderer {
     viewport: Viewport,
     tileValues: Int16Array
   ) {
-    // We don't even need to clear the previous frame since there's no transparency anywhere, so it only matters when panning to outside the grid's edge
-    // (and in that case, it merely results in the fun hall of mirrors effect that's really fun to play with, so it's almost a feature really)
-
     // prettier-ignore
     ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
+    // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
+    // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
+    // Suffice to say, this clearRect() is VITAL for performance, even though we shouldn't need it and it makes no sense.
+    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
     ctx.translate(this.offsetX, this.offsetY);
     ctx.scale(this.zoomLevel, this.zoomLevel);
     if (this.isRotated) ctx.rotate(ROTATION_RADS);
