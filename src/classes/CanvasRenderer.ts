@@ -47,13 +47,10 @@ class CanvasRenderer {
   private devicePixelRatio: number;
 
   // Canvas elements
-  private tilesCanvas: HTMLCanvasElement;
+  private allCanvases: HTMLCanvasElement[] = [];
   private tilesCtx: CanvasRenderingContext2D;
-  private tileNumbersCanvas: HTMLCanvasElement;
   private tileNumbersCtx: CanvasRenderingContext2D;
-  private gridLinesCanvas: HTMLCanvasElement;
   private gridLinesCtx: CanvasRenderingContext2D;
-  private buildingsCanvas: HTMLCanvasElement;
   private buildingsCtx: CanvasRenderingContext2D;
 
   // Transform state
@@ -78,22 +75,30 @@ class CanvasRenderer {
   }
 
   constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
-    const createCanvas = (id: string, zIndex: number): HTMLCanvasElement => {
+    const createCtx = (
+      id: string,
+      zIndex: number
+    ): CanvasRenderingContext2D => {
       const canvas = document.createElement('canvas');
       canvas.id = id;
+      canvas.className = 'canvasLayer';
 
       // Size canvas to match the viewport (not the grid)
       canvas.width = this.clientWidth * this.devicePixelRatio;
       canvas.height = this.clientHeight * this.devicePixelRatio;
 
-      // Set display size via CSS
-      canvas.className = 'canvasLayer';
       canvas.style.width = this.clientWidth + 'px';
       canvas.style.height = this.clientHeight + 'px';
       canvas.style.zIndex = zIndex.toString();
 
       this.parentContainer.appendChild(canvas);
-      return canvas;
+      this.allCanvases.push(canvas);
+
+      const ctx = canvas.getContext('2d', {
+        alpha: true,
+        desynchronized: true,
+      }) as CanvasRenderingContext2D;
+      return ctx;
     };
 
     this.parentContainer = parentContainer;
@@ -111,29 +116,10 @@ class CanvasRenderer {
     this.parentContainer.appendChild(this.labelContainer);
 
     // Create canvas elements - all sized to fit the viewport
-    this.buildingsCanvas = createCanvas('buildings-canvas', 400);
-    this.buildingsCtx = this.buildingsCanvas.getContext('2d', {
-      alpha: true,
-      desynchronized: true,
-    }) as CanvasRenderingContext2D;
-
-    this.gridLinesCanvas = createCanvas('tile-numbers-canvas', 300);
-    this.gridLinesCtx = this.gridLinesCanvas.getContext('2d', {
-      alpha: true,
-      desynchronized: true,
-    }) as CanvasRenderingContext2D;
-
-    this.tileNumbersCanvas = createCanvas('tile-numbers-canvas', 200);
-    this.tileNumbersCtx = this.tileNumbersCanvas.getContext('2d', {
-      alpha: true,
-      desynchronized: true,
-    }) as CanvasRenderingContext2D;
-
-    this.tilesCanvas = createCanvas('tiles-canvas', 100);
-    this.tilesCtx = this.tilesCanvas.getContext('2d', {
-      alpha: false,
-      desynchronized: true,
-    }) as CanvasRenderingContext2D;
+    this.buildingsCtx = createCtx('buildings-canvas', 400);
+    this.gridLinesCtx = createCtx('tile-numbers-canvas', 300);
+    this.tileNumbersCtx = createCtx('tile-numbers-canvas', 200);
+    this.tilesCtx = createCtx('tiles-canvas', 100);
 
     // Todo: React can probably do this better. Also todo: Debounce this
     const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
@@ -148,10 +134,10 @@ class CanvasRenderer {
 
   public destroy() {
     this.parentContainer.removeChild(this.labelContainer);
-    this.parentContainer.removeChild(this.tilesCanvas);
-    this.parentContainer.removeChild(this.tileNumbersCanvas);
-    this.parentContainer.removeChild(this.gridLinesCanvas);
-    this.parentContainer.removeChild(this.buildingsCanvas);
+    for (const canvas of this.allCanvases) {
+      this.parentContainer.removeChild(canvas);
+    }
+    this.allCanvases = [];
   }
 
   public scheduleRender(updateFlags: number): void {
@@ -168,12 +154,7 @@ class CanvasRenderer {
     this.clientHeight = this.parentContainer.clientHeight;
 
     // Resize all canvases
-    [
-      this.tilesCanvas,
-      this.tileNumbersCanvas,
-      this.gridLinesCanvas,
-      this.buildingsCanvas,
-    ].forEach((canvas) => {
+    this.allCanvases.forEach((canvas) => {
       canvas.width = this.clientWidth * this.devicePixelRatio;
       canvas.height = this.clientHeight * this.devicePixelRatio;
       canvas.style.width = this.clientWidth + 'px';
@@ -482,10 +463,10 @@ class CanvasRenderer {
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
       this.renderTiles(this.tilesCtx, viewport, modifiedValues);
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-        this.tileNumbersCanvas.style.display = 'initial';
+        this.tileNumbersCtx.canvas.style.display = 'initial';
         this.renderTileNumbers(this.tileNumbersCtx, viewport, modifiedValues);
       } else {
-        this.tileNumbersCanvas.style.display = 'none';
+        this.tileNumbersCtx.canvas.style.display = 'none';
       }
       const tilesTime = performance.now() - startTime;
       if (tilesTime > 4) {
@@ -497,10 +478,10 @@ class CanvasRenderer {
 
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.GRIDLINES) {
       if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
-        this.gridLinesCanvas.style.display = 'initial';
+        this.gridLinesCtx.canvas.style.display = 'initial';
         this.renderGridlines(this.gridLinesCtx, viewport);
       } else {
-        this.gridLinesCanvas.style.display = 'none';
+        this.gridLinesCtx.canvas.style.display = 'none';
       }
       const gridLinesTime = performance.now() - startTime;
       if (gridLinesTime > 3) {
@@ -667,6 +648,7 @@ class CanvasRenderer {
   ) {
     // prettier-ignore
     ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
+    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
     ctx.translate(this.offsetX, this.offsetY);
     ctx.scale(this.zoomLevel, this.zoomLevel);
     if (this.isRotated) ctx.rotate(ROTATION_RADS);
