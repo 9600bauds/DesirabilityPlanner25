@@ -123,13 +123,6 @@ class CanvasRenderer {
     const canvas = document.createElement('canvas');
     canvas.id = id;
     canvas.className = 'canvasLayer';
-
-    // Size canvas to match the viewport (not the grid)
-    canvas.width = this.clientWidth * this.devicePixelRatio;
-    canvas.height = this.clientHeight * this.devicePixelRatio;
-
-    canvas.style.width = this.clientWidth + 'px';
-    canvas.style.height = this.clientHeight + 'px';
     canvas.style.zIndex = zIndex.toString();
 
     this.parentContainer.appendChild(canvas);
@@ -149,10 +142,13 @@ class CanvasRenderer {
     ctx.canvas.style.width = this.clientWidth + 'px';
     ctx.canvas.style.height = this.clientHeight + 'px';
 
-    ctx.translate(this.offsetX, this.offsetY);
+    ctx.translate(
+      this.offsetX * this.devicePixelRatio,
+      this.offsetY * this.devicePixelRatio
+    );
     ctx.scale(
-      this.devicePixelRatio * this.zoomLevel,
-      this.devicePixelRatio * this.zoomLevel
+      this.zoomLevel * this.devicePixelRatio,
+      this.zoomLevel * this.devicePixelRatio
     );
     if (rotate) ctx.rotate(ROTATION_RADS);
   }
