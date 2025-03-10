@@ -51,7 +51,20 @@ export class Rectangle {
   public height: number;
   public width: number;
 
-  constructor(origin: Tile, height: number, width: number) {
+  public get startX() {
+    return this.origin.x;
+  }
+  public get startY() {
+    return this.origin.y;
+  }
+  public get endX() {
+    return this.origin.x + this.width - 1;
+  }
+  public get endY() {
+    return this.origin.y + this.height - 1;
+  }
+
+  constructor(origin: Tile, width: number, height: number) {
     this.origin = origin;
     this.height = height;
     this.width = width;
@@ -75,7 +88,7 @@ export class Rectangle {
     const width = Math.abs(t1.x - t2.x) + 1;
     const height = Math.abs(t1.y - t2.y) + 1;
 
-    return new Rectangle(new Tile(originX, originY), height, width);
+    return new Rectangle(new Tile(originX, originY), width, height);
   }
 
   public interceptsTile(t: Tile): boolean {

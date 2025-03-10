@@ -28,7 +28,7 @@ class DesireBox {
       this.effectPerRange[dist] = data.baseDesirability + distanceModifier;
     }
 
-    this.bounds = new Rectangle(origin, height, width);
+    this.bounds = new Rectangle(origin, width, height);
     this.maxRange = data.maxRange;
   }
 

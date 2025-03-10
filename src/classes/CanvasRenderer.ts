@@ -1,5 +1,4 @@
 import RenderContext from '../interfaces/RenderContext';
-import Viewport from '../interfaces/Viewport';
 import colors, { getDesirabilityRGB } from '../utils/colors';
 import {
   GRID_CENTER_PX,
@@ -219,7 +218,7 @@ class CanvasRenderer {
   }
 
   // Get the range of tiles currently visible in the viewport
-  public getViewport(): Viewport {
+  public getViewport(): { coordsRect: Rectangle; tilesRect: Rectangle } {
     // Currently, this function uses a very simple and slightly wasteful algorithm.
     // In order to handle grid rotation, we need to get the axis-aligned bounding box of all four corners of the viewport.
     // This means that when the grid is rotated, up to 50% of the tiles we render are wasted effort since they're offscreen!
@@ -254,30 +253,27 @@ class CanvasRenderer {
     const coordStartY = Math.max(0, minY);
     const coordEndX = Math.min(GRID_TOTAL_PX, maxX);
     const coordEndY = Math.min(GRID_TOTAL_PX, maxY);
+    const coordWidth = coordEndX - coordStartX + 1;
+    const coordHeight = coordEndY - coordStartY + 1;
+    const coordsRect: Rectangle = new Rectangle(
+      new Tile(coordStartX, coordStartY),
+      coordWidth,
+      coordHeight
+    );
 
     const tileStartX = Math.max(0, PX_TO_COORD(minX));
     const tileStartY = Math.max(0, PX_TO_COORD(minY));
     const tileEndX = Math.min(GRID_MAX_X, PX_TO_COORD(maxX) + 1);
     const tileEndY = Math.min(GRID_MAX_Y, PX_TO_COORD(maxY) + 1);
+    const tileWidth = tileEndX - tileStartX + 1;
+    const tileHeight = tileEndY - tileStartY + 1;
+    const tilesRect: Rectangle = new Rectangle(
+      new Tile(tileStartX, tileStartY),
+      tileWidth,
+      tileHeight
+    );
 
-    return {
-      coords: {
-        startX: coordStartX,
-        startY: coordStartY,
-        endX: coordEndX,
-        endY: coordEndY,
-        width: coordEndX - coordStartX,
-        height: coordEndY - coordStartY,
-      },
-      tiles: {
-        startX: tileStartX,
-        startY: tileStartY,
-        endX: tileEndX,
-        endY: tileEndY,
-        width: tileEndX - tileStartX + 1,
-        height: tileEndY - tileStartY + 1,
-      },
-    };
+    return { coordsRect, tilesRect };
   }
 
   /*
@@ -426,7 +422,7 @@ class CanvasRenderer {
    */
   private render(): void {
     const viewport = this.getViewport();
-    if (viewport.tiles.height < 1 || viewport.tiles.width < 1) {
+    if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
       return; //We are fully offscreen!
     }
 
@@ -468,10 +464,14 @@ class CanvasRenderer {
 
     let startTime = performance.now();
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
-      this.renderTiles(this.tilesCtx, viewport, modifiedValues);
+      this.renderTiles(this.tilesCtx, modifiedValues, viewport.tilesRect);
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
         this.tileNumbersCtx.canvas.style.display = 'initial';
-        this.renderTileNumbers(this.tileNumbersCtx, viewport, modifiedValues);
+        this.renderTileNumbers(
+          this.tileNumbersCtx,
+          viewport.tilesRect,
+          modifiedValues
+        );
       } else {
         this.tileNumbersCtx.canvas.style.display = 'none';
       }
@@ -486,7 +486,7 @@ class CanvasRenderer {
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.GRIDLINES) {
       if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
         this.gridLinesCtx.canvas.style.display = 'initial';
-        this.renderGridlines(this.gridLinesCtx, viewport);
+        this.renderGridlines(this.gridLinesCtx, viewport.tilesRect);
       } else {
         this.gridLinesCtx.canvas.style.display = 'none';
       }
@@ -501,11 +501,11 @@ class CanvasRenderer {
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.BUILDINGS) {
       this.renderBuildings(
         this.buildingsCtx,
-        viewport,
+        viewport.tilesRect,
         modifiedValues,
         placedBuildings
       );
-      this.renderBuildingLabels(viewport, modifiedValues);
+      this.renderBuildingLabels(viewport.tilesRect, modifiedValues);
       const buildingsTime = performance.now() - startTime;
       if (buildingsTime > 3) {
         //prettier-ignore
@@ -523,8 +523,8 @@ class CanvasRenderer {
    */
   private renderTiles(
     ctx: CanvasRenderingContext2D,
-    viewport: Viewport,
-    tileValues: Int16Array
+    tileValues: Int16Array,
+    bounds: Rectangle
   ) {
     // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
     // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
@@ -535,8 +535,8 @@ class CanvasRenderer {
     // We make use of a temporary canvas here. We draw each tile as 1 pixel big. Then we expand it to cover the entire canvas.
     // This is more efficient, but we need this ugly temporary canvas to do it, because bitmap creation is asynchronous and I don't want to deal with that.
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = viewport.tiles.width;
-    tempCanvas.height = viewport.tiles.height;
+    tempCanvas.width = bounds.endX - bounds.startX + 1;
+    tempCanvas.height = bounds.endY - bounds.startY + 1;
     const tempCtx = tempCanvas.getContext('2d')!;
     const imageData = tempCtx.createImageData(
       tempCanvas.width,
@@ -545,8 +545,8 @@ class CanvasRenderer {
 
     // Fill the image with cell colors - one pixel per cell
     let idx = 0;
-    for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
-      for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
+    for (let y = bounds.startY; y <= bounds.endY; y++) {
+      for (let x = bounds.startX; x <= bounds.endX; x++) {
         const rgb = getDesirabilityRGB(tileValues[COORD_TO_INT16(x, y)]);
         imageData.data[idx++] = rgb.r;
         imageData.data[idx++] = rgb.g;
@@ -563,16 +563,16 @@ class CanvasRenderer {
       tempCanvas,
       0,
       0,
-      viewport.tiles.width,
-      viewport.tiles.height,
-      COORD_TO_PX(viewport.tiles.startX), //We're not using viewport.coords because we're drawing the visual representation of tiles, basically
-      COORD_TO_PX(viewport.tiles.startY),
-      COORD_TO_PX(viewport.tiles.width),
-      COORD_TO_PX(viewport.tiles.height)
+      tempCanvas.width,
+      tempCanvas.height,
+      COORD_TO_PX(bounds.startX),
+      COORD_TO_PX(bounds.startY),
+      COORD_TO_PX(tempCanvas.width),
+      COORD_TO_PX(tempCanvas.height)
     );
   }
 
-  private renderGridlines(ctx: CanvasRenderingContext2D, viewport: Viewport) {
+  private renderGridlines(ctx: CanvasRenderingContext2D, bounds: Rectangle) {
     this.fastClearCtx(ctx);
 
     ctx.lineWidth = 1;
@@ -580,14 +580,14 @@ class CanvasRenderer {
     // Batch all line drawing into a single path
     ctx.beginPath();
     // Path the horizontal lines
-    for (let y = viewport.tiles.startY + 1; y <= viewport.tiles.endY; y++) {
-      ctx.moveTo(viewport.coords.startX, COORD_TO_PX(y));
-      ctx.lineTo(viewport.coords.endX, COORD_TO_PX(y));
+    for (let y = bounds.startY; y <= bounds.endY; y++) {
+      ctx.moveTo(COORD_TO_PX(bounds.startX), COORD_TO_PX(y));
+      ctx.lineTo(COORD_TO_PX(bounds.endX), COORD_TO_PX(y));
     }
     // Path the vertical lines
-    for (let x = viewport.tiles.startX + 1; x <= viewport.tiles.endX; x++) {
-      ctx.moveTo(COORD_TO_PX(x), viewport.coords.startY);
-      ctx.lineTo(COORD_TO_PX(x), viewport.coords.endY);
+    for (let x = bounds.startX; x <= bounds.endX; x++) {
+      ctx.moveTo(COORD_TO_PX(x), COORD_TO_PX(bounds.startY));
+      ctx.lineTo(COORD_TO_PX(x), COORD_TO_PX(bounds.endY));
     }
     // Execute the path!
     ctx.stroke();
@@ -595,7 +595,7 @@ class CanvasRenderer {
 
   private renderTileNumbers(
     ctx: CanvasRenderingContext2D,
-    viewport: Viewport,
+    bounds: Rectangle,
     tileValues: Int16Array
   ) {
     this.fastClearCtx(ctx, false); //We intentionally do not rotate!
@@ -608,8 +608,8 @@ class CanvasRenderer {
     ctx.strokeStyle = 'white';
     ctx.fillStyle = 'black';
 
-    for (let x = viewport.tiles.startX; x <= viewport.tiles.endX; x++) {
-      for (let y = viewport.tiles.startY; y <= viewport.tiles.endY; y++) {
+    for (let x = bounds.startX; x <= bounds.endX; x++) {
+      for (let y = bounds.startY; y <= bounds.endY; y++) {
         const desirabilityValue = tileValues[COORD_TO_INT16(x, y)];
 
         if (desirabilityValue === 0) continue;
@@ -634,7 +634,7 @@ class CanvasRenderer {
 
   private renderBuildings(
     ctx: CanvasRenderingContext2D,
-    viewport: Viewport,
+    bounds: Rectangle,
     tileValues: Int16Array,
     placedBuildings: Set<Building>
   ) {
@@ -657,7 +657,7 @@ class CanvasRenderer {
     ctx.stroke(buildingOutlinesPath);
   }
 
-  private renderBuildingLabels(viewport: Viewport, baseValues: Int16Array) {
+  private renderBuildingLabels(bounds: Rectangle, baseValues: Int16Array) {
     const buildings = this.renderContext.getBuildings();
     const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
 
