@@ -3,9 +3,16 @@ import { GRID_MAX_X, GRID_MAX_Y, GRID_SIZE_BITS } from '../utils/constants';
 import { Rectangle, Tile } from '../utils/geometry';
 
 class DesireBox {
-  readonly effectPerRange: Int16Array;
-  readonly bounds: Rectangle; //The origin of this rectangle is relative to 0,0 which is the origin of the base building
-  readonly maxRange: number;
+  public effectPerRange: Int16Array;
+  public bounds: Rectangle; //The origin of this rectangle is relative to 0,0 which is the origin of the base building
+  public maxRange: number;
+  public get affectedBounds(): Rectangle {
+    const startX = this.bounds.startX - this.maxRange;
+    const startY = this.bounds.startY - this.maxRange;
+    const endX = this.bounds.endX + this.maxRange;
+    const endY = this.bounds.endY + this.maxRange;
+    return Rectangle.fromTiles(new Tile(startX, startY), new Tile(endX, endY));
+  }
 
   constructor(data: NewDesireBox, origin: Tile, height: number, width: number) {
     if (data.maxRange === undefined || data.maxRange > 99) {

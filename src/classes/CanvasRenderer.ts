@@ -22,6 +22,7 @@ export enum CanvasUpdateFlag {
   TILES = 1 << 0,
   GRIDLINES = 1 << 1,
   BUILDINGS = 1 << 2,
+  PREVIEW = 1 << 3,
   ALL = ~0, // All bits set to 1
 }
 
@@ -51,6 +52,7 @@ class CanvasRenderer {
   private tileNumbersCtx: CanvasRenderingContext2D;
   private gridLinesCtx: CanvasRenderingContext2D;
   private buildingsCtx: CanvasRenderingContext2D;
+  private previewCtx: CanvasRenderingContext2D;
 
   // Transform state
   private isRotated: boolean = false;
@@ -89,6 +91,7 @@ class CanvasRenderer {
     this.parentContainer.appendChild(this.labelContainer);
 
     // Create canvas elements - all sized to fit the viewport
+    this.previewCtx = this.createCtx('preview-canvas', 499);
     this.buildingsCtx = this.createCtx('buildings-canvas', 400);
     this.gridLinesCtx = this.createCtx('tile-numbers-canvas', 300);
     this.tileNumbersCtx = this.createCtx('tile-numbers-canvas', 200);
@@ -426,51 +429,19 @@ class CanvasRenderer {
       return; //We are fully offscreen!
     }
 
-    const selectedBlueprint = this.renderContext.getSelectedBlueprint();
     const placedBuildings = this.renderContext.getBuildings();
     // These are the precomputed desirability values from the "true" gridstate.
     const baseValues = this.renderContext.getBaseValues();
-    // Let's clone them so we can do our own calculations (such as applying the changes from previews)
-    const modifiedValues = new Int16Array(baseValues);
-
-    // These sets are not persistent. We recalculate them each time. This is potentially inefficient,
-    // but probably only to a marginal degree - so I'm not prematurely optimizing them yet.
-    const buildingsBeingAdded: Set<Building> = new Set();
-    if (this.lastMouseoverTile && selectedBlueprint) {
-      // Yes, we re-create this building each time too.
-      buildingsBeingAdded.add(
-        new Building(this.lastMouseoverTile, selectedBlueprint)
-      );
-    }
-    for (const building of buildingsBeingAdded) {
-      for (const dbox of building.desireBoxes) {
-        dbox.apply(modifiedValues);
-      }
-    }
-
-    const buildingsBeingRemoved: Set<Building> = new Set();
-    if (this.isDragging && this.dragBox) {
-      for (const building of placedBuildings) {
-        if (building.interceptsRectangle(this.dragBox)) {
-          buildingsBeingRemoved.add(building);
-        }
-      }
-    }
-    for (const building of buildingsBeingRemoved) {
-      for (const dbox of building.desireBoxes) {
-        dbox.apply(modifiedValues, -1);
-      }
-    }
 
     let startTime = performance.now();
     if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
-      this.renderTiles(this.tilesCtx, modifiedValues, viewport.tilesRect);
+      this.renderTiles(this.tilesCtx, baseValues, viewport.tilesRect);
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
         this.tileNumbersCtx.canvas.style.display = 'initial';
         this.renderTileNumbers(
           this.tileNumbersCtx,
-          viewport.tilesRect,
-          modifiedValues
+          baseValues,
+          viewport.tilesRect
         );
       } else {
         this.tileNumbersCtx.canvas.style.display = 'none';
@@ -502,10 +473,10 @@ class CanvasRenderer {
       this.renderBuildings(
         this.buildingsCtx,
         viewport.tilesRect,
-        modifiedValues,
+        baseValues,
         placedBuildings
       );
-      this.renderBuildingLabels(viewport.tilesRect, modifiedValues);
+      this.renderBuildingLabels(viewport.tilesRect, baseValues);
       const buildingsTime = performance.now() - startTime;
       if (buildingsTime > 3) {
         //prettier-ignore
@@ -514,18 +485,74 @@ class CanvasRenderer {
       startTime = performance.now();
     }
 
+    if (this.sectionsNeedUpdating & CanvasUpdateFlag.PREVIEW) {
+      this.renderPreview(baseValues, placedBuildings, viewport.tilesRect);
+      const previewTime = performance.now() - startTime;
+      if (previewTime > 5) {
+        //prettier-ignore
+        console.log("Preview rendering took", previewTime, "ms!");
+      }
+      startTime = performance.now();
+    }
+
     this.pendingFrame = null;
     this.sectionsNeedUpdating = CanvasUpdateFlag.NONE;
   }
 
-  /*
-   * Render the tiles
-   */
+  private renderPreview(
+    baseValues: Int16Array,
+    placedBuildings: Set<Building>,
+    viewport: Rectangle
+  ) {
+    const selectedBlueprint = this.renderContext.getSelectedBlueprint();
+    // Let's clone the base values so we can do our own calculations
+    const modifiedValues = new Int16Array(baseValues);
+    const modifiedAreas: Set<Rectangle> = new Set();
+
+    // These sets are not persistent. We recalculate them each time. This is potentially inefficient,
+    // but probably only to a marginal degree - so I'm not prematurely optimizing them yet.
+    const buildingsBeingAdded: Set<Building> = new Set();
+    if (this.lastMouseoverTile && selectedBlueprint) {
+      // Yes, we re-create this building each time too.
+      buildingsBeingAdded.add(
+        new Building(this.lastMouseoverTile, selectedBlueprint)
+      );
+    }
+    for (const building of buildingsBeingAdded) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(modifiedValues);
+        modifiedAreas.add(dbox.affectedBounds);
+      }
+    }
+
+    const buildingsBeingRemoved: Set<Building> = new Set();
+    if (this.isDragging && this.dragBox) {
+      for (const building of placedBuildings) {
+        if (building.interceptsRectangle(this.dragBox)) {
+          buildingsBeingRemoved.add(building);
+        }
+      }
+    }
+    for (const building of buildingsBeingRemoved) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(modifiedValues, -1);
+        modifiedAreas.add(dbox.affectedBounds);
+      }
+    }
+
+    const modifiedArea = Rectangle.boundingBoxOfSet(modifiedAreas);
+    if (!modifiedArea) return;
+    console.log('modified area is ', modifiedArea);
+    this.renderTiles(this.previewCtx, modifiedValues, modifiedArea);
+    //this.renderTileNumbers(this.previewCtx, modifiedValues, modifiedArea);
+  }
+
   private renderTiles(
     ctx: CanvasRenderingContext2D,
     tileValues: Int16Array,
     bounds: Rectangle
   ) {
+    console.log('I am rendering', bounds);
     // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
     // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
     // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
@@ -595,8 +622,8 @@ class CanvasRenderer {
 
   private renderTileNumbers(
     ctx: CanvasRenderingContext2D,
-    bounds: Rectangle,
-    tileValues: Int16Array
+    tileValues: Int16Array,
+    bounds: Rectangle
   ) {
     this.fastClearCtx(ctx, false); //We intentionally do not rotate!
 

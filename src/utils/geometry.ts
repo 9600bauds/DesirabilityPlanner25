@@ -91,6 +91,30 @@ export class Rectangle {
     return new Rectangle(new Tile(originX, originY), width, height);
   }
 
+  public static boundingBoxOfSet(rectangles: Set<Rectangle>): Rectangle | null {
+    if (rectangles.size === 0) {
+      return null;
+    }
+
+    let minX = Number.MAX_SAFE_INTEGER;
+    let minY = Number.MAX_SAFE_INTEGER;
+    let maxX = Number.MIN_SAFE_INTEGER;
+    let maxY = Number.MIN_SAFE_INTEGER;
+
+    for (const rect of rectangles) {
+      minX = Math.min(minX, rect.startX);
+      minY = Math.min(minY, rect.startY);
+      maxX = Math.max(maxX, rect.endX);
+      maxY = Math.max(maxY, rect.endY);
+    }
+
+    const origin = new Tile(minX, minY);
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
+
+    return new Rectangle(origin, width, height);
+  }
+
   public interceptsTile(t: Tile): boolean {
     const isInsideHorizontal =
       t.x >= this.origin.x && t.x < this.origin.x + this.width;
