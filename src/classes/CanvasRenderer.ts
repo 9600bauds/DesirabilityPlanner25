@@ -75,32 +75,6 @@ class CanvasRenderer {
   }
 
   constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
-    const createCtx = (
-      id: string,
-      zIndex: number
-    ): CanvasRenderingContext2D => {
-      const canvas = document.createElement('canvas');
-      canvas.id = id;
-      canvas.className = 'canvasLayer';
-
-      // Size canvas to match the viewport (not the grid)
-      canvas.width = this.clientWidth * this.devicePixelRatio;
-      canvas.height = this.clientHeight * this.devicePixelRatio;
-
-      canvas.style.width = this.clientWidth + 'px';
-      canvas.style.height = this.clientHeight + 'px';
-      canvas.style.zIndex = zIndex.toString();
-
-      this.parentContainer.appendChild(canvas);
-      this.allCanvases.push(canvas);
-
-      const ctx = canvas.getContext('2d', {
-        alpha: true,
-        desynchronized: true,
-      }) as CanvasRenderingContext2D;
-      return ctx;
-    };
-
     this.parentContainer = parentContainer;
     this.renderContext = renderContext;
     this.devicePixelRatio = window.devicePixelRatio || 1;
@@ -116,10 +90,10 @@ class CanvasRenderer {
     this.parentContainer.appendChild(this.labelContainer);
 
     // Create canvas elements - all sized to fit the viewport
-    this.buildingsCtx = createCtx('buildings-canvas', 400);
-    this.gridLinesCtx = createCtx('tile-numbers-canvas', 300);
-    this.tileNumbersCtx = createCtx('tile-numbers-canvas', 200);
-    this.tilesCtx = createCtx('tiles-canvas', 100);
+    this.buildingsCtx = this.createCtx('buildings-canvas', 400);
+    this.gridLinesCtx = this.createCtx('tile-numbers-canvas', 300);
+    this.tileNumbersCtx = this.createCtx('tile-numbers-canvas', 200);
+    this.tilesCtx = this.createCtx('tiles-canvas', 100);
 
     // Todo: React can probably do this better. Also todo: Debounce this
     const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
@@ -140,6 +114,47 @@ class CanvasRenderer {
     this.allCanvases = [];
   }
 
+  private createCtx = (
+    id: string,
+    zIndex: number
+  ): CanvasRenderingContext2D => {
+    const canvas = document.createElement('canvas');
+    canvas.id = id;
+    canvas.className = 'canvasLayer';
+
+    // Size canvas to match the viewport (not the grid)
+    canvas.width = this.clientWidth * this.devicePixelRatio;
+    canvas.height = this.clientHeight * this.devicePixelRatio;
+
+    canvas.style.width = this.clientWidth + 'px';
+    canvas.style.height = this.clientHeight + 'px';
+    canvas.style.zIndex = zIndex.toString();
+
+    this.parentContainer.appendChild(canvas);
+    this.allCanvases.push(canvas);
+
+    const ctx = canvas.getContext('2d', {
+      alpha: true,
+      desynchronized: true,
+    }) as CanvasRenderingContext2D;
+    return ctx;
+  };
+
+  private fastClearCtx(ctx: CanvasRenderingContext2D, rotate = this.isRotated) {
+    //Setting the width every time is apparently the fastest way to clear the canvas? Even if the size didn't change?
+    ctx.canvas.width = this.clientWidth * this.devicePixelRatio;
+    ctx.canvas.height = this.clientHeight * this.devicePixelRatio;
+    ctx.canvas.style.width = this.clientWidth + 'px';
+    ctx.canvas.style.height = this.clientHeight + 'px';
+
+    ctx.translate(this.offsetX, this.offsetY);
+    ctx.scale(
+      this.devicePixelRatio * this.zoomLevel,
+      this.devicePixelRatio * this.zoomLevel
+    );
+    if (rotate) ctx.rotate(ROTATION_RADS);
+  }
+
   public scheduleRender(updateFlags: number): void {
     this.sectionsNeedUpdating |= updateFlags; //Add the flags of the parts that need updating via bitwise OR
 
@@ -152,14 +167,6 @@ class CanvasRenderer {
   public canvasSizeUpdated() {
     this.clientWidth = this.parentContainer.clientWidth;
     this.clientHeight = this.parentContainer.clientHeight;
-
-    // Resize all canvases
-    this.allCanvases.forEach((canvas) => {
-      canvas.width = this.clientWidth * this.devicePixelRatio;
-      canvas.height = this.clientHeight * this.devicePixelRatio;
-      canvas.style.width = this.clientWidth + 'px';
-      canvas.style.height = this.clientHeight + 'px';
-    });
 
     this.scheduleRender(CanvasUpdateFlag.ALL);
   }
@@ -519,16 +526,11 @@ class CanvasRenderer {
     viewport: Viewport,
     tileValues: Int16Array
   ) {
-    // prettier-ignore
-    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
     // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
     // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
     // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
-    // Suffice to say, this clearRect() is VITAL for performance, even though we shouldn't need it and it makes no sense.
-    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
-    ctx.translate(this.offsetX, this.offsetY);
-    ctx.scale(this.zoomLevel, this.zoomLevel);
-    if (this.isRotated) ctx.rotate(ROTATION_RADS);
+    // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
+    this.fastClearCtx(ctx);
 
     // We make use of a temporary canvas here. We draw each tile as 1 pixel big. Then we expand it to cover the entire canvas.
     // This is more efficient, but we need this ugly temporary canvas to do it, because bitmap creation is asynchronous and I don't want to deal with that.
@@ -571,12 +573,7 @@ class CanvasRenderer {
   }
 
   private renderGridlines(ctx: CanvasRenderingContext2D, viewport: Viewport) {
-    // prettier-ignore
-    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
-    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
-    ctx.translate(this.offsetX, this.offsetY);
-    ctx.scale(this.zoomLevel, this.zoomLevel);
-    if (this.isRotated) ctx.rotate(ROTATION_RADS);
+    this.fastClearCtx(ctx);
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.pureBlack;
@@ -601,12 +598,7 @@ class CanvasRenderer {
     viewport: Viewport,
     tileValues: Int16Array
   ) {
-    // prettier-ignore
-    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
-    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
-    ctx.translate(this.offsetX, this.offsetY);
-    ctx.scale(this.zoomLevel, this.zoomLevel);
-    //We intentionally do not rotate!
+    this.fastClearCtx(ctx, false); //We intentionally do not rotate!
 
     // Set text style
     ctx.font = 'bold 14px Arial';
@@ -646,19 +638,7 @@ class CanvasRenderer {
     tileValues: Int16Array,
     placedBuildings: Set<Building>
   ) {
-    // prettier-ignore
-    ctx.setTransform(this.devicePixelRatio, 0, 0, this.devicePixelRatio, 0, 0);
-    ctx.clearRect(0, 0, this.clientWidth, this.clientHeight);
-    ctx.translate(this.offsetX, this.offsetY);
-    ctx.scale(this.zoomLevel, this.zoomLevel);
-    if (this.isRotated) ctx.rotate(ROTATION_RADS);
-
-    ctx.clearRect(
-      viewport.coords.startX,
-      viewport.coords.startY,
-      viewport.coords.width,
-      viewport.coords.height
-    );
+    this.fastClearCtx(ctx);
 
     const buildingOutlinesPath = new Path2D();
 
