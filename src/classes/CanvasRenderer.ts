@@ -144,8 +144,6 @@ class CanvasRenderer {
     //Setting the width every time is apparently the fastest way to clear the canvas? Even if the size didn't change?
     ctx.canvas.width = this.clientWidth * this.devicePixelRatio;
     ctx.canvas.height = this.clientHeight * this.devicePixelRatio;
-    ctx.canvas.style.width = this.clientWidth + 'px';
-    ctx.canvas.style.height = this.clientHeight + 'px';
 
     ctx.translate(
       this.offsetX * this.devicePixelRatio,
@@ -159,9 +157,8 @@ class CanvasRenderer {
   }
 
   private hideCanvases(canvases: HTMLCanvasElement[]) {
-    console.log('hiding', canvases);
     for (const canvas of canvases) {
-      canvas.style.display = 'none';
+      canvas.style.opacity = '0';
     }
   }
 
@@ -454,7 +451,7 @@ class CanvasRenderer {
     // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
     this.fastClearCtx(this.tilesCtx);
     this.renderTiles(this.tilesCtx, baseValues, viewport.tilesRect);
-    this.tilesCtx.canvas.style.display = 'initial';
+    this.tilesCtx.canvas.style.opacity = '100';
 
     if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
       this.fastClearCtx(this.tileNumbersCtx, false); //We intentionally do not rotate!;
@@ -463,12 +460,12 @@ class CanvasRenderer {
         baseValues,
         viewport.tilesRect
       );
-      this.tileNumbersCtx.canvas.style.display = 'initial';
+      this.tileNumbersCtx.canvas.style.opacity = '100';
     }
 
     this.fastClearCtx(this.gridLinesCtx);
     this.renderGridlines(this.gridLinesCtx, viewport.tilesRect);
-    this.gridLinesCtx.canvas.style.display = 'initial';
+    this.gridLinesCtx.canvas.style.opacity = '100';
 
     this.fastClearCtx(this.buildingsCtx);
     this.renderBuildings(
@@ -477,7 +474,7 @@ class CanvasRenderer {
       baseValues,
       placedBuildings
     );
-    this.buildingsCtx.canvas.style.display = 'initial';
+    this.buildingsCtx.canvas.style.opacity = '100';
 
     this.renderBuildingLabels(viewport.tilesRect, baseValues);
   }
@@ -541,7 +538,7 @@ class CanvasRenderer {
     if (modifiedArea) {
       this.fastClearCtx(this.previewTilesCtx);
       this.renderTiles(this.previewTilesCtx, modifiedValues, modifiedArea);
-      this.previewTilesCtx.canvas.style.display = 'initial';
+      this.previewTilesCtx.canvas.style.opacity = '100';
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
         this.fastClearCtx(this.previewTileNumbersCtx, false); //We intentionally do not rotate!;
         this.renderTileNumbers(
@@ -549,7 +546,7 @@ class CanvasRenderer {
           modifiedValues,
           modifiedArea
         );
-        this.previewTileNumbersCtx.canvas.style.display = 'initial';
+        this.previewTileNumbersCtx.canvas.style.opacity = '100';
       }
     }
   }
