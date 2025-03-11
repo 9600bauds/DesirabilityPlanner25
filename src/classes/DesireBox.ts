@@ -11,7 +11,11 @@ class DesireBox {
     const startY = this.bounds.startY - this.maxRange;
     const endX = this.bounds.endX + this.maxRange;
     const endY = this.bounds.endY + this.maxRange;
-    return Rectangle.fromTiles(new Tile(startX, startY), new Tile(endX, endY));
+    return new Rectangle(
+      new Tile(startX, startY),
+      endX - startX + 1,
+      endY - startY + 1
+    );
   }
 
   constructor(data: NewDesireBox, origin: Tile, height: number, width: number) {

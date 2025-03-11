@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import GridStateManager from '../classes/GridStateManager';
 import Subcategory from '../interfaces/Subcategory';
-import CanvasRenderer, { CanvasUpdateFlag } from '../classes/CanvasRenderer';
+import CanvasRenderer from '../classes/CanvasRenderer';
 import CursorAction from '../types/CursorAction';
 import Blueprint from '../types/Blueprint';
 
@@ -94,7 +94,7 @@ const App: React.FC = () => {
         const erasedRect = renderer.stopDragging();
         if (erasedRect) {
           if (gridStateManager.eraseRect(erasedRect)) {
-            renderer.scheduleRender(CanvasUpdateFlag.ALL);
+            renderer.scheduleRerender();
           }
         }
       } else if (cursorAction === 'placing') {
@@ -103,7 +103,7 @@ const App: React.FC = () => {
           const blueprint = getSelectedBlueprint();
           if (blueprint) {
             if (gridStateManager.tryPlaceBuilding(tile, blueprint)) {
-              renderer.scheduleRender(CanvasUpdateFlag.ALL);
+              renderer.scheduleRerender();
             }
           }
         }
@@ -145,7 +145,7 @@ const App: React.FC = () => {
     if (cursorAction === 'erasing') {
       renderer.handleDragging();
     } else if (cursorAction === 'placing') {
-      renderer.handlePlacementPreview();
+      renderer.schedulePreview();
     }
   };
 
@@ -160,7 +160,7 @@ const App: React.FC = () => {
 
         // Since changing a ref doesn't trigger re-renders, manually notify the renderer
         if (rendererRef.current && cursorAction === 'placing') {
-          rendererRef.current.handlePlacementPreview();
+          rendererRef.current.schedulePreview();
         }
       }
     }
@@ -187,7 +187,7 @@ const App: React.FC = () => {
     selectedBlueprintIndexRef.current = 0;
     // Notify renderer if needed
     if (rendererRef.current) {
-      rendererRef.current.handlePlacementPreview();
+      rendererRef.current.schedulePreview();
     }
   };
 
@@ -196,7 +196,7 @@ const App: React.FC = () => {
     selectedBlueprintIndexRef.current = 0;
     // Notify renderer if needed
     if (rendererRef.current) {
-      rendererRef.current.handlePlacementPreview();
+      rendererRef.current.schedulePreview();
     }
   };
 

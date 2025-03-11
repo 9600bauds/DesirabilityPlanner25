@@ -16,25 +16,14 @@ import {
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, GridPoint } from '../utils/geometry';
 import Building from './Building';
-
-export enum CanvasUpdateFlag {
-  NONE = 0,
-  TILES = 1 << 0,
-  GRIDLINES = 1 << 1,
-  BUILDINGS = 1 << 2,
-  PREVIEW = 1 << 3,
-  ALL = ~0, // All bits set to 1
-}
-
 class CanvasRenderer {
   // Settings
   private transparentBuildings: boolean = false;
   private readonly GRID_TEXT_THRESHOLD = 0.6; // Zoom threshold to draw
-  private readonly GRID_LINES_THRESHOLD = 0.1; // Zoom threshold to draw
 
   // Rendering system
-  private sectionsNeedUpdating: number = CanvasUpdateFlag.NONE; //Uses a bitflag system
-  private pendingFrame: number | null = null;
+  private pendingRerender: number | null = null;
+  private pendingPreview: number | null = null;
   private renderContext: RenderContext;
 
   // DOM elements
@@ -47,12 +36,14 @@ class CanvasRenderer {
   private devicePixelRatio: number;
 
   // Canvas elements
-  private allCanvases: HTMLCanvasElement[] = [];
+  private mainCanvases: HTMLCanvasElement[] = [];
+  private previewCanvases: HTMLCanvasElement[] = [];
   private tilesCtx: CanvasRenderingContext2D;
   private tileNumbersCtx: CanvasRenderingContext2D;
   private gridLinesCtx: CanvasRenderingContext2D;
   private buildingsCtx: CanvasRenderingContext2D;
-  private previewCtx: CanvasRenderingContext2D;
+  private previewTilesCtx: CanvasRenderingContext2D;
+  private previewTileNumbersCtx: CanvasRenderingContext2D;
 
   // Transform state
   private isRotated: boolean = false;
@@ -90,10 +81,15 @@ class CanvasRenderer {
     this.labelContainer.style.zIndex = '500';
     this.parentContainer.appendChild(this.labelContainer);
 
-    // Create canvas elements - all sized to fit the viewport
-    this.previewCtx = this.createCtx('preview-canvas', 499);
+    // Create canvas elements
     this.buildingsCtx = this.createCtx('buildings-canvas', 400);
-    this.gridLinesCtx = this.createCtx('tile-numbers-canvas', 300);
+    this.gridLinesCtx = this.createCtx('grid-lines-canvas', 300);
+    this.previewTileNumbersCtx = this.createCtx(
+      'preview-tile-numbers-canvas',
+      202,
+      true
+    );
+    this.previewTilesCtx = this.createCtx('preview-tiles-canvas', 201, true);
     this.tileNumbersCtx = this.createCtx('tile-numbers-canvas', 200);
     this.tilesCtx = this.createCtx('tiles-canvas', 100);
 
@@ -105,20 +101,25 @@ class CanvasRenderer {
     this.centerViewAt({ x: GRID_CENTER_PX, y: GRID_CENTER_PX });
 
     // Go ahead and get us started here
-    this.scheduleRender(CanvasUpdateFlag.ALL);
+    this.scheduleRerender();
   }
 
   public destroy() {
     this.parentContainer.removeChild(this.labelContainer);
-    for (const canvas of this.allCanvases) {
+    for (const canvas of this.mainCanvases) {
       this.parentContainer.removeChild(canvas);
     }
-    this.allCanvases = [];
+    this.mainCanvases = [];
+    for (const canvas of this.previewCanvases) {
+      this.parentContainer.removeChild(canvas);
+    }
+    this.previewCanvases = [];
   }
 
   private createCtx = (
     id: string,
-    zIndex: number
+    zIndex: number,
+    isPreview = false
   ): CanvasRenderingContext2D => {
     const canvas = document.createElement('canvas');
     canvas.id = id;
@@ -126,7 +127,11 @@ class CanvasRenderer {
     canvas.style.zIndex = zIndex.toString();
 
     this.parentContainer.appendChild(canvas);
-    this.allCanvases.push(canvas);
+    if (isPreview) {
+      this.previewCanvases.push(canvas);
+    } else {
+      this.mainCanvases.push(canvas);
+    }
 
     const ctx = canvas.getContext('2d', {
       alpha: true,
@@ -153,11 +158,24 @@ class CanvasRenderer {
     if (rotate) ctx.rotate(ROTATION_RADS);
   }
 
-  public scheduleRender(updateFlags: number): void {
-    this.sectionsNeedUpdating |= updateFlags; //Add the flags of the parts that need updating via bitwise OR
+  private hideCanvases(canvases: HTMLCanvasElement[]) {
+    console.log('hiding', canvases);
+    for (const canvas of canvases) {
+      canvas.style.display = 'none';
+    }
+  }
 
-    if (!this.pendingFrame) {
-      this.pendingFrame = requestAnimationFrame(this.render.bind(this));
+  public scheduleRerender(): void {
+    if (!this.pendingRerender) {
+      this.pendingRerender = requestAnimationFrame(
+        this.fullRerender.bind(this)
+      );
+    }
+  }
+
+  public schedulePreview(): void {
+    if (!this.pendingPreview) {
+      this.pendingPreview = requestAnimationFrame(this.preview.bind(this));
     }
   }
 
@@ -166,7 +184,7 @@ class CanvasRenderer {
     this.clientWidth = this.parentContainer.clientWidth;
     this.clientHeight = this.parentContainer.clientHeight;
 
-    this.scheduleRender(CanvasUpdateFlag.ALL);
+    this.scheduleRerender();
   }
 
   /*
@@ -286,7 +304,7 @@ class CanvasRenderer {
     // Recenter view
     this.centerViewAt(oldCenter);
 
-    this.scheduleRender(CanvasUpdateFlag.ALL);
+    this.scheduleRerender();
   }
 
   public centerViewAt(point: GridPoint) {
@@ -299,7 +317,7 @@ class CanvasRenderer {
     this.offsetX = center.x - point.x * this.zoomLevel;
     this.offsetY = center.y - point.y * this.zoomLevel;
 
-    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
+    this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   }
 
   public zoomIn() {
@@ -317,7 +335,7 @@ class CanvasRenderer {
     // Recenter view
     this.centerViewAt(oldCenter);
 
-    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
+    this.scheduleRerender(); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
   }
 
   // Panning methods
@@ -340,7 +358,7 @@ class CanvasRenderer {
     this.lastPanCursorX = event.clientX;
     this.lastPanCursorY = event.clientY;
 
-    this.scheduleRender(CanvasUpdateFlag.ALL); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
+    this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   }
 
   public stopPanning() {
@@ -364,7 +382,7 @@ class CanvasRenderer {
     if (this.dragStartTile && newPos) {
       this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
     }
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
+    this.scheduleRerender(); //Todo: Only update preview
   }
 
   public stopDragging() {
@@ -374,15 +392,9 @@ class CanvasRenderer {
     this.dragBox = undefined;
     this.isDragging = false;
 
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: Later when we have a proper overlays layer we only need to update that
+    this.scheduleRerender(); //Todo... Maybe do the deletion here?
 
     return returnBox;
-  }
-
-  // Placement preview
-  public handlePlacementPreview() {
-    this.scheduleRender(CanvasUpdateFlag.ALL); //Todo: More optimized version if needed
-    return;
   }
 
   // Mouse handling
@@ -419,7 +431,14 @@ class CanvasRenderer {
   /*
    * Actual rendering methods
    */
-  private render(): void {
+  private fullRerender(): void {
+    console.log('fully rerendering...');
+    this.pendingRerender = null;
+    this.pendingPreview = null;
+
+    this.hideCanvases(this.previewCanvases);
+    this.hideCanvases(this.mainCanvases); //We'll re-enable them as needed
+
     const viewport = this.getViewport();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
       return; //We are fully offscreen!
@@ -429,78 +448,56 @@ class CanvasRenderer {
     // These are the precomputed desirability values from the "true" gridstate.
     const baseValues = this.renderContext.getBaseValues();
 
-    let startTime = performance.now();
-    if (this.sectionsNeedUpdating & CanvasUpdateFlag.TILES) {
-      this.renderTiles(this.tilesCtx, baseValues, viewport.tilesRect);
-      if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-        this.tileNumbersCtx.canvas.style.display = 'initial';
-        this.renderTileNumbers(
-          this.tileNumbersCtx,
-          baseValues,
-          viewport.tilesRect
-        );
-      } else {
-        this.tileNumbersCtx.canvas.style.display = 'none';
-      }
-      const tilesTime = performance.now() - startTime;
-      if (tilesTime > 4) {
-        //prettier-ignore
-        console.log("Tile rendering took", tilesTime, "ms!");
-      }
-      startTime = performance.now();
-    }
+    // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
+    // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
+    // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
+    // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
+    this.fastClearCtx(this.tilesCtx);
+    this.renderTiles(this.tilesCtx, baseValues, viewport.tilesRect);
+    this.tilesCtx.canvas.style.display = 'initial';
 
-    if (this.sectionsNeedUpdating & CanvasUpdateFlag.GRIDLINES) {
-      if (this.zoomLevel > this.GRID_LINES_THRESHOLD) {
-        this.gridLinesCtx.canvas.style.display = 'initial';
-        this.renderGridlines(this.gridLinesCtx, viewport.tilesRect);
-      } else {
-        this.gridLinesCtx.canvas.style.display = 'none';
-      }
-      const gridLinesTime = performance.now() - startTime;
-      if (gridLinesTime > 3) {
-        //prettier-ignore
-        console.log("Gridline rendering took", gridLinesTime, "ms!");
-      }
-      startTime = performance.now();
-    }
-
-    if (this.sectionsNeedUpdating & CanvasUpdateFlag.BUILDINGS) {
-      this.renderBuildings(
-        this.buildingsCtx,
-        viewport.tilesRect,
+    if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+      this.fastClearCtx(this.tileNumbersCtx, false); //We intentionally do not rotate!;
+      this.renderTileNumbers(
+        this.tileNumbersCtx,
         baseValues,
-        placedBuildings
+        viewport.tilesRect
       );
-      this.renderBuildingLabels(viewport.tilesRect, baseValues);
-      const buildingsTime = performance.now() - startTime;
-      if (buildingsTime > 3) {
-        //prettier-ignore
-        console.log("Rendering buildings took", buildingsTime, "ms!");
-      }
-      startTime = performance.now();
+      this.tileNumbersCtx.canvas.style.display = 'initial';
     }
 
-    if (this.sectionsNeedUpdating & CanvasUpdateFlag.PREVIEW) {
-      this.renderPreview(baseValues, placedBuildings, viewport.tilesRect);
-      const previewTime = performance.now() - startTime;
-      if (previewTime > 5) {
-        //prettier-ignore
-        console.log("Preview rendering took", previewTime, "ms!");
-      }
-      startTime = performance.now();
-    }
+    this.fastClearCtx(this.gridLinesCtx);
+    this.renderGridlines(this.gridLinesCtx, viewport.tilesRect);
+    this.gridLinesCtx.canvas.style.display = 'initial';
 
-    this.pendingFrame = null;
-    this.sectionsNeedUpdating = CanvasUpdateFlag.NONE;
+    this.fastClearCtx(this.buildingsCtx);
+    this.renderBuildings(
+      this.buildingsCtx,
+      viewport.tilesRect,
+      baseValues,
+      placedBuildings
+    );
+    this.buildingsCtx.canvas.style.display = 'initial';
+
+    this.renderBuildingLabels(viewport.tilesRect, baseValues);
   }
 
-  private renderPreview(
-    baseValues: Int16Array,
-    placedBuildings: Set<Building>,
-    viewport: Rectangle
-  ) {
+  private preview() {
+    console.log('previewing......');
+    this.pendingPreview = null;
+    this.hideCanvases(this.previewCanvases);
+
+    if (this.pendingRerender) return; //Let's not preview anything if we're going to full update anyways.
+    const viewport = this.getViewport();
+    if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
+      return; //We are fully offscreen!
+    }
+
     const selectedBlueprint = this.renderContext.getSelectedBlueprint();
+    const placedBuildings = this.renderContext.getBuildings();
+
+    // These are the precomputed desirability values from the "true" gridstate.
+    const baseValues = this.renderContext.getBaseValues();
     // Let's clone the base values so we can do our own calculations
     const modifiedValues = new Int16Array(baseValues);
     const modifiedAreas: Set<Rectangle> = new Set();
@@ -514,19 +511,19 @@ class CanvasRenderer {
         new Building(this.lastMouseoverTile, selectedBlueprint)
       );
     }
-    for (const building of buildingsBeingAdded) {
-      for (const dbox of building.desireBoxes) {
-        dbox.apply(modifiedValues);
-        modifiedAreas.add(dbox.affectedBounds);
-      }
-    }
-
     const buildingsBeingRemoved: Set<Building> = new Set();
     if (this.isDragging && this.dragBox) {
       for (const building of placedBuildings) {
         if (building.interceptsRectangle(this.dragBox)) {
           buildingsBeingRemoved.add(building);
         }
+      }
+    }
+
+    for (const building of buildingsBeingAdded) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(modifiedValues);
+        modifiedAreas.add(dbox.affectedBounds);
       }
     }
     for (const building of buildingsBeingRemoved) {
@@ -536,11 +533,25 @@ class CanvasRenderer {
       }
     }
 
-    const modifiedArea = Rectangle.boundingBoxOfSet(modifiedAreas);
-    if (!modifiedArea) return;
-    console.log('modified area is ', modifiedArea);
-    this.renderTiles(this.previewCtx, modifiedValues, modifiedArea);
-    //this.renderTileNumbers(this.previewCtx, modifiedValues, modifiedArea);
+    let modifiedArea = Rectangle.boundingBoxOfSet(modifiedAreas);
+    if (modifiedArea) {
+      modifiedArea = Rectangle.intersection(modifiedArea, viewport.tilesRect);
+    }
+
+    if (modifiedArea) {
+      this.fastClearCtx(this.previewTilesCtx);
+      this.renderTiles(this.previewTilesCtx, modifiedValues, modifiedArea);
+      this.previewTilesCtx.canvas.style.display = 'initial';
+      if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+        this.fastClearCtx(this.previewTileNumbersCtx, false); //We intentionally do not rotate!;
+        this.renderTileNumbers(
+          this.previewTileNumbersCtx,
+          modifiedValues,
+          modifiedArea
+        );
+        this.previewTileNumbersCtx.canvas.style.display = 'initial';
+      }
+    }
   }
 
   private renderTiles(
@@ -548,13 +559,6 @@ class CanvasRenderer {
     tileValues: Int16Array,
     bounds: Rectangle
   ) {
-    console.log('I am rendering', bounds);
-    // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
-    // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
-    // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
-    // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
-    this.fastClearCtx(ctx);
-
     // We make use of a temporary canvas here. We draw each tile as 1 pixel big. Then we expand it to cover the entire canvas.
     // This is more efficient, but we need this ugly temporary canvas to do it, because bitmap creation is asynchronous and I don't want to deal with that.
     const tempCanvas = document.createElement('canvas');
@@ -570,7 +574,8 @@ class CanvasRenderer {
     let idx = 0;
     for (let y = bounds.startY; y <= bounds.endY; y++) {
       for (let x = bounds.startX; x <= bounds.endX; x++) {
-        const rgb = getDesirabilityRGB(tileValues[COORD_TO_INT16(x, y)]);
+        const thisVal = tileValues[COORD_TO_INT16(x, y)];
+        const rgb = getDesirabilityRGB(thisVal);
         imageData.data[idx++] = rgb.r;
         imageData.data[idx++] = rgb.g;
         imageData.data[idx++] = rgb.b;
@@ -596,8 +601,6 @@ class CanvasRenderer {
   }
 
   private renderGridlines(ctx: CanvasRenderingContext2D, bounds: Rectangle) {
-    this.fastClearCtx(ctx);
-
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.pureBlack;
     // Batch all line drawing into a single path
@@ -621,8 +624,6 @@ class CanvasRenderer {
     tileValues: Int16Array,
     bounds: Rectangle
   ) {
-    this.fastClearCtx(ctx, false); //We intentionally do not rotate!
-
     // Set text style
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
@@ -661,8 +662,6 @@ class CanvasRenderer {
     tileValues: Int16Array,
     placedBuildings: Set<Building>
   ) {
-    this.fastClearCtx(ctx);
-
     const buildingOutlinesPath = new Path2D();
 
     for (const building of placedBuildings) {

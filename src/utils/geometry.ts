@@ -82,39 +82,6 @@ export class Rectangle {
     );
   }
 
-  public static fromTiles(t1: Tile, t2: Tile) {
-    const originX = Math.min(t1.x, t2.x);
-    const originY = Math.min(t1.y, t2.y);
-    const width = Math.abs(t1.x - t2.x) + 1;
-    const height = Math.abs(t1.y - t2.y) + 1;
-
-    return new Rectangle(new Tile(originX, originY), width, height);
-  }
-
-  public static boundingBoxOfSet(rectangles: Set<Rectangle>): Rectangle | null {
-    if (rectangles.size === 0) {
-      return null;
-    }
-
-    let minX = Number.MAX_SAFE_INTEGER;
-    let minY = Number.MAX_SAFE_INTEGER;
-    let maxX = Number.MIN_SAFE_INTEGER;
-    let maxY = Number.MIN_SAFE_INTEGER;
-
-    for (const rect of rectangles) {
-      minX = Math.min(minX, rect.startX);
-      minY = Math.min(minY, rect.startY);
-      maxX = Math.max(maxX, rect.endX);
-      maxY = Math.max(maxY, rect.endY);
-    }
-
-    const origin = new Tile(minX, minY);
-    const width = maxX - minX + 1;
-    const height = maxY - minY + 1;
-
-    return new Rectangle(origin, width, height);
-  }
-
   public interceptsTile(t: Tile): boolean {
     const isInsideHorizontal =
       t.x >= this.origin.x && t.x < this.origin.x + this.width;
@@ -131,6 +98,69 @@ export class Rectangle {
       }
     }
     return false;
+  }
+
+  public static fromTiles(t1: Tile, t2: Tile) {
+    const originX = Math.min(t1.x, t2.x);
+    const originY = Math.min(t1.y, t2.y);
+    const width = Math.abs(t1.x - t2.x) + 1;
+    const height = Math.abs(t1.y - t2.y) + 1;
+
+    return new Rectangle(new Tile(originX, originY), width, height);
+  }
+
+  public static boundingBoxOfSet(rects: Set<Rectangle>): Rectangle | null {
+    if (rects.size === 0) {
+      return null;
+    }
+
+    let minX = Number.MAX_SAFE_INTEGER;
+    let minY = Number.MAX_SAFE_INTEGER;
+    let maxX = Number.MIN_SAFE_INTEGER;
+    let maxY = Number.MIN_SAFE_INTEGER;
+
+    for (const rect of rects) {
+      minX = Math.min(minX, rect.startX);
+      minY = Math.min(minY, rect.startY);
+      maxX = Math.max(maxX, rect.endX);
+      maxY = Math.max(maxY, rect.endY);
+    }
+
+    return new Rectangle(
+      new Tile(minX, minY),
+      maxX - minX + 1,
+      maxY - minY + 1
+    );
+  }
+
+  public static boundingBoxOfTwo(r1: Rectangle, r2: Rectangle): Rectangle {
+    const minX = Math.min(r1.startX, r2.startX);
+    const minY = Math.min(r1.startY, r2.startY);
+    const maxX = Math.max(r1.endX, r2.endX);
+    const maxY = Math.max(r1.endY, r2.endY);
+
+    return new Rectangle(
+      new Tile(minX, minY),
+      maxX - minX + 1,
+      maxY - minY + 1
+    );
+  }
+
+  public static intersection(r1: Rectangle, r2: Rectangle): Rectangle | null {
+    const minX = Math.max(r1.startX, r2.startX);
+    const minY = Math.max(r1.startY, r2.startY);
+    const maxX = Math.min(r1.endX, r2.endX);
+    const maxY = Math.min(r1.endY, r2.endY);
+
+    if (minX > maxX || minY > maxY) {
+      return null;
+    }
+
+    return new Rectangle(
+      new Tile(minX, minY),
+      maxX - minX + 1,
+      maxY - minY + 1
+    );
   }
 }
 
