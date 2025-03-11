@@ -603,14 +603,14 @@ class CanvasRenderer {
     // Batch all line drawing into a single path
     ctx.beginPath();
     // Path the horizontal lines
-    for (let y = bounds.startY; y <= bounds.endY; y++) {
+    for (let y = bounds.startY; y <= bounds.endY + 1; y++) {
       ctx.moveTo(COORD_TO_PX(bounds.startX), COORD_TO_PX(y));
-      ctx.lineTo(COORD_TO_PX(bounds.endX), COORD_TO_PX(y));
+      ctx.lineTo(COORD_TO_PX(bounds.endX + 1), COORD_TO_PX(y));
     }
     // Path the vertical lines
-    for (let x = bounds.startX; x <= bounds.endX; x++) {
+    for (let x = bounds.startX; x <= bounds.endX + 1; x++) {
       ctx.moveTo(COORD_TO_PX(x), COORD_TO_PX(bounds.startY));
-      ctx.lineTo(COORD_TO_PX(x), COORD_TO_PX(bounds.endY));
+      ctx.lineTo(COORD_TO_PX(x), COORD_TO_PX(bounds.endY + 1));
     }
     // Execute the path!
     ctx.stroke();
