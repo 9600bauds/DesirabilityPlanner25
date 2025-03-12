@@ -38,6 +38,8 @@ const App: React.FC = () => {
       }
       document.addEventListener('keydown', handleKeyDown);
       document.addEventListener('keyup', handleKeyUp);
+      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mousemove', handleMouseMove);
     } catch (error) {
       console.error('Error initializing data:', error);
     }
@@ -53,6 +55,34 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const setCursorAction = (newAction: CursorAction) => {
+    cursorActionRef.current = newAction;
+    if (newAction !== 'placing') {
+      deselectSubcategory();
+    }
+    updateCursor();
+  };
+
+  const updateCursor = () => {
+    if (!canvasContainer.current) return;
+
+    if (cursorActionRef.current === 'placing') {
+      document.body.style.cursor = 'auto';
+      canvasContainer.current.style.cursor = 'copy';
+    } else if (cursorActionRef.current === 'erasing') {
+      document.body.style.cursor = 'auto';
+      canvasContainer.current.style.cursor = 'cell';
+    } else if (cursorActionRef.current === 'panning') {
+      if (rendererRef.current?.isPanning) {
+        document.body.style.cursor = 'grabbing';
+        canvasContainer.current.style.cursor = 'grabbing';
+      } else {
+        document.body.style.cursor = 'auto';
+        canvasContainer.current.style.cursor = 'grab';
+      }
+    }
+  };
+
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     const renderer = rendererRef.current;
     if (!renderer) return;
@@ -60,11 +90,9 @@ const App: React.FC = () => {
     if (event.button === 2) {
       // Right click
       if (cursorActionRef.current === 'placing') {
-        cursorActionRef.current = 'panning';
-        deselectSubcategory();
+        setCursorAction('panning');
       } else if (cursorActionRef.current === 'erasing') {
-        cursorActionRef.current = 'panning';
-        deselectSubcategory();
+        setCursorAction('panning');
         renderer.stopDragging();
       }
     } else if (event.button === 0) {
@@ -74,10 +102,11 @@ const App: React.FC = () => {
       } else if (cursorActionRef.current === 'erasing') {
         renderer.startDragging();
       }
+      updateCursor();
     }
   };
 
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseUp = (event: MouseEvent) => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
@@ -92,7 +121,7 @@ const App: React.FC = () => {
           }
         }
       } else if (cursorActionRef.current === 'placing') {
-        const tile = renderer.getMouseCoords(event.nativeEvent);
+        const tile = renderer.getMouseCoords(event);
         if (tile) {
           const blueprint = getSelectedBlueprint();
           if (blueprint) {
@@ -102,17 +131,18 @@ const App: React.FC = () => {
           }
         }
       }
+      updateCursor();
     }
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (event: MouseEvent) => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
-    const tileChanged = renderer.checkForTileChange(event.nativeEvent);
+    const tileChanged = renderer.checkForTileChange(event);
 
     if (cursorActionRef.current === 'panning') {
-      renderer.handlePanning(event.nativeEvent);
+      renderer.handlePanning(event);
     }
     if (tileChanged) {
       handleTileChange();
@@ -124,9 +154,6 @@ const App: React.FC = () => {
     if (!renderer) return;
 
     const tileChanged = renderer.checkForTileChange(event.nativeEvent);
-    if (cursorActionRef.current === 'panning') {
-      renderer.stopPanning();
-    }
     if (tileChanged) {
       handleTileChange();
     }
@@ -176,7 +203,7 @@ const App: React.FC = () => {
   };
 
   const selectSubcategory = (subcat: Subcategory) => {
-    cursorActionRef.current = 'placing';
+    setCursorAction('placing');
     selectedSubcategoryRef.current = subcat;
     selectedBlueprintIndexRef.current = 0;
     // Notify renderer if needed
@@ -209,8 +236,6 @@ const App: React.FC = () => {
         ref={canvasContainer}
         id="canvas-container"
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onContextMenu={preventRightclickMenu}
       />
@@ -225,12 +250,10 @@ const App: React.FC = () => {
             }
           }}
           onPanClick={() => {
-            cursorActionRef.current = 'panning';
-            deselectSubcategory();
+            setCursorAction('panning');
           }}
           onEraserClick={() => {
-            cursorActionRef.current = 'erasing';
-            deselectSubcategory();
+            setCursorAction('erasing');
           }}
           onZoomInClick={() => {
             if (rendererRef.current) {

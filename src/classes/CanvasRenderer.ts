@@ -46,13 +46,13 @@ class CanvasRenderer {
   private offsetY: number = 0;
 
   // Mouse state
-  private isPanning: boolean = false;
+  public isPanning: boolean = false;
   private lastPanCursorX: number = 0;
   private lastPanCursorY: number = 0;
   private lastMouseoverTile?: Tile;
 
   // Dragging state
-  private isDragging: boolean = false;
+  public isDragging: boolean = false;
   private dragStartTile?: Tile;
   private dragBox?: Rectangle;
 
@@ -326,7 +326,6 @@ class CanvasRenderer {
     this.isPanning = true;
     this.lastPanCursorX = event.clientX;
     this.lastPanCursorY = event.clientY;
-    this.parentContainer.style.cursor = 'grabbing';
   }
 
   public handlePanning(event: MouseEvent) {
@@ -346,7 +345,6 @@ class CanvasRenderer {
 
   public stopPanning() {
     this.isPanning = false;
-    this.parentContainer.style.cursor = 'grab';
   }
 
   // Drag handling
