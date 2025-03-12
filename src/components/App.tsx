@@ -1,17 +1,16 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import GridStateManager from '../classes/GridStateManager';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
-import CursorAction from '../types/CursorAction';
 import Blueprint from '../types/Blueprint';
+import CursorAction from '../types/CursorAction';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE (or refs, I guess?) =====
   const selectedSubcategoryRef = useRef<Subcategory | null>(null);
   const selectedBlueprintIndexRef = useRef<number>(0);
-
-  const [cursorAction, setCursorAction] = useState<CursorAction>('panning');
+  const cursorActionRef = useRef<CursorAction>('panning');
 
   const gridStateManager = useRef(new GridStateManager()).current;
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -54,30 +53,25 @@ const App: React.FC = () => {
     };
   }, []);
 
-  //Deselect the subcategory entirely whenever our cursoraction is set to anything except placing
-  useEffect(() => {
-    if (cursorAction !== 'placing') {
-      deselectSubcategory();
-    }
-  }, [cursorAction]);
-
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
     if (event.button === 2) {
       // Right click
-      if (cursorAction === 'placing') {
-        setCursorAction('panning');
-      } else if (cursorAction === 'erasing') {
-        setCursorAction('panning');
+      if (cursorActionRef.current === 'placing') {
+        cursorActionRef.current = 'panning';
+        deselectSubcategory();
+      } else if (cursorActionRef.current === 'erasing') {
+        cursorActionRef.current = 'panning';
+        deselectSubcategory();
         renderer.stopDragging();
       }
     } else if (event.button === 0) {
       // Left click
-      if (cursorAction === 'panning') {
+      if (cursorActionRef.current === 'panning') {
         renderer.startPanning(event.nativeEvent);
-      } else if (cursorAction === 'erasing') {
+      } else if (cursorActionRef.current === 'erasing') {
         renderer.startDragging();
       }
     }
@@ -90,14 +84,14 @@ const App: React.FC = () => {
     if (event.button === 0) {
       //Left click
       renderer.stopPanning();
-      if (cursorAction === 'erasing') {
+      if (cursorActionRef.current === 'erasing') {
         const erasedRect = renderer.stopDragging();
         if (erasedRect) {
           if (gridStateManager.eraseRect(erasedRect)) {
             renderer.scheduleRerender();
           }
         }
-      } else if (cursorAction === 'placing') {
+      } else if (cursorActionRef.current === 'placing') {
         const tile = renderer.getMouseCoords(event.nativeEvent);
         if (tile) {
           const blueprint = getSelectedBlueprint();
@@ -117,7 +111,7 @@ const App: React.FC = () => {
 
     const tileChanged = renderer.checkForTileChange(event.nativeEvent);
 
-    if (cursorAction === 'panning') {
+    if (cursorActionRef.current === 'panning') {
       renderer.handlePanning(event.nativeEvent);
     }
     if (tileChanged) {
@@ -130,7 +124,7 @@ const App: React.FC = () => {
     if (!renderer) return;
 
     const tileChanged = renderer.checkForTileChange(event.nativeEvent);
-    if (cursorAction === 'panning') {
+    if (cursorActionRef.current === 'panning') {
       renderer.stopPanning();
     }
     if (tileChanged) {
@@ -142,9 +136,9 @@ const App: React.FC = () => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
-    if (cursorAction === 'erasing') {
+    if (cursorActionRef.current === 'erasing') {
       renderer.handleDragging();
-    } else if (cursorAction === 'placing') {
+    } else if (cursorActionRef.current === 'placing') {
       renderer.schedulePreview();
     }
   };
@@ -159,7 +153,7 @@ const App: React.FC = () => {
           subcategory.blueprints.length;
 
         // Since changing a ref doesn't trigger re-renders, manually notify the renderer
-        if (rendererRef.current && cursorAction === 'placing') {
+        if (rendererRef.current && cursorActionRef.current === 'placing') {
           rendererRef.current.schedulePreview();
         }
       }
@@ -182,7 +176,7 @@ const App: React.FC = () => {
   };
 
   const selectSubcategory = (subcat: Subcategory) => {
-    setCursorAction('placing');
+    cursorActionRef.current = 'placing';
     selectedSubcategoryRef.current = subcat;
     selectedBlueprintIndexRef.current = 0;
     // Notify renderer if needed
@@ -231,10 +225,12 @@ const App: React.FC = () => {
             }
           }}
           onPanClick={() => {
-            setCursorAction('panning');
+            cursorActionRef.current = 'panning';
+            deselectSubcategory();
           }}
           onEraserClick={() => {
-            setCursorAction('erasing');
+            cursorActionRef.current = 'erasing';
+            deselectSubcategory();
           }}
           onZoomInClick={() => {
             if (rendererRef.current) {
