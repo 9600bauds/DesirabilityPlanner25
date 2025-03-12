@@ -456,7 +456,6 @@ class CanvasRenderer {
     this.renderBuildings(
       this.mainLayers.buildings,
       viewport.tilesRect,
-      baseValues,
       placedBuildings
     );
     this.mainLayers.buildings.canvas.style.opacity = '100';
@@ -539,7 +538,6 @@ class CanvasRenderer {
         this.renderBuildings(
           this.previewLayers.buildings,
           modifiedArea,
-          baseValues,
           buildingsBeingAdded
         );
         this.previewLayers.buildings.canvas.style.opacity = '100';
@@ -652,12 +650,12 @@ class CanvasRenderer {
   private renderBuildings(
     ctx: CanvasRenderingContext2D,
     bounds: Rectangle,
-    tileValues: Int16Array,
     placedBuildings: Set<Building>
   ) {
     const buildingOutlinesPath = new Path2D();
 
     for (const building of placedBuildings) {
+      if (!building.interceptsRectangle(bounds)) continue;
       const graphic = building.graphic;
       if (!graphic) continue;
 
@@ -677,6 +675,7 @@ class CanvasRenderer {
     const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
 
     for (const building of buildings) {
+      if (!building.interceptsRectangle(bounds)) continue;
       const innerLabel = building.getLabel(0);
       if (!innerLabel) continue;
 
