@@ -36,14 +36,8 @@ class CanvasRenderer {
   private devicePixelRatio: number;
 
   // Canvas elements
-  private mainCanvases: HTMLCanvasElement[] = [];
-  private previewCanvases: HTMLCanvasElement[] = [];
-  private tilesCtx: CanvasRenderingContext2D;
-  private tileNumbersCtx: CanvasRenderingContext2D;
-  private gridLinesCtx: CanvasRenderingContext2D;
-  private buildingsCtx: CanvasRenderingContext2D;
-  private previewTilesCtx: CanvasRenderingContext2D;
-  private previewTileNumbersCtx: CanvasRenderingContext2D;
+  private mainLayers: Record<string, CanvasRenderingContext2D> = {};
+  private previewLayers: Record<string, CanvasRenderingContext2D> = {};
 
   // Transform state
   private isRotated: boolean = false;
@@ -82,16 +76,14 @@ class CanvasRenderer {
     this.parentContainer.appendChild(this.labelContainer);
 
     // Create canvas elements
-    this.buildingsCtx = this.createCtx('buildings-canvas', 400);
-    this.gridLinesCtx = this.createCtx('grid-lines-canvas', 300);
-    this.previewTileNumbersCtx = this.createCtx(
-      'preview-tile-numbers-canvas',
-      202,
-      true
-    );
-    this.previewTilesCtx = this.createCtx('preview-tiles-canvas', 201, true);
-    this.tileNumbersCtx = this.createCtx('tile-numbers-canvas', 200);
-    this.tilesCtx = this.createCtx('tiles-canvas', 100);
+    this.previewLayers.buildings = this.createCtx('buildings-preview', 71);
+    this.previewLayers.tileNumbers = this.createCtx('tilenumbers-preview', 22);
+    this.previewLayers.tiles = this.createCtx('tiles-preview', 21);
+
+    this.mainLayers.buildings = this.createCtx('buildings-main', 61);
+    this.mainLayers.gridLines = this.createCtx('gridlines-main', 50);
+    this.mainLayers.tileNumbers = this.createCtx('tilenumbers-main', 12);
+    this.mainLayers.tiles = this.createCtx('tiles-main', 11);
 
     // Todo: React can probably do this better. Also todo: Debounce this
     const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
@@ -106,20 +98,19 @@ class CanvasRenderer {
 
   public destroy() {
     this.parentContainer.removeChild(this.labelContainer);
-    for (const canvas of this.mainCanvases) {
-      this.parentContainer.removeChild(canvas);
+    for (const ctx of Object.values(this.mainLayers)) {
+      this.parentContainer.removeChild(ctx.canvas);
     }
-    this.mainCanvases = [];
-    for (const canvas of this.previewCanvases) {
-      this.parentContainer.removeChild(canvas);
+    this.mainLayers = {};
+    for (const ctx of Object.values(this.previewLayers)) {
+      this.parentContainer.removeChild(ctx.canvas);
     }
-    this.previewCanvases = [];
+    this.previewLayers = {};
   }
 
   private createCtx = (
     id: string,
-    zIndex: number,
-    isPreview = false
+    zIndex: number
   ): CanvasRenderingContext2D => {
     const canvas = document.createElement('canvas');
     canvas.id = id;
@@ -127,11 +118,6 @@ class CanvasRenderer {
     canvas.style.zIndex = zIndex.toString();
 
     this.parentContainer.appendChild(canvas);
-    if (isPreview) {
-      this.previewCanvases.push(canvas);
-    } else {
-      this.mainCanvases.push(canvas);
-    }
 
     const ctx = canvas.getContext('2d', {
       alpha: true,
@@ -156,9 +142,9 @@ class CanvasRenderer {
     if (rotate) ctx.rotate(ROTATION_RADS);
   }
 
-  private hideCanvases(canvases: HTMLCanvasElement[]) {
-    for (const canvas of canvases) {
-      canvas.style.opacity = '0';
+  private hideLayers(layers: Record<string, CanvasRenderingContext2D>) {
+    for (const ctx of Object.values(layers)) {
+      ctx.canvas.style.opacity = '0';
     }
   }
 
@@ -379,7 +365,7 @@ class CanvasRenderer {
     if (this.dragStartTile && newPos) {
       this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
     }
-    this.scheduleRerender(); //Todo: Only update preview
+    this.schedulePreview();
   }
 
   public stopDragging() {
@@ -429,12 +415,11 @@ class CanvasRenderer {
    * Actual rendering methods
    */
   private fullRerender(): void {
-    console.log('fully rerendering...');
     this.pendingRerender = null;
     this.pendingPreview = null;
 
-    this.hideCanvases(this.previewCanvases);
-    this.hideCanvases(this.mainCanvases); //We'll re-enable them as needed
+    this.hideLayers(this.previewLayers);
+    this.hideLayers(this.mainLayers); //We'll re-enable them as needed
 
     const viewport = this.getViewport();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
@@ -449,40 +434,39 @@ class CanvasRenderer {
     // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
     // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
     // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
-    this.fastClearCtx(this.tilesCtx);
-    this.renderTiles(this.tilesCtx, baseValues, viewport.tilesRect);
-    this.tilesCtx.canvas.style.opacity = '100';
+    this.fastClearCtx(this.mainLayers.tiles);
+    this.renderTiles(this.mainLayers.tiles, baseValues, viewport.tilesRect);
+    this.mainLayers.tiles.canvas.style.opacity = '100';
 
     if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-      this.fastClearCtx(this.tileNumbersCtx, false); //We intentionally do not rotate!;
+      this.fastClearCtx(this.mainLayers.tileNumbers, false); //We intentionally do not rotate!;
       this.renderTileNumbers(
-        this.tileNumbersCtx,
+        this.mainLayers.tileNumbers,
         baseValues,
         viewport.tilesRect
       );
-      this.tileNumbersCtx.canvas.style.opacity = '100';
+      this.mainLayers.tileNumbers.canvas.style.opacity = '100';
     }
 
-    this.fastClearCtx(this.gridLinesCtx);
-    this.renderGridlines(this.gridLinesCtx, viewport.tilesRect);
-    this.gridLinesCtx.canvas.style.opacity = '100';
+    this.fastClearCtx(this.mainLayers.gridLines);
+    this.renderGridlines(this.mainLayers.gridLines, viewport.tilesRect);
+    this.mainLayers.gridLines.canvas.style.opacity = '100';
 
-    this.fastClearCtx(this.buildingsCtx);
+    this.fastClearCtx(this.mainLayers.buildings);
     this.renderBuildings(
-      this.buildingsCtx,
+      this.mainLayers.buildings,
       viewport.tilesRect,
       baseValues,
       placedBuildings
     );
-    this.buildingsCtx.canvas.style.opacity = '100';
+    this.mainLayers.buildings.canvas.style.opacity = '100';
 
     this.renderBuildingLabels(viewport.tilesRect, baseValues);
   }
 
   private preview() {
-    console.log('previewing......');
     this.pendingPreview = null;
-    this.hideCanvases(this.previewCanvases);
+    this.hideLayers(this.previewLayers);
 
     if (this.pendingRerender) return; //Let's not preview anything if we're going to full update anyways.
     const viewport = this.getViewport();
@@ -536,17 +520,29 @@ class CanvasRenderer {
     }
 
     if (modifiedArea) {
-      this.fastClearCtx(this.previewTilesCtx);
-      this.renderTiles(this.previewTilesCtx, modifiedValues, modifiedArea);
-      this.previewTilesCtx.canvas.style.opacity = '100';
+      this.fastClearCtx(this.previewLayers.tiles);
+      this.renderTiles(this.previewLayers.tiles, modifiedValues, modifiedArea);
+      this.previewLayers.tiles.canvas.style.opacity = '100';
+
       if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-        this.fastClearCtx(this.previewTileNumbersCtx, false); //We intentionally do not rotate!;
+        this.fastClearCtx(this.previewLayers.tileNumbers, false); //We intentionally do not rotate!;
         this.renderTileNumbers(
-          this.previewTileNumbersCtx,
+          this.previewLayers.tileNumbers,
           modifiedValues,
           modifiedArea
         );
-        this.previewTileNumbersCtx.canvas.style.opacity = '100';
+        this.previewLayers.tileNumbers.canvas.style.opacity = '100';
+      }
+
+      if (buildingsBeingAdded.size > 0) {
+        this.fastClearCtx(this.previewLayers.buildings);
+        this.renderBuildings(
+          this.previewLayers.buildings,
+          modifiedArea,
+          baseValues,
+          buildingsBeingAdded
+        );
+        this.previewLayers.buildings.canvas.style.opacity = '100';
       }
     }
   }
