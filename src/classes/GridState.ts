@@ -1,8 +1,7 @@
 import { Tile } from '../utils/geometry';
 import Building from './Building';
 import { GRID_SIZE, COORD_TO_INT16 } from '../utils/constants';
-import Blueprint from '../types/Blueprint';
-import House from './House';
+import Blueprint, { createBuilding } from '../types/Blueprint';
 
 class GridState {
   private grid: Int16Array;
@@ -30,16 +29,7 @@ class GridState {
   }
 
   public placeBuilding(position: Tile, blueprint: Blueprint): Building {
-    let newBuilding: Building;
-    if (
-      'desirabilityToEvolve' in blueprint ||
-      'desirabilityToDevolve' in blueprint ||
-      'desirabilityToBeStable' in blueprint
-    ) {
-      newBuilding = new House(position, blueprint);
-    } else {
-      newBuilding = new Building(position, blueprint);
-    }
+    const newBuilding = createBuilding(position, blueprint);
 
     for (const dbox of newBuilding.desireBoxes) {
       dbox.apply(this.grid, 1);

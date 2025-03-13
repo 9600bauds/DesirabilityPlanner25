@@ -1,4 +1,6 @@
+import { fillPath } from '../interfaces/BuildingGraphic';
 import RenderContext from '../interfaces/RenderContext';
+import { createBuilding } from '../types/Blueprint';
 import colors, { getDesirabilityRGB } from '../utils/colors';
 import {
   GRID_CENTER_PX,
@@ -12,6 +14,7 @@ import {
   GRID_MAX_Y,
   ROTATE_AROUND_ORIGIN,
   COUNTERROTATE_AROUND_ORIGIN,
+  CELL_PX,
 } from '../utils/constants';
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, GridPoint } from '../utils/geometry';
@@ -98,6 +101,7 @@ class CanvasRenderer {
     // Create canvas elements
     this.labelContainer = createTextDiv('label-container', 99);
 
+    this.previewLayers.overlays = createCtx('overlays-preview', 73);
     this.previewLayers.outlines = createCtx('outlines-preview', 72);
     this.mainLayers.outlines = createCtx('outlines-main', 71);
     this.previewLayers.buildings = createCtx('buildings-preview', 62);
@@ -493,7 +497,9 @@ class CanvasRenderer {
 
     const selectedBlueprint = this.renderContext.getSelectedBlueprint();
     const placedBuildings = this.renderContext.getBuildings();
-    const buildingsToRerenderLabelsFor = new Set(placedBuildings);
+    const buildingsToRerenderLabelsFor = new Set<Building>(placedBuildings);
+    const buildingsToRerender = new Set<Building>();
+    const overlays: fillPath[] = [];
 
     // These are the precomputed desirability values from the "true" gridstate.
     const baseValues = this.renderContext.getBaseValues();
@@ -507,7 +513,7 @@ class CanvasRenderer {
     if (this.lastMouseoverTile && selectedBlueprint) {
       // Yes, we re-create this building each time too.
       buildingsBeingAdded.add(
-        new Building(this.lastMouseoverTile, selectedBlueprint)
+        createBuilding(this.lastMouseoverTile, selectedBlueprint)
       );
     }
     const buildingsBeingRemoved: Set<Building> = new Set();
@@ -519,10 +525,39 @@ class CanvasRenderer {
       }
     }
 
-    for (const building of buildingsBeingAdded) {
-      for (const dbox of building.desireBoxes) {
+    for (const virtualBuilding of buildingsBeingAdded) {
+      for (const dbox of virtualBuilding.desireBoxes) {
         dbox.apply(modifiedValues);
         modifiedAreas.add(dbox.affectedBounds);
+      }
+      const blockedTiles: Tile[] = [];
+      const openTiles: Tile[] = [];
+      for (const tile of virtualBuilding.tilesOccupied.toArray()) {
+        if (this.renderContext.isTileOccupied(tile)) {
+          blockedTiles.push(tile);
+        } else {
+          openTiles.push(tile);
+        }
+      }
+      if (blockedTiles.length === 0) {
+        buildingsToRerender.add(virtualBuilding);
+        buildingsToRerenderLabelsFor.add(virtualBuilding);
+        if (virtualBuilding.graphic)
+          overlays.push({
+            path: virtualBuilding.graphic.outline,
+            fillColor: colors.greenMidTransparency,
+          });
+      } else {
+        for (const tile of blockedTiles) {
+          const path = new Path2D();
+          path.rect(COORD_TO_PX(tile.x), COORD_TO_PX(tile.y), CELL_PX, CELL_PX);
+          overlays.push({ path, fillColor: colors.redMidTransparency });
+        }
+        for (const tile of openTiles) {
+          const path = new Path2D();
+          path.rect(COORD_TO_PX(tile.x), COORD_TO_PX(tile.y), CELL_PX, CELL_PX);
+          overlays.push({ path, fillColor: colors.greenMidTransparency });
+        }
       }
     }
     for (const building of buildingsBeingRemoved) {
@@ -551,25 +586,28 @@ class CanvasRenderer {
         );
         this.previewLayers.tileNumbers.canvas.style.opacity = '100';
       }
-
-      if (buildingsBeingAdded.size > 0) {
-        this.fastClearCtx(this.previewLayers.buildings);
-        this.renderBuildings(
-          this.previewLayers.buildings,
-          modifiedArea,
-          buildingsBeingAdded
-        );
-        this.previewLayers.buildings.canvas.style.opacity = '100';
-
-        this.fastClearCtx(this.previewLayers.outlines);
-        this.renderBuildingOutlines(
-          this.previewLayers.outlines,
-          viewport.tilesRect,
-          buildingsBeingAdded
-        );
-        this.previewLayers.outlines.canvas.style.opacity = '100';
-      }
     }
+    if (buildingsToRerender.size > 0) {
+      this.fastClearCtx(this.previewLayers.buildings);
+      this.renderBuildings(
+        this.previewLayers.buildings,
+        viewport.tilesRect,
+        buildingsToRerender
+      );
+      this.previewLayers.buildings.canvas.style.opacity = '100';
+
+      this.fastClearCtx(this.previewLayers.outlines);
+      this.renderBuildingOutlines(
+        this.previewLayers.outlines,
+        viewport.tilesRect,
+        buildingsToRerender
+      );
+      this.previewLayers.outlines.canvas.style.opacity = '100';
+    }
+    this.fastClearCtx(this.previewLayers.overlays);
+    this.renderOverlays(this.previewLayers.overlays, overlays);
+    this.previewLayers.overlays.canvas.style.opacity = '100';
+
     this.renderBuildingLabels(
       this.labelContainer,
       viewport.tilesRect,
@@ -710,6 +748,13 @@ class CanvasRenderer {
         ctx.fillStyle = pathFill.fillColor;
         ctx.fill(pathFill.path);
       }
+    }
+  }
+
+  private renderOverlays(ctx: CanvasRenderingContext2D, overlays: fillPath[]) {
+    for (const overlay of overlays) {
+      ctx.fillStyle = overlay.fillColor;
+      ctx.fill(overlay.path);
     }
   }
 
