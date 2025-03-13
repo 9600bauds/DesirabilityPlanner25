@@ -28,26 +28,20 @@ class House extends Building {
 
     if (this.desirabilityToDevolve && max <= this.desirabilityToDevolve) {
       return (
-        this.baseLabel! + `<br>Devolving: ${max}/${this.desirabilityToDevolve}`
+        this.baseLabel! +
+        `<br>${max}/${this.desirabilityToDevolve} to<br>devolve`
       );
     } else if (
       this.desirabilityToBeStable &&
       max < this.desirabilityToBeStable
     ) {
       return (
-        this.baseLabel! + `<br>Unstable: ${max}/${this.desirabilityToBeStable}`
+        this.baseLabel! +
+        `<br>${max}/${this.desirabilityToBeStable} to<br>be stable`
       );
-    } else if (
-      this.desirabilityToBeStable &&
-      this.desirabilityToEvolve &&
-      max < this.desirabilityToEvolve
-    ) {
+    } else if (this.desirabilityToEvolve) {
       return (
-        this.baseLabel! + `<br>Stable: ${max}/${this.desirabilityToEvolve}`
-      );
-    } else if (this.desirabilityToEvolve && max >= this.desirabilityToEvolve) {
-      return (
-        this.baseLabel! + `<br>Can evolve: ${max}/${this.desirabilityToEvolve}`
+        this.baseLabel! + `<br>${max}/${this.desirabilityToEvolve} to<br>evolve`
       );
     }
     return this.baseLabel;
