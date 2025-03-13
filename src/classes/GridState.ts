@@ -31,7 +31,11 @@ class GridState {
 
   public placeBuilding(position: Tile, blueprint: Blueprint): Building {
     let newBuilding: Building;
-    if ('desirabilityToEvolve' in blueprint) {
+    if (
+      'desirabilityToEvolve' in blueprint ||
+      'desirabilityToDevolve' in blueprint ||
+      'desirabilityToBeStable' in blueprint
+    ) {
       newBuilding = new House(position, blueprint);
     } else {
       newBuilding = new Building(position, blueprint);

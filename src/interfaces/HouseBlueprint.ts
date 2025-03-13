@@ -1,6 +1,7 @@
 import { BuildingBlueprint } from './BuildingBlueprint';
 
 export interface HouseBlueprint extends BuildingBlueprint {
-  desirabilityToEvolve: number;
-  desirabilityToDevolve: number;
+  desirabilityToDevolve?: number;
+  desirabilityToBeStable: number;
+  desirabilityToEvolve?: number;
 }

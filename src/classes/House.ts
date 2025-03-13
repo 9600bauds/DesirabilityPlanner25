@@ -1,20 +1,18 @@
-import Blueprint from '../types/Blueprint';
+import { HouseBlueprint } from '../interfaces/HouseBlueprint';
 import { COORD_TO_INT16 } from '../utils/constants';
 import { Tile } from '../utils/geometry';
 import Building from './Building';
 
 class House extends Building {
-  desirabilityToEvolve: number;
-  desirabilityToDevolve: number;
+  desirabilityToEvolve?: number;
+  desirabilityToBeStable?: number;
+  desirabilityToDevolve?: number;
 
-  constructor(origin: Tile, blueprint: Blueprint) {
+  constructor(origin: Tile, blueprint: HouseBlueprint) {
     super(origin, blueprint);
-    if ('desirabilityToEvolve' in blueprint) {
-      this.desirabilityToEvolve = blueprint.desirabilityToEvolve;
-      this.desirabilityToDevolve = blueprint.desirabilityToDevolve;
-    } else {
-      throw new Error('House blueprint got an incomplete interface object!');
-    }
+    this.desirabilityToEvolve = blueprint.desirabilityToEvolve;
+    this.desirabilityToDevolve = blueprint.desirabilityToDevolve;
+    this.desirabilityToBeStable = blueprint.desirabilityToBeStable;
   }
 
   public maxDesirabilityFromGrid(tileValues: Int16Array): number {
@@ -26,11 +24,33 @@ class House extends Building {
   }
 
   public getLabel(tileValues: Int16Array) {
-    const maxDesirability = this.maxDesirabilityFromGrid(tileValues);
-    return (
-      this.baseLabel! +
-      `<br>Devolving: ${maxDesirability}/${this.desirabilityToDevolve}`
-    );
+    const max = this.maxDesirabilityFromGrid(tileValues);
+
+    if (this.desirabilityToDevolve && max <= this.desirabilityToDevolve) {
+      return (
+        this.baseLabel! + `<br>Devolving: ${max}/${this.desirabilityToDevolve}`
+      );
+    } else if (
+      this.desirabilityToBeStable &&
+      max < this.desirabilityToBeStable
+    ) {
+      return (
+        this.baseLabel! + `<br>Unstable: ${max}/${this.desirabilityToBeStable}`
+      );
+    } else if (
+      this.desirabilityToBeStable &&
+      this.desirabilityToEvolve &&
+      max < this.desirabilityToEvolve
+    ) {
+      return (
+        this.baseLabel! + `<br>Stable: ${max}/${this.desirabilityToEvolve}`
+      );
+    } else if (this.desirabilityToEvolve && max >= this.desirabilityToEvolve) {
+      return (
+        this.baseLabel! + `<br>Can evolve: ${max}/${this.desirabilityToEvolve}`
+      );
+    }
+    return this.baseLabel;
   }
 }
 
