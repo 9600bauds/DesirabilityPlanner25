@@ -1,4 +1,5 @@
 import Blueprint from '../types/Blueprint';
+import { COORD_TO_INT16 } from '../utils/constants';
 import { Tile } from '../utils/geometry';
 import Building from './Building';
 
@@ -16,8 +17,20 @@ class House extends Building {
     }
   }
 
-  public getLabel(maxDesirability?: number) {
-    return this.baseLabel! + '<br>Devolving: 77/150'; //Todo
+  public maxDesirabilityFromGrid(tileValues: Int16Array): number {
+    let max = Number.MIN_SAFE_INTEGER;
+    for (const tile of this.tilesOccupied.toArray()) {
+      max = Math.max(max, tileValues[COORD_TO_INT16(tile.x, tile.y)]);
+    }
+    return max;
+  }
+
+  public getLabel(tileValues: Int16Array) {
+    const maxDesirability = this.maxDesirabilityFromGrid(tileValues);
+    return (
+      this.baseLabel! +
+      `<br>Devolving: ${maxDesirability}/${this.desirabilityToDevolve}`
+    );
   }
 }
 

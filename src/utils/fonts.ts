@@ -18,7 +18,7 @@ export function smallestFontSizeInBounds(
     ''
   );
 
-  const avgCharWidth = 0.6; //Rough estimation
+  const avgCharWidth = 0.62; //Rough estimation
   const lineHeight = 1.2; //Rough estimation
 
   // Calculate what font size would make the longest segment fit

@@ -28,16 +28,14 @@ class CanvasRenderer {
 
   // DOM elements
   private parentContainer: HTMLDivElement;
-  private labelContainer: HTMLDivElement;
+  private labelContainer: HTMLElement;
+  private mainLayers: Record<string, CanvasRenderingContext2D> = {};
+  private previewLayers: Record<string, CanvasRenderingContext2D> = {};
 
   // Size variables
   private clientWidth: number;
   private clientHeight: number;
   private devicePixelRatio: number;
-
-  // Canvas elements
-  private mainLayers: Record<string, CanvasRenderingContext2D> = {};
-  private previewLayers: Record<string, CanvasRenderingContext2D> = {};
 
   // Transform state
   private isRotated: boolean = false;
@@ -61,6 +59,34 @@ class CanvasRenderer {
   }
 
   constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
+    const createCtx = (
+      id: string,
+      zIndex: number
+    ): CanvasRenderingContext2D => {
+      const canvas = document.createElement('canvas');
+      canvas.id = id;
+      canvas.className = 'canvasLayer';
+      canvas.style.zIndex = zIndex.toString();
+
+      this.parentContainer.appendChild(canvas);
+
+      const ctx = canvas.getContext('2d', {
+        alpha: true,
+        desynchronized: true,
+      }) as CanvasRenderingContext2D;
+      return ctx;
+    };
+
+    const createTextDiv = (id: string, zIndex: number): HTMLElement => {
+      const div = document.createElement('div');
+      div.id = id;
+      div.className = 'textLayer';
+      div.style.zIndex = zIndex.toString();
+      this.parentContainer.appendChild(div);
+
+      return div;
+    };
+
     this.parentContainer = parentContainer;
     this.renderContext = renderContext;
     this.devicePixelRatio = window.devicePixelRatio || 1;
@@ -69,21 +95,20 @@ class CanvasRenderer {
     this.clientWidth = parentContainer.clientWidth;
     this.clientHeight = parentContainer.clientHeight;
 
-    // Create the building label container
-    this.labelContainer = document.createElement('div');
-    this.labelContainer.id = 'building-labels-container';
-    this.labelContainer.style.zIndex = '500';
-    this.parentContainer.appendChild(this.labelContainer);
-
     // Create canvas elements
-    this.previewLayers.buildings = this.createCtx('buildings-preview', 71);
-    this.previewLayers.tileNumbers = this.createCtx('tilenumbers-preview', 22);
-    this.previewLayers.tiles = this.createCtx('tiles-preview', 21);
+    this.labelContainer = createTextDiv('label-container', 99);
 
-    this.mainLayers.buildings = this.createCtx('buildings-main', 61);
-    this.mainLayers.gridLines = this.createCtx('gridlines-main', 50);
-    this.mainLayers.tileNumbers = this.createCtx('tilenumbers-main', 12);
-    this.mainLayers.tiles = this.createCtx('tiles-main', 11);
+    this.previewLayers.outlines = createCtx('outlines-preview', 72);
+    this.mainLayers.outlines = createCtx('outlines-main', 71);
+    this.previewLayers.buildings = createCtx('buildings-preview', 62);
+    this.mainLayers.buildings = createCtx('buildings-main', 61);
+
+    this.mainLayers.gridLines = createCtx('gridlines-main', 50);
+
+    this.previewLayers.tileNumbers = createCtx('tilenumbers-preview', 22);
+    this.previewLayers.tiles = createCtx('tiles-preview', 21);
+    this.mainLayers.tileNumbers = createCtx('tilenumbers-main', 12);
+    this.mainLayers.tiles = createCtx('tiles-main', 11);
 
     // Todo: React can probably do this better. Also todo: Debounce this
     const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
@@ -107,24 +132,6 @@ class CanvasRenderer {
     }
     this.previewLayers = {};
   }
-
-  private createCtx = (
-    id: string,
-    zIndex: number
-  ): CanvasRenderingContext2D => {
-    const canvas = document.createElement('canvas');
-    canvas.id = id;
-    canvas.className = 'canvasLayer';
-    canvas.style.zIndex = zIndex.toString();
-
-    this.parentContainer.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d', {
-      alpha: true,
-      desynchronized: true,
-    }) as CanvasRenderingContext2D;
-    return ctx;
-  };
 
   private fastClearCtx(ctx: CanvasRenderingContext2D, rotate = this.isRotated) {
     //Setting the width every time is apparently the fastest way to clear the canvas? Even if the size didn't change?
@@ -450,6 +457,14 @@ class CanvasRenderer {
     this.renderGridlines(this.mainLayers.gridLines, viewport.tilesRect);
     this.mainLayers.gridLines.canvas.style.opacity = '100';
 
+    this.fastClearCtx(this.mainLayers.outlines);
+    this.renderBuildingOutlines(
+      this.mainLayers.outlines,
+      viewport.tilesRect,
+      placedBuildings
+    );
+    this.mainLayers.outlines.canvas.style.opacity = '100';
+
     this.fastClearCtx(this.mainLayers.buildings);
     this.renderBuildings(
       this.mainLayers.buildings,
@@ -458,7 +473,12 @@ class CanvasRenderer {
     );
     this.mainLayers.buildings.canvas.style.opacity = '100';
 
-    this.renderBuildingLabels(viewport.tilesRect, baseValues);
+    this.renderBuildingLabels(
+      this.labelContainer,
+      viewport.tilesRect,
+      placedBuildings,
+      baseValues
+    );
   }
 
   private preview() {
@@ -473,6 +493,7 @@ class CanvasRenderer {
 
     const selectedBlueprint = this.renderContext.getSelectedBlueprint();
     const placedBuildings = this.renderContext.getBuildings();
+    const buildingsToRerenderLabelsFor = new Set(placedBuildings);
 
     // These are the precomputed desirability values from the "true" gridstate.
     const baseValues = this.renderContext.getBaseValues();
@@ -539,8 +560,22 @@ class CanvasRenderer {
           buildingsBeingAdded
         );
         this.previewLayers.buildings.canvas.style.opacity = '100';
+
+        this.fastClearCtx(this.previewLayers.outlines);
+        this.renderBuildingOutlines(
+          this.previewLayers.outlines,
+          viewport.tilesRect,
+          buildingsBeingAdded
+        );
+        this.previewLayers.outlines.canvas.style.opacity = '100';
       }
     }
+    this.renderBuildingLabels(
+      this.labelContainer,
+      viewport.tilesRect,
+      buildingsToRerenderLabelsFor,
+      modifiedValues
+    );
   }
 
   private renderTiles(
@@ -645,36 +680,51 @@ class CanvasRenderer {
     }
   }
 
-  private renderBuildings(
+  private renderBuildingOutlines(
     ctx: CanvasRenderingContext2D,
     bounds: Rectangle,
     placedBuildings: Set<Building>
   ) {
     const buildingOutlinesPath = new Path2D();
-
     for (const building of placedBuildings) {
       if (!building.interceptsRectangle(bounds)) continue;
-      const graphic = building.graphic;
-      if (!graphic) continue;
+      if (!building.graphic) continue;
 
-      for (const pathFill of graphic.fillPaths) {
-        ctx.fillStyle = pathFill.fillColor;
-        ctx.fill(pathFill.path);
-      }
-      buildingOutlinesPath.addPath(graphic.outline);
+      buildingOutlinesPath.addPath(building.graphic.outline);
     }
     ctx.strokeStyle = colors.pureBlack;
     ctx.lineWidth = 3;
     ctx.stroke(buildingOutlinesPath);
   }
 
-  private renderBuildingLabels(bounds: Rectangle, baseValues: Int16Array) {
-    const buildings = this.renderContext.getBuildings();
+  private renderBuildings(
+    ctx: CanvasRenderingContext2D,
+    bounds: Rectangle,
+    placedBuildings: Set<Building>
+  ) {
+    for (const building of placedBuildings) {
+      if (!building.interceptsRectangle(bounds)) continue;
+      if (!building.graphic) continue;
+
+      for (const pathFill of building.graphic.fillPaths) {
+        ctx.fillStyle = pathFill.fillColor;
+        ctx.fill(pathFill.path);
+      }
+    }
+  }
+
+  private renderBuildingLabels(
+    div: HTMLElement,
+    bounds: Rectangle,
+    buildings: Set<Building>,
+    tileValues: Int16Array
+  ) {
     const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
 
     for (const building of buildings) {
       if (!building.interceptsRectangle(bounds)) continue;
-      const innerLabel = building.getLabel(0);
+
+      const innerLabel = building.getLabel(tileValues);
       if (!innerLabel) continue;
 
       let labelHeight = COORD_TO_PX(building.height) * this.zoomLevel;
@@ -727,7 +777,7 @@ class CanvasRenderer {
         </div>`;
       labelsHTML.push(labelHTML);
     }
-    this.labelContainer.innerHTML = labelsHTML.join('');
+    div.innerHTML = labelsHTML.join('');
   }
 }
 

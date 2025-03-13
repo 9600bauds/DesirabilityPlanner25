@@ -143,7 +143,7 @@ class Building {
     return colors.backgroundWhite;
   }
 
-  public getLabel(maxDesirability?: number) {
+  public getLabel(tileValues: Int16Array) {
     return this.baseLabel;
   }
 
