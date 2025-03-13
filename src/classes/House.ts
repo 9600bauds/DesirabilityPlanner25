@@ -29,7 +29,7 @@ class House extends Building {
     if (this.desirabilityToDevolve && max <= this.desirabilityToDevolve) {
       return (
         this.baseLabel! +
-        `<br>${max}/${this.desirabilityToDevolve} to<br>devolve`
+        `<br>${max}/${this.desirabilityToDevolve + 1} to<br>not devolve`
       );
     } else if (
       this.desirabilityToBeStable &&

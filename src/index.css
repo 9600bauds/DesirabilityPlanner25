@@ -28,6 +28,7 @@
 .building-label {
   position: absolute;
   pointer-events: none;
+  user-select: none;
   display: flex;
   align-items: center ;
   justify-content: center;
