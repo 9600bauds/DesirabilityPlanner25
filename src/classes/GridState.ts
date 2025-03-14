@@ -28,15 +28,13 @@ class GridState {
     return this.placedBuildings;
   }
 
-  public placeBuilding(position: Tile, blueprint: Blueprint): Building {
-    const newBuilding = createBuilding(position, blueprint);
-
-    for (const dbox of newBuilding.desireBoxes) {
+  public addBuilding(building: Building): Building {
+    for (const dbox of building.desireBoxes) {
       dbox.apply(this.grid, 1);
     }
 
-    this.placedBuildings.add(newBuilding);
-    return newBuilding;
+    this.placedBuildings.add(building);
+    return building;
   }
 
   public removeBuilding(building: Building): void {
@@ -44,7 +42,6 @@ class GridState {
       dbox.apply(this.grid, -1);
     }
 
-    // Remove the building from the set
     this.placedBuildings.delete(building);
   }
 }

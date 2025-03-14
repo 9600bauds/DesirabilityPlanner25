@@ -144,7 +144,7 @@ class Building {
     return colors.backgroundWhite;
   }
 
-  public getLabel(tileValues: Int16Array) {
+  public getLabel(_tileValues: Int16Array) {
     return this.baseLabel;
   }
 

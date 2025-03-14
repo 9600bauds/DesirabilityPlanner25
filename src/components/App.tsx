@@ -125,7 +125,7 @@ const App: React.FC = () => {
         if (tile) {
           const blueprint = getSelectedBlueprint();
           if (blueprint) {
-            if (gridStateManager.tryPlaceBuilding(tile, blueprint)) {
+            if (gridStateManager.tryPlaceBlueprint(tile, blueprint)) {
               renderer.scheduleRerender();
             }
           }

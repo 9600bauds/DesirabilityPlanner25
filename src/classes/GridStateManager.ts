@@ -1,4 +1,4 @@
-import Blueprint from '../types/Blueprint';
+import Blueprint, { createBuilding } from '../types/Blueprint';
 import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 import Building from './Building';
@@ -32,22 +32,22 @@ class GridStateManager {
     return undefined;
   };
 
-  public canPlaceBuilding = (position: Tile, blueprint: Blueprint) => {
-    // TODO
-    /*const tileArray = blueprint.tilesOccupied.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
+  public verifyPlacement = (building: Building) => {
+    const tileArray = building.tilesOccupied.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
     for (const tile of tileArray) {
-      if (this.isTileOccupied(tile.add(position))) {
+      if (this.isTileOccupied(tile)) {
         return false;
       }
-    }*/
+    }
     return true;
   };
 
-  public tryPlaceBuilding(position: Tile, blueprint: Blueprint) {
-    if (!this.canPlaceBuilding(position, blueprint)) {
+  public tryPlaceBlueprint(position: Tile, blueprint: Blueprint) {
+    const newBuilding = createBuilding(position, blueprint);
+    if (!this.verifyPlacement(newBuilding)) {
       return false;
     }
-    this.activeGridState.placeBuilding(position, blueprint);
+    this.activeGridState.addBuilding(newBuilding);
     return true;
   }
 
