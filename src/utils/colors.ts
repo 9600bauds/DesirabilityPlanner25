@@ -62,6 +62,7 @@ export function desirabilityColor(value: number): string {
 
 const backgroundWhite = 'rgba(255,255,255,1)';
 const outlineWhite = 'rgba(255,255,255,1)';
+const redVeryLowTransparency = 'rgba(255, 0, 0, 0.1)';
 const redLowTransparency = 'rgba(255, 0, 0, 0.2)';
 const redMidTransparency = 'rgba(255, 0, 0, 0.4)';
 const redHighTransparency = 'rgba(255, 0, 0, 1)';
@@ -73,6 +74,7 @@ const pureBlack = 'rgba(0,0,0,1)';
 export default {
   backgroundWhite,
   outlineWhite,
+  redVeryLowTransparency,
   redLowTransparency,
   redMidTransparency,
   redHighTransparency,

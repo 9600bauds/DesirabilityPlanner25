@@ -620,6 +620,14 @@ class CanvasRenderer {
     }
 
     this.renderOverlays(this.previewLayers.overlays, overlaysToRender);
+    if (this.isDragging && this.dragBox) {
+      this.renderDragBox(
+        this.previewLayers.overlays,
+        this.dragBox,
+        colors.redHighTransparency,
+        colors.redVeryLowTransparency
+      );
+    }
     this.showLayer(this.previewLayers.overlays);
 
     this.renderBuildingLabels(
@@ -782,6 +790,27 @@ class CanvasRenderer {
       ctx.fillStyle = overlay.fillColor;
       ctx.fill(overlay.path);
     }
+  }
+
+  private renderDragBox(
+    ctx: CanvasRenderingContext2D,
+    dragBox: Rectangle,
+    strokeColor: string,
+    fillColor: string
+  ) {
+    // We do not clear the ctx here! Or check for bounds!
+    const path = new Path2D();
+    path.rect(
+      COORD_TO_PX(dragBox.origin.x),
+      COORD_TO_PX(dragBox.origin.y),
+      COORD_TO_PX(dragBox.width),
+      COORD_TO_PX(dragBox.height)
+    );
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 2;
+    ctx.stroke(path);
+    ctx.fillStyle = fillColor;
+    ctx.fill(path);
   }
 
   private renderBuildingLabels(
