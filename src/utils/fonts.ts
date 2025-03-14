@@ -10,7 +10,7 @@ export function smallestFontSizeInBounds(
   // Split text based on the chosen delimiters, remove invisible characters so our logic doesn't think a zero-width space is actually a seven-width space, and filter out empty segments
   const segments = text
     .split(delimiterPattern)
-    .map((segment) => removeInvisibleCharacters(segment))
+    .map((segment) => removeInvisibleCharacters(segment).replace('&nbsp;', ' '))
     .filter((segment) => segment.length > 0);
 
   const longestSegment = segments.reduce(

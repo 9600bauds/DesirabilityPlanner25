@@ -758,7 +758,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
 
   */
   'Crude Hut_2x2': {
-    label: 'Crude Hut',
+    label: 'Crude<br>Hut',
     height: 2,
     width: 2,
     desireBox: {
@@ -771,7 +771,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Crude Hut_1x1': {
-    label: 'Crude Hut',
+    label: 'Crude<br>Hut',
     height: 1,
     width: 1,
     desireBox: {
@@ -784,7 +784,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Sturdy Hut_2x2': {
-    label: 'Sturdy Hut',
+    label: 'Sturdy<br>Hut',
     height: 2,
     width: 2,
     desireBox: {
@@ -799,7 +799,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Sturdy Hut_1x1': {
-    label: 'Sturdy Hut',
+    label: 'Sturdy<br>Hut',
     height: 1,
     width: 1,
     desireBox: {
@@ -814,7 +814,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Meager Shanty_2x2': {
-    label: 'Meager Shanty',
+    label: 'Meager<br>Shanty',
     height: 2,
     width: 2,
     desireBox: {
@@ -829,7 +829,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Meager Shanty_1x1': {
-    label: 'Meager Shanty',
+    label: 'Meager<br>Shanty',
     height: 1,
     width: 1,
     desireBox: {
@@ -844,7 +844,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Common Shanty_2x2': {
-    label: 'Common Shanty',
+    label: 'Common<br>Shanty',
     height: 2,
     width: 2,
     desireBox: {
@@ -859,7 +859,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Common Shanty_1x1': {
-    label: 'Common Shanty',
+    label: 'Common<br>Shanty',
     height: 1,
     width: 1,
     desireBox: {
@@ -874,7 +874,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Rough Cottage_2x2': {
-    label: 'Rough Cottage',
+    label: 'Rough<br>Cottage',
     height: 2,
     width: 2,
     desireBox: {
@@ -889,7 +889,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Rough Cottage_1x1': {
-    label: 'Rough Cottage',
+    label: 'Rough<br>Cottage',
     height: 1,
     width: 1,
     desireBox: {
@@ -904,7 +904,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Ordinary Cottage_2x2': {
-    label: 'Ordinary Cottage',
+    label: 'Ordinary<br>Cottage',
     height: 2,
     width: 2,
     desireBox: {
@@ -919,7 +919,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Ordinary Cottage_1x1': {
-    label: 'Ordinary Cottage',
+    label: 'Ordinary<br>Cottage',
     height: 1,
     width: 1,
     desireBox: {
@@ -934,7 +934,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Modest Homestead_2x2': {
-    label: 'Modest Homestead',
+    label: 'Modest<br>Homestead',
     height: 2,
     width: 2,
     desireBox: {
@@ -949,7 +949,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Modest Homestead_1x1': {
-    label: 'Modest Homestead',
+    label: 'Modest<br>Homestead',
     height: 1,
     width: 1,
     desireBox: {
@@ -964,7 +964,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Spacious Homestead_2x2': {
-    label: 'Spacious Homestead',
+    label: 'Spacious<br>Homestead',
     height: 2,
     width: 2,
     desireBox: {
@@ -979,7 +979,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Spacious Homestead_1x1': {
-    label: 'Spacious Homestead',
+    label: 'Spacious<br>Homestead',
     height: 1,
     width: 1,
     desireBox: {
@@ -994,7 +994,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Modest Apartment_2x2': {
-    label: 'Modest Apartment',
+    label: 'Modest<br>Apartment',
     height: 2,
     width: 2,
     desirabilityToBeStable: 21,
@@ -1003,7 +1003,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Modest Apartment_1x1': {
-    label: 'Modest Apartment',
+    label: 'Modest<br>Apartment',
     height: 1,
     width: 1,
     desirabilityToBeStable: 21,
@@ -1012,7 +1012,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Spacious Apartment_2x2': {
-    label: 'Spacious Apartment',
+    label: 'Spacious<br>Apartment',
     height: 2,
     width: 2,
     desirabilityToBeStable: 26,
@@ -1021,7 +1021,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Spacious Apartment_1x1': {
-    label: 'Spacious Apartment',
+    label: 'Spacious<br>Apartment',
     height: 1,
     width: 1,
     desirabilityToBeStable: 26,
@@ -1030,7 +1030,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Common Residence': {
-    label: 'Common Residence',
+    label: 'Common<br>Residence',
     height: 2,
     width: 2,
     desirabilityToBeStable: 33,
@@ -1039,7 +1039,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Spacious Residence': {
-    label: 'Spacious Residence',
+    label: 'Spacious<br>Residence',
     height: 2,
     width: 2,
     desirabilityToBeStable: 41,
@@ -1048,7 +1048,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Elegant Residence': {
-    label: 'Elegant Residence',
+    label: 'Elegant<br>Residence',
     height: 2,
     width: 2,
     desireBox: {
@@ -1063,7 +1063,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Fancy Residence': {
-    label: 'Fancy Residence',
+    label: 'Fancy<br>Residence',
     height: 2,
     width: 2,
     desireBox: {
@@ -1078,7 +1078,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Common Manor': {
-    label: 'Common Manor',
+    label: 'Common<br>Manor',
     height: 3,
     width: 3,
     desireBox: {
@@ -1093,7 +1093,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Spacious Manor': {
-    label: 'Spacious Manor',
+    label: 'Spacious<br>Manor',
     height: 3,
     width: 3,
     desireBox: {
@@ -1108,7 +1108,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Elegant Manor': {
-    label: 'Elegant Manor',
+    label: 'Elegant<br>Manor',
     height: 3,
     width: 3,
     desireBox: {
@@ -1123,7 +1123,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Stately Manor': {
-    label: 'Stately Manor',
+    label: 'Stately<br>Manor',
     height: 3,
     width: 3,
     desireBox: {
@@ -1138,7 +1138,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Modest Estate': {
-    label: 'Modest Estate',
+    label: 'Modest<br>Estate',
     height: 4,
     width: 4,
     desireBox: {
@@ -1153,7 +1153,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HOUSE',
   },
   'Palatial Estate': {
-    label: 'Palatial Estate',
+    label: 'Palatial<br>Estate',
     height: 4,
     width: 4,
     desireBox: {

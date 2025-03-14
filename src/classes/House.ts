@@ -29,7 +29,7 @@ class House extends Building {
     if (this.desirabilityToDevolve && max <= this.desirabilityToDevolve) {
       return (
         this.baseLabel! +
-        `<br>${max}/${this.desirabilityToDevolve + 1} to<br>not devolve`
+        `<br>${max}/${this.desirabilityToDevolve + 1}&nbsp;to<br>not&nbsp;devolve`
       );
     } else if (
       this.desirabilityToBeStable &&
@@ -37,11 +37,12 @@ class House extends Building {
     ) {
       return (
         this.baseLabel! +
-        `<br>${max}/${this.desirabilityToBeStable} to<br>be stable`
+        `<br>${max}/${this.desirabilityToBeStable}&nbsp;to<br>be&nbsp;stable`
       );
     } else if (this.desirabilityToEvolve) {
       return (
-        this.baseLabel! + `<br>${max}/${this.desirabilityToEvolve} to<br>evolve`
+        this.baseLabel! +
+        `<br>${max}/${this.desirabilityToEvolve}&nbsp;to<br>evolve`
       );
     }
     return this.baseLabel;
