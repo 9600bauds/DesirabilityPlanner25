@@ -153,9 +153,16 @@ class CanvasRenderer {
     if (rotate) ctx.rotate(ROTATION_RADS);
   }
 
+  private hideLayer(layer: CanvasRenderingContext2D) {
+    layer.canvas.style.opacity = '0%';
+  }
+  private showLayer(layer: CanvasRenderingContext2D) {
+    layer.canvas.style.opacity = '100%';
+  }
+
   private hideLayers(layers: Record<string, CanvasRenderingContext2D>) {
     for (const ctx of Object.values(layers)) {
-      ctx.canvas.style.opacity = '0';
+      this.hideLayer(ctx);
     }
   }
 
@@ -417,7 +424,12 @@ class CanvasRenderer {
   public setBuildingTransparency(newSetting: boolean): void {
     this.transparentBuildings = newSetting;
 
-    //Todo: What needs rerendering here?
+    if (this.transparentBuildings) {
+      this.mainLayers.buildings.canvas.style.opacity = '50%';
+    } else {
+      this.mainLayers.buildings.canvas.style.opacity = '100%';
+    }
+    //Todo: Also transparentize the preview? Is this shortcut even needed?
   }
 
   /*
@@ -425,57 +437,44 @@ class CanvasRenderer {
    */
   private fullRerender(): void {
     this.pendingRerender = null;
-    this.pendingPreview = null;
+    this.pendingPreview = null; //Cancel any previews too
 
     this.hideLayers(this.previewLayers);
-    this.hideLayers(this.mainLayers); //We'll re-enable them as needed
 
     const viewport = this.getViewport();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
-      return; //We are fully offscreen!
+      return; //We are fully offscreen! //todo: prevent this from happening to begin with!
     }
 
     const placedBuildings = this.renderContext.getBuildings();
-    // These are the precomputed desirability values from the "true" gridstate.
-    const baseValues = this.renderContext.getBaseValues();
+    const baseValues = this.renderContext.getBaseValues(); // These are the precomputed desirability values from the "true" gridstate.
 
-    // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
-    // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
-    // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
-    // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
-    this.fastClearCtx(this.mainLayers.tiles);
     this.renderTiles(this.mainLayers.tiles, baseValues, viewport.tilesRect);
-    this.mainLayers.tiles.canvas.style.opacity = '100';
 
     if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-      this.fastClearCtx(this.mainLayers.tileNumbers, false); //We intentionally do not rotate!;
       this.renderTileNumbers(
         this.mainLayers.tileNumbers,
         baseValues,
         viewport.tilesRect
       );
-      this.mainLayers.tileNumbers.canvas.style.opacity = '100';
+      this.showLayer(this.mainLayers.tileNumbers);
+    } else {
+      this.hideLayer(this.mainLayers.tileNumbers);
     }
 
-    this.fastClearCtx(this.mainLayers.gridLines);
     this.renderGridlines(this.mainLayers.gridLines, viewport.tilesRect);
-    this.mainLayers.gridLines.canvas.style.opacity = '100';
 
-    this.fastClearCtx(this.mainLayers.outlines);
     this.renderBuildingOutlines(
       this.mainLayers.outlines,
       viewport.tilesRect,
       placedBuildings
     );
-    this.mainLayers.outlines.canvas.style.opacity = '100';
 
-    this.fastClearCtx(this.mainLayers.buildings);
     this.renderBuildings(
       this.mainLayers.buildings,
       viewport.tilesRect,
       placedBuildings
     );
-    this.mainLayers.buildings.canvas.style.opacity = '100';
 
     this.renderBuildingLabels(
       this.labelContainer,
@@ -487,28 +486,17 @@ class CanvasRenderer {
 
   private preview() {
     this.pendingPreview = null;
-    this.hideLayers(this.previewLayers);
-
     if (this.pendingRerender) return; //Let's not preview anything if we're going to full update anyways.
+
     const viewport = this.getViewport();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
-      return; //We are fully offscreen!
+      return; //We are fully offscreen! //todo: prevent this from happening to begin with!
     }
 
     const selectedBlueprint = this.renderContext.getSelectedBlueprint();
     const placedBuildings = this.renderContext.getBuildings();
-    const buildingsToRerenderLabelsFor = new Set<Building>(placedBuildings);
-    const buildingsToRerender = new Set<Building>();
-    const overlays: fillPath[] = [];
+    const baseValues = this.renderContext.getBaseValues(); // These are the precomputed desirability values from the "true" gridstate.
 
-    // These are the precomputed desirability values from the "true" gridstate.
-    const baseValues = this.renderContext.getBaseValues();
-    // Let's clone the base values so we can do our own calculations
-    const modifiedValues = new Int16Array(baseValues);
-    const modifiedAreas: Set<Rectangle> = new Set();
-
-    // These sets are not persistent. We recalculate them each time. This is potentially inefficient,
-    // but probably only to a marginal degree - so I'm not prematurely optimizing them yet.
     const buildingsBeingAdded: Set<Building> = new Set();
     if (this.lastMouseoverTile && selectedBlueprint) {
       // Yes, we re-create this building each time too.
@@ -524,44 +512,21 @@ class CanvasRenderer {
         }
       }
     }
+    const modifiedValues = new Int16Array(baseValues); // Let's clone the base values so we can do our own calculations.
+    const modifiedAreas: Set<Rectangle> = new Set();
+    const buildingsToRender = new Set<Building>(); // We don't rerender the base buildings
+    const outlinesToRender = new Set<Building>();
+    const labelsToRender = new Set<Building>(placedBuildings); // Since it's hard to rerender -only- some buildings, let's just do a full update.
+    const overlaysToRender: fillPath[] = [];
 
     for (const virtualBuilding of buildingsBeingAdded) {
       for (const dbox of virtualBuilding.desireBoxes) {
         dbox.apply(modifiedValues);
         modifiedAreas.add(dbox.affectedBounds);
       }
-      const blockedTiles: Tile[] = [];
-      const openTiles: Tile[] = [];
-      for (const tile of virtualBuilding.tilesOccupied.toArray()) {
-        if (this.renderContext.isTileOccupied(tile)) {
-          blockedTiles.push(tile);
-        } else {
-          openTiles.push(tile);
-        }
-      }
-      if (blockedTiles.length === 0) {
-        buildingsToRerender.add(virtualBuilding);
-        buildingsToRerenderLabelsFor.add(virtualBuilding);
-        if (virtualBuilding.graphic)
-          overlays.push({
-            path: virtualBuilding.graphic.outline,
-            fillColor: colors.greenMidTransparency,
-          });
-      } else {
-        for (const tile of blockedTiles) {
-          const path = new Path2D();
-          path.rect(COORD_TO_PX(tile.x), COORD_TO_PX(tile.y), CELL_PX, CELL_PX);
-          overlays.push({ path, fillColor: colors.redMidTransparency });
-        }
-        for (const tile of openTiles) {
-          const path = new Path2D();
-          path.rect(COORD_TO_PX(tile.x), COORD_TO_PX(tile.y), CELL_PX, CELL_PX);
-          overlays.push({ path, fillColor: colors.greenMidTransparency });
-        }
-      }
     }
-    for (const building of buildingsBeingRemoved) {
-      for (const dbox of building.desireBoxes) {
+    for (const erasedBuilding of buildingsBeingRemoved) {
+      for (const dbox of erasedBuilding.desireBoxes) {
         dbox.apply(modifiedValues, -1);
         modifiedAreas.add(dbox.affectedBounds);
       }
@@ -571,47 +536,96 @@ class CanvasRenderer {
     if (modifiedArea) {
       modifiedArea = Rectangle.intersection(modifiedArea, viewport.tilesRect);
     }
-
     if (modifiedArea) {
-      this.fastClearCtx(this.previewLayers.tiles);
       this.renderTiles(this.previewLayers.tiles, modifiedValues, modifiedArea);
-      this.previewLayers.tiles.canvas.style.opacity = '100';
+      this.showLayer(this.previewLayers.tiles);
+    } else {
+      this.hideLayer(this.previewLayers.tiles);
+    }
+    if (modifiedArea && this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+      this.renderTileNumbers(
+        this.previewLayers.tileNumbers,
+        modifiedValues,
+        modifiedArea
+      );
+      this.showLayer(this.previewLayers.tileNumbers);
+    } else {
+      this.hideLayer(this.previewLayers.tileNumbers);
+    }
 
-      if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-        this.fastClearCtx(this.previewLayers.tileNumbers, false); //We intentionally do not rotate!;
-        this.renderTileNumbers(
-          this.previewLayers.tileNumbers,
-          modifiedValues,
-          modifiedArea
-        );
-        this.previewLayers.tileNumbers.canvas.style.opacity = '100';
+    for (const virtualBuilding of buildingsBeingAdded) {
+      outlinesToRender.add(virtualBuilding);
+      const blockedTiles: Tile[] = [];
+      const openTiles: Tile[] = [];
+      for (const tile of virtualBuilding.tilesOccupied.toArray()) {
+        if (this.renderContext.isTileOccupied(tile)) {
+          blockedTiles.push(tile);
+        } else {
+          openTiles.push(tile);
+        }
+      }
+      const canPlaceBuilding = blockedTiles.length === 0;
+      if (canPlaceBuilding) {
+        buildingsToRender.add(virtualBuilding);
+        labelsToRender.add(virtualBuilding);
+        if (virtualBuilding.graphic)
+          overlaysToRender.push({
+            path: virtualBuilding.graphic.outline,
+            fillColor: colors.greenMidTransparency,
+          });
+      } else {
+        for (const tile of blockedTiles) {
+          const path = new Path2D();
+          path.rect(COORD_TO_PX(tile.x), COORD_TO_PX(tile.y), CELL_PX, CELL_PX);
+          overlaysToRender.push({ path, fillColor: colors.redMidTransparency });
+        }
+        for (const tile of openTiles) {
+          const path = new Path2D();
+          path.rect(COORD_TO_PX(tile.x), COORD_TO_PX(tile.y), CELL_PX, CELL_PX);
+          overlaysToRender.push({
+            path,
+            fillColor: colors.greenMidTransparency,
+          });
+        }
       }
     }
-    if (buildingsToRerender.size > 0) {
-      this.fastClearCtx(this.previewLayers.buildings);
+    for (const erasedBuilding of buildingsBeingRemoved) {
+      if (erasedBuilding.graphic)
+        overlaysToRender.push({
+          path: erasedBuilding.graphic.outline,
+          fillColor: colors.redMidTransparency,
+        });
+    }
+
+    if (buildingsToRender.size > 0) {
       this.renderBuildings(
         this.previewLayers.buildings,
         viewport.tilesRect,
-        buildingsToRerender
+        buildingsToRender
       );
-      this.previewLayers.buildings.canvas.style.opacity = '100';
+      this.showLayer(this.previewLayers.buildings);
+    } else {
+      this.hideLayer(this.previewLayers.buildings);
+    }
 
-      this.fastClearCtx(this.previewLayers.outlines);
+    if (outlinesToRender.size > 0) {
       this.renderBuildingOutlines(
         this.previewLayers.outlines,
         viewport.tilesRect,
-        buildingsToRerender
+        outlinesToRender
       );
-      this.previewLayers.outlines.canvas.style.opacity = '100';
+      this.showLayer(this.previewLayers.outlines);
+    } else {
+      this.hideLayer(this.previewLayers.outlines);
     }
-    this.fastClearCtx(this.previewLayers.overlays);
-    this.renderOverlays(this.previewLayers.overlays, overlays);
-    this.previewLayers.overlays.canvas.style.opacity = '100';
+
+    this.renderOverlays(this.previewLayers.overlays, overlaysToRender);
+    this.showLayer(this.previewLayers.overlays);
 
     this.renderBuildingLabels(
       this.labelContainer,
       viewport.tilesRect,
-      buildingsToRerenderLabelsFor,
+      labelsToRender,
       modifiedValues
     );
   }
@@ -621,6 +635,12 @@ class CanvasRenderer {
     tileValues: Int16Array,
     bounds: Rectangle
   ) {
+    // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
+    // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
+    // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
+    // Suffice to say, this clear is VITAL for performance, even though we shouldn't need it and it makes no sense.
+    this.fastClearCtx(ctx);
+
     // We make use of a temporary canvas here. We draw each tile as 1 pixel big. Then we expand it to cover the entire canvas.
     // This is more efficient, but we need this ugly temporary canvas to do it, because bitmap creation is asynchronous and I don't want to deal with that.
     const tempCanvas = document.createElement('canvas');
@@ -663,6 +683,8 @@ class CanvasRenderer {
   }
 
   private renderGridlines(ctx: CanvasRenderingContext2D, bounds: Rectangle) {
+    this.fastClearCtx(ctx);
+
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.pureBlack;
     // Batch all line drawing into a single path
@@ -686,6 +708,7 @@ class CanvasRenderer {
     tileValues: Int16Array,
     bounds: Rectangle
   ) {
+    this.fastClearCtx(ctx, false); //We intentionally do not rotate!;
     // Set text style
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
@@ -723,6 +746,7 @@ class CanvasRenderer {
     bounds: Rectangle,
     placedBuildings: Set<Building>
   ) {
+    this.fastClearCtx(ctx);
     const buildingOutlinesPath = new Path2D();
     for (const building of placedBuildings) {
       if (!building.interceptsRectangle(bounds)) continue;
@@ -731,7 +755,7 @@ class CanvasRenderer {
       buildingOutlinesPath.addPath(building.graphic.outline);
     }
     ctx.strokeStyle = colors.pureBlack;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2;
     ctx.stroke(buildingOutlinesPath);
   }
 
@@ -740,6 +764,7 @@ class CanvasRenderer {
     bounds: Rectangle,
     placedBuildings: Set<Building>
   ) {
+    this.fastClearCtx(ctx);
     for (const building of placedBuildings) {
       if (!building.interceptsRectangle(bounds)) continue;
       if (!building.graphic) continue;
@@ -752,6 +777,7 @@ class CanvasRenderer {
   }
 
   private renderOverlays(ctx: CanvasRenderingContext2D, overlays: fillPath[]) {
+    this.fastClearCtx(ctx);
     for (const overlay of overlays) {
       ctx.fillStyle = overlay.fillColor;
       ctx.fill(overlay.path);
