@@ -125,7 +125,7 @@ class CanvasRenderer {
     this.scheduleRerender();
   }
 
-  public destroy() {
+  public destroy = () => {
     this.parentContainer.removeChild(this.labelContainer);
     for (const ctx of Object.values(this.mainLayers)) {
       this.parentContainer.removeChild(ctx.canvas);
@@ -135,9 +135,12 @@ class CanvasRenderer {
       this.parentContainer.removeChild(ctx.canvas);
     }
     this.previewLayers = {};
-  }
+  };
 
-  private fastClearCtx(ctx: CanvasRenderingContext2D, rotate = this.isRotated) {
+  private fastClearCtx = (
+    ctx: CanvasRenderingContext2D,
+    rotate = this.isRotated
+  ) => {
     //Setting the width every time is apparently the fastest way to clear the canvas? Even if the size didn't change?
     ctx.canvas.width = this.clientWidth * this.devicePixelRatio;
     ctx.canvas.height = this.clientHeight * this.devicePixelRatio;
@@ -151,63 +154,69 @@ class CanvasRenderer {
       this.zoomLevel * this.devicePixelRatio
     );
     if (rotate) ctx.rotate(ROTATION_RADS);
-  }
+  };
 
-  private hideLayer(layer: CanvasRenderingContext2D) {
+  private hideLayer = (layer: CanvasRenderingContext2D) => {
     layer.canvas.style.opacity = '0%';
-  }
-  private showLayer(layer: CanvasRenderingContext2D) {
+  };
+  private showLayer = (layer: CanvasRenderingContext2D) => {
     layer.canvas.style.opacity = '100%';
-  }
+  };
 
-  private hideLayers(layers: Record<string, CanvasRenderingContext2D>) {
+  private hideLayers = (layers: Record<string, CanvasRenderingContext2D>) => {
     for (const ctx of Object.values(layers)) {
       this.hideLayer(ctx);
     }
-  }
+  };
 
-  public scheduleRerender(): void {
+  public scheduleRerender = (): void => {
     if (!this.pendingRerender) {
       this.pendingRerender = requestAnimationFrame(
         this.fullRerender.bind(this)
       );
     }
-  }
+  };
 
-  public schedulePreview(): void {
+  public schedulePreview = (): void => {
     if (!this.pendingPreview) {
       this.pendingPreview = requestAnimationFrame(this.preview.bind(this));
     }
-  }
+  };
 
   // Size handling
-  public canvasSizeUpdated() {
+  public canvasSizeUpdated = () => {
     this.clientWidth = this.parentContainer.clientWidth;
     this.clientHeight = this.parentContainer.clientHeight;
 
     this.scheduleRerender();
-  }
+  };
 
   /*
    * Coordinate transformations
    */
-  private grid2canvas(point: GridPoint, rotate = this.isRotated): DOMPoint {
+  private grid2canvas = (
+    point: GridPoint,
+    rotate = this.isRotated
+  ): DOMPoint => {
     if (rotate) point = ROTATE_AROUND_ORIGIN(point);
     return new DOMPoint(
       COORD_TO_PX(point.x) * this.zoomLevel + this.offsetX,
       COORD_TO_PX(point.y) * this.zoomLevel + this.offsetY
     );
-  }
+  };
 
-  private canvas2grid(dompoint: DOMPoint, rotate = this.isRotated): GridPoint {
+  private canvas2grid = (
+    dompoint: DOMPoint,
+    rotate = this.isRotated
+  ): GridPoint => {
     const x = (dompoint.x - this.offsetX) / this.zoomLevel;
     const y = (dompoint.y - this.offsetY) / this.zoomLevel;
     let point = { x, y };
     if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
     return point;
-  }
+  };
 
-  private pointToTile(point: DOMPoint): Tile | undefined {
+  private pointToTile = (point: DOMPoint): Tile | undefined => {
     if (
       point.x < 0 ||
       point.y < 0 ||
@@ -229,14 +238,14 @@ class CanvasRenderer {
     }
 
     return undefined;
-  }
+  };
 
-  public getMouseCoords(event: MouseEvent): Tile | undefined {
+  public getMouseCoords = (event: MouseEvent): Tile | undefined => {
     return this.pointToTile(new DOMPoint(event.clientX, event.clientY));
-  }
+  };
 
   // Get the range of tiles currently visible in the viewport
-  public getViewport(): { coordsRect: Rectangle; tilesRect: Rectangle } {
+  public getViewport = (): { coordsRect: Rectangle; tilesRect: Rectangle } => {
     // Currently, this function uses a very simple and slightly wasteful algorithm.
     // In order to handle grid rotation, we need to get the axis-aligned bounding box of all four corners of the viewport.
     // This means that when the grid is rotated, up to 50% of the tiles we render are wasted effort since they're offscreen!
@@ -292,12 +301,12 @@ class CanvasRenderer {
     );
 
     return { coordsRect, tilesRect };
-  }
+  };
 
   /*
    * Canvas transforms
    */
-  public toggleGridRotation(): void {
+  public toggleGridRotation = (): void => {
     const oldCenter = this.canvas2grid(this.viewCenter);
 
     this.isRotated = !this.isRotated;
@@ -306,9 +315,9 @@ class CanvasRenderer {
     this.centerViewAt(oldCenter);
 
     this.scheduleRerender();
-  }
+  };
 
-  public centerViewAt(point: GridPoint) {
+  public centerViewAt = (point: GridPoint) => {
     const center = this.viewCenter;
 
     if (this.isRotated) {
@@ -319,17 +328,17 @@ class CanvasRenderer {
     this.offsetY = center.y - point.y * this.zoomLevel;
 
     this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
-  }
+  };
 
-  public zoomIn() {
+  public zoomIn = () => {
     this.zoom(1.2);
-  }
+  };
 
-  public zoomOut() {
+  public zoomOut = () => {
     this.zoom(1 / 1.2);
-  }
+  };
 
-  private zoom(factor: number) {
+  private zoom = (factor: number) => {
     const oldCenter = this.canvas2grid(this.viewCenter);
     this.zoomLevel *= factor;
 
@@ -337,16 +346,16 @@ class CanvasRenderer {
     this.centerViewAt(oldCenter);
 
     this.scheduleRerender(); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
-  }
+  };
 
   // Panning methods
-  public startPanning(event: MouseEvent) {
+  public startPanning = (event: MouseEvent) => {
     this.isPanning = true;
     this.lastPanCursorX = event.clientX;
     this.lastPanCursorY = event.clientY;
-  }
+  };
 
-  public handlePanning(event: MouseEvent) {
+  public handlePanning = (event: MouseEvent) => {
     if (!this.isPanning) return;
 
     const deltaX = event.clientX - this.lastPanCursorX;
@@ -359,32 +368,32 @@ class CanvasRenderer {
     this.lastPanCursorY = event.clientY;
 
     this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
-  }
+  };
 
-  public stopPanning() {
+  public stopPanning = () => {
     this.isPanning = false;
-  }
+  };
 
   // Drag handling
-  public startDragging() {
+  public startDragging = () => {
     this.isDragging = true;
     this.dragStartTile = this.lastMouseoverTile;
     this.updateDragBox(this.lastMouseoverTile);
-  }
+  };
 
-  public handleDragging() {
+  public handleDragging = () => {
     if (!this.isDragging) return;
     this.updateDragBox(this.lastMouseoverTile);
-  }
+  };
 
-  private updateDragBox(newPos: Tile | undefined) {
+  private updateDragBox = (newPos: Tile | undefined) => {
     if (this.dragStartTile && newPos) {
       this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
     }
     this.schedulePreview();
-  }
+  };
 
-  public stopDragging() {
+  public stopDragging = () => {
     if (!this.isDragging) return;
 
     const returnBox = this.dragBox;
@@ -394,10 +403,10 @@ class CanvasRenderer {
     this.scheduleRerender(); //Todo... Maybe do the deletion here?
 
     return returnBox;
-  }
+  };
 
   // Mouse handling
-  public checkForTileChange(event?: MouseEvent) {
+  public checkForTileChange = (event?: MouseEvent) => {
     const previousTile = this.lastMouseoverTile;
     const newTile = event && this.getMouseCoords(event);
     let tileChanged: boolean;
@@ -418,10 +427,10 @@ class CanvasRenderer {
 
     this.lastMouseoverTile = newTile;
     return tileChanged;
-  }
+  };
 
   // Building transparency
-  public setBuildingTransparency(newSetting: boolean): void {
+  public setBuildingTransparency = (newSetting: boolean): void => {
     this.transparentBuildings = newSetting;
 
     if (this.transparentBuildings) {
@@ -430,12 +439,12 @@ class CanvasRenderer {
       this.mainLayers.buildings.canvas.style.opacity = '100%';
     }
     //Todo: Also transparentize the preview? Is this shortcut even needed?
-  }
+  };
 
   /*
    * Actual rendering methods
    */
-  private fullRerender(): void {
+  private fullRerender = (): void => {
     this.pendingRerender = null;
     this.pendingPreview = null; //Cancel any previews too
 
@@ -482,9 +491,9 @@ class CanvasRenderer {
       placedBuildings,
       baseValues
     );
-  }
+  };
 
-  private preview() {
+  private preview = () => {
     this.pendingPreview = null;
     if (this.pendingRerender) return; //Let's not preview anything if we're going to full update anyways.
 
@@ -636,13 +645,13 @@ class CanvasRenderer {
       labelsToRender,
       modifiedValues
     );
-  }
+  };
 
-  private renderTiles(
+  private renderTiles = (
     ctx: CanvasRenderingContext2D,
     tileValues: Int16Array,
     bounds: Rectangle
-  ) {
+  ) => {
     // Even though canvases are "just bitmaps", and so, it shouldn't be a problem to draw on top of the previous frame...
     // NOT clearing the previous frame inexplicably causes setTransform() to be extremely slow. Even though we're clearing it AFTER the setTransform().
     // I have no idea how this works, I've been unable to find any explanation, and at this point, I've given up trying to understand.
@@ -688,9 +697,12 @@ class CanvasRenderer {
       COORD_TO_PX(tempCanvas.width),
       COORD_TO_PX(tempCanvas.height)
     );
-  }
+  };
 
-  private renderGridlines(ctx: CanvasRenderingContext2D, bounds: Rectangle) {
+  private renderGridlines = (
+    ctx: CanvasRenderingContext2D,
+    bounds: Rectangle
+  ) => {
     this.fastClearCtx(ctx);
 
     ctx.lineWidth = 1;
@@ -709,13 +721,13 @@ class CanvasRenderer {
     }
     // Execute the path!
     ctx.stroke();
-  }
+  };
 
-  private renderTileNumbers(
+  private renderTileNumbers = (
     ctx: CanvasRenderingContext2D,
     tileValues: Int16Array,
     bounds: Rectangle
-  ) {
+  ) => {
     this.fastClearCtx(ctx, false); //We intentionally do not rotate!;
     // Set text style
     ctx.font = 'bold 14px Arial';
@@ -747,13 +759,13 @@ class CanvasRenderer {
         ctx.fillText(valueText, centerPoint.x, centerPoint.y);
       }
     }
-  }
+  };
 
-  private renderBuildingOutlines(
+  private renderBuildingOutlines = (
     ctx: CanvasRenderingContext2D,
     bounds: Rectangle,
     placedBuildings: Set<Building>
-  ) {
+  ) => {
     this.fastClearCtx(ctx);
     const buildingOutlinesPath = new Path2D();
     for (const building of placedBuildings) {
@@ -765,13 +777,13 @@ class CanvasRenderer {
     ctx.strokeStyle = colors.pureBlack;
     ctx.lineWidth = 2;
     ctx.stroke(buildingOutlinesPath);
-  }
+  };
 
-  private renderBuildings(
+  private renderBuildings = (
     ctx: CanvasRenderingContext2D,
     bounds: Rectangle,
     placedBuildings: Set<Building>
-  ) {
+  ) => {
     this.fastClearCtx(ctx);
     for (const building of placedBuildings) {
       if (!building.interceptsRectangle(bounds)) continue;
@@ -782,22 +794,25 @@ class CanvasRenderer {
         ctx.fill(pathFill.path);
       }
     }
-  }
+  };
 
-  private renderOverlays(ctx: CanvasRenderingContext2D, overlays: fillPath[]) {
+  private renderOverlays = (
+    ctx: CanvasRenderingContext2D,
+    overlays: fillPath[]
+  ) => {
     this.fastClearCtx(ctx);
     for (const overlay of overlays) {
       ctx.fillStyle = overlay.fillColor;
       ctx.fill(overlay.path);
     }
-  }
+  };
 
-  private renderDragBox(
+  private renderDragBox = (
     ctx: CanvasRenderingContext2D,
     dragBox: Rectangle,
     strokeColor: string,
     fillColor: string
-  ) {
+  ) => {
     // We do not clear the ctx here! Or check for bounds!
     const path = new Path2D();
     path.rect(
@@ -811,14 +826,14 @@ class CanvasRenderer {
     ctx.stroke(path);
     ctx.fillStyle = fillColor;
     ctx.fill(path);
-  }
+  };
 
-  private renderBuildingLabels(
+  private renderBuildingLabels = (
     div: HTMLElement,
     bounds: Rectangle,
     buildings: Set<Building>,
     tileValues: Int16Array
-  ) {
+  ) => {
     const labelsHTML: string[] = []; //Just building these as a raw string is the fastest way to do it, believe it or not.
 
     for (const building of buildings) {
@@ -878,7 +893,7 @@ class CanvasRenderer {
       labelsHTML.push(labelHTML);
     }
     div.innerHTML = labelsHTML.join('');
-  }
+  };
 }
 
 export default CanvasRenderer;

@@ -1,10 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import Sidebar from './Sidebar';
-import GridStateManager from '../classes/GridStateManager';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
 import Blueprint from '../types/Blueprint';
 import CursorAction from '../types/CursorAction';
+import { useGridManager } from '../hooks.ts/useGridManager';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE (or refs, I guess?) =====
@@ -12,9 +12,18 @@ const App: React.FC = () => {
   const selectedBlueprintIndexRef = useRef<number>(0);
   const cursorActionRef = useRef<CursorAction>('panning');
 
-  const gridStateManager = useRef(new GridStateManager()).current;
   const canvasContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
+
+  const {
+    gridManager,
+    canUndo,
+    canRedo,
+    placeBlueprint,
+    eraseRect,
+    undo,
+    redo,
+  } = useGridManager();
 
   // ===== INITIALIZATION =====
   useEffect(() => {
@@ -26,10 +35,10 @@ const App: React.FC = () => {
     try {
       if (!rendererRef.current) {
         const renderContext = {
-          getBaseValues: gridStateManager.getBaseValues,
-          getBuildings: gridStateManager.getBuildings,
+          getBaseValues: gridManager.getBaseValues,
+          getBuildings: gridManager.getBuildings,
           getSelectedBlueprint: getSelectedBlueprint,
-          isTileOccupied: gridStateManager.isTileOccupied,
+          isTileOccupied: gridManager.isTileOccupied,
         };
         rendererRef.current = new CanvasRenderer(
           canvasContainer.current,
@@ -116,7 +125,7 @@ const App: React.FC = () => {
       if (cursorActionRef.current === 'erasing') {
         const erasedRect = renderer.stopDragging();
         if (erasedRect) {
-          if (gridStateManager.eraseRect(erasedRect)) {
+          if (eraseRect(erasedRect)) {
             renderer.scheduleRerender();
           }
         }
@@ -125,7 +134,7 @@ const App: React.FC = () => {
         if (tile) {
           const blueprint = getSelectedBlueprint();
           if (blueprint) {
-            if (gridStateManager.tryPlaceBlueprint(tile, blueprint)) {
+            if (placeBlueprint(tile, blueprint)) {
               renderer.scheduleRerender();
             }
           }
@@ -171,6 +180,28 @@ const App: React.FC = () => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    // Handle keyboard shortcuts for undo/redo
+    if (
+      event.ctrlKey &&
+      (event.key === 'z' || event.key === 'Z') &&
+      !event.shiftKey
+    ) {
+      event.preventDefault();
+      handleUndo();
+      return;
+    }
+
+    if (
+      (event.ctrlKey && (event.key === 'y' || event.key === 'Y')) ||
+      (event.ctrlKey &&
+        event.shiftKey &&
+        (event.key === 'z' || event.key === 'Z'))
+    ) {
+      event.preventDefault();
+      handleRedo();
+      return;
+    }
+
     // Handle 'r' key for blueprint rotation
     if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
       const subcategory = selectedSubcategoryRef.current;
@@ -181,6 +212,7 @@ const App: React.FC = () => {
 
         // Since changing a ref doesn't trigger re-renders, manually notify the renderer
         if (rendererRef.current && cursorActionRef.current === 'placing') {
+          event.preventDefault();
           rendererRef.current.schedulePreview();
         }
       }
@@ -230,6 +262,22 @@ const App: React.FC = () => {
     ];
   };
 
+  const handleUndo = () => {
+    if (undo()) {
+      if (rendererRef.current) {
+        rendererRef.current.scheduleRerender();
+      }
+    }
+  };
+
+  const handleRedo = () => {
+    if (redo()) {
+      if (rendererRef.current) {
+        rendererRef.current.scheduleRerender();
+      }
+    }
+  };
+
   return (
     <div id="app-container" className="d-flex">
       <div
@@ -265,6 +313,10 @@ const App: React.FC = () => {
               rendererRef.current.zoomOut();
             }
           }}
+          onUndoClick={handleUndo}
+          onRedoClick={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
           selectSubcategory={selectSubcategory}
         />
       </div>

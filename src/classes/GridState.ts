@@ -1,23 +1,13 @@
-import { Tile } from '../utils/geometry';
 import Building from './Building';
-import { GRID_SIZE, COORD_TO_INT16 } from '../utils/constants';
-import Blueprint, { createBuilding } from '../types/Blueprint';
+import { GRID_SIZE } from '../utils/constants';
 
 class GridState {
-  private grid: Int16Array;
-  private placedBuildings: Set<Building>; //This is effectively a list, not a set, right?
+  private readonly grid: Int16Array;
+  private readonly placedBuildings: Set<Building>;
 
-  constructor() {
-    this.grid = new Int16Array(GRID_SIZE * GRID_SIZE);
-    this.placedBuildings = new Set();
-  }
-
-  getValue(x: number, y: number): number {
-    return this.grid[COORD_TO_INT16(x, y)];
-  }
-
-  setValue(x: number, y: number, value: number): void {
-    this.grid[COORD_TO_INT16(x, y)] = value;
+  constructor(grid?: Int16Array, placedBuildings?: Set<Building>) {
+    this.grid = grid || new Int16Array(GRID_SIZE * GRID_SIZE);
+    this.placedBuildings = placedBuildings || new Set();
   }
 
   public getDesirabilityGrid() {
@@ -28,21 +18,44 @@ class GridState {
     return this.placedBuildings;
   }
 
-  public addBuilding(building: Building): Building {
-    for (const dbox of building.desireBoxes) {
-      dbox.apply(this.grid, 1);
-    }
-
-    this.placedBuildings.add(building);
-    return building;
+  public addBuilding(building: Building): GridState {
+    return this.addBuildings([building]);
   }
 
-  public removeBuilding(building: Building): void {
-    for (const dbox of building.desireBoxes) {
-      dbox.apply(this.grid, -1);
+  public removeBuilding(building: Building): GridState {
+    return this.removeBuildings([building]);
+  }
+
+  public addBuildings(buildings: Building[]): GridState {
+    if (buildings.length === 0) return this;
+
+    const newGrid = new Int16Array(this.grid);
+    const newBuildings = new Set(this.placedBuildings);
+
+    for (const building of buildings) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(newGrid, 1);
+      }
+      newBuildings.add(building);
     }
 
-    this.placedBuildings.delete(building);
+    return new GridState(newGrid, newBuildings);
+  }
+
+  public removeBuildings(buildings: Building[]): GridState {
+    if (buildings.length === 0) return this;
+
+    const newGrid = new Int16Array(this.grid);
+    const newBuildings = new Set(this.placedBuildings);
+
+    for (const building of buildings) {
+      for (const dbox of building.desireBoxes) {
+        dbox.apply(newGrid, -1);
+      }
+      newBuildings.delete(building);
+    }
+
+    return new GridState(newGrid, newBuildings);
   }
 }
 

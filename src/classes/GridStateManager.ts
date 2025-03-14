@@ -4,36 +4,41 @@ import GridState from './GridState';
 import Building from './Building';
 
 class GridStateManager {
-  private activeGridState = new GridState();
+  private states: GridState[] = [];
+  private stateIndex: number = 0;
+  private maxHistorySize: number = 50;
 
-  public getActiveGridState = () => {
-    return this.activeGridState;
+  constructor() {
+    const initialState = new GridState();
+    this.states = [initialState];
+    this.stateIndex = 0;
+  }
+
+  private get activeGridState(): GridState {
+    return this.states[this.stateIndex];
+  }
+
+  public getBaseValues = (): Int16Array => {
+    return this.activeGridState.getDesirabilityGrid();
   };
 
-  public getBaseValues = () => {
-    return this.getActiveGridState().getDesirabilityGrid();
+  public getBuildings = (): Set<Building> => {
+    return this.activeGridState.getPlacedBuildings();
   };
 
-  public getBuildings = () => {
-    return this.getActiveGridState().getPlacedBuildings();
+  public isTileOccupied = (tile: Tile): boolean => {
+    return this.getInterceptingBuilding(tile) !== undefined;
   };
 
-  public isTileOccupied = (tile: Tile) => {
-    if (this.getInterceptingBuilding(tile)) {
-      return true;
-    }
-    return false;
-  };
-
-  public getInterceptingBuilding = (tile: Tile) => {
+  public getInterceptingBuilding = (tile: Tile): Building | undefined => {
     for (const building of this.activeGridState.getPlacedBuildings()) {
       if (building.interceptsTile(tile)) return building;
     }
     return undefined;
   };
 
-  public verifyPlacement = (building: Building) => {
-    const tileArray = building.tilesOccupied.toArray(); //apparently this library doesn't support iterators... so I need to make it into an array
+  public isBuildingValid = (building: Building): boolean => {
+    const tileArray = building.tilesOccupied.toArray();
     for (const tile of tileArray) {
       if (this.isTileOccupied(tile)) {
         return false;
@@ -42,25 +47,112 @@ class GridStateManager {
     return true;
   };
 
-  public tryPlaceBlueprint(position: Tile, blueprint: Blueprint) {
+  // Push a new state to the history
+  private pushState = (state: GridState): void => {
+    // If we're not at the end of the history, truncate future states
+    if (this.stateIndex < this.states.length - 1) {
+      this.states = this.states.slice(0, this.stateIndex + 1);
+    }
+
+    // Add the new state and move index forward
+    this.states.push(state);
+    this.stateIndex++;
+
+    // Prune history if it exceeds max size
+    if (this.states.length > this.maxHistorySize) {
+      this.states.shift();
+      this.stateIndex--;
+    }
+  };
+
+  public canUndo = (): boolean => {
+    return this.stateIndex > 0;
+  };
+
+  public canRedo = (): boolean => {
+    return this.stateIndex < this.states.length - 1;
+  };
+
+  public undo = (): boolean => {
+    if (!this.canUndo()) return false;
+
+    this.stateIndex--;
+    return true;
+  };
+
+  public redo = (): boolean => {
+    if (!this.canRedo()) return false;
+
+    this.stateIndex++;
+    return true;
+  };
+
+  public tryPlaceBlueprint = (
+    position: Tile,
+    blueprint: Blueprint
+  ): boolean => {
     const newBuilding = createBuilding(position, blueprint);
-    if (!this.verifyPlacement(newBuilding)) {
+    if (!this.isBuildingValid(newBuilding)) {
       return false;
     }
-    this.activeGridState.addBuilding(newBuilding);
+
+    // Create new state with the building added
+    const newState = this.activeGridState.addBuilding(newBuilding);
+
+    // Add to history
+    this.pushState(newState);
+
+    return true;
+  };
+
+  public tryPlaceBlueprints(
+    placements: Array<{ position: Tile; blueprint: Blueprint }>
+  ): boolean {
+    // Create all buildings first
+    const newBuildings: Building[] = [];
+
+    for (const { position, blueprint } of placements) {
+      const newBuilding = createBuilding(position, blueprint);
+
+      // Check if each building can be placed
+      if (!this.isBuildingValid(newBuilding)) {
+        return false;
+      }
+
+      newBuildings.push(newBuilding);
+    }
+
+    // If all buildings can be placed, create a new state with all of them
+    const newState = this.activeGridState.addBuildings(newBuildings);
+
+    // Add to history
+    this.pushState(newState);
+
     return true;
   }
 
-  public eraseRect(rect: Rectangle) {
-    let success = false;
+  public eraseRect = (rect: Rectangle): boolean => {
+    // Check if there are any buildings to erase first
+    const buildingsToRemove: Building[] = [];
+
     for (const building of this.activeGridState.getPlacedBuildings()) {
       if (building.interceptsRectangle(rect)) {
-        this.activeGridState.removeBuilding(building);
-        success = true;
+        buildingsToRemove.push(building);
       }
     }
-    return success;
-  }
+
+    if (buildingsToRemove.length === 0) {
+      return false;
+    }
+
+    // Remove all buildings in a single operation
+    const newState = this.activeGridState.removeBuildings(buildingsToRemove);
+
+    // Add to history
+    this.pushState(newState);
+
+    return true;
+  };
 }
 
 export default GridStateManager;

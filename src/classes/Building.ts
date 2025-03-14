@@ -7,7 +7,6 @@ import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
 import { COORD_TO_PX } from '../utils/constants';
 import { ALL_CATEGORIES } from '../data/CATEGORIES';
 import colors from '../utils/colors';
-import House from './House';
 
 class Building {
   id: string;
