@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import Sidebar from './Sidebar';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
 import Blueprint from '../types/Blueprint';
 import CursorAction from '../types/CursorAction';
-import { useGridManager } from '../hooks.ts/useGridManager';
+import { useGridManager } from '../hooks/useGridManager';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE (or refs, I guess?) =====
@@ -15,15 +15,23 @@ const App: React.FC = () => {
   const canvasContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
 
+  const gridStateUpdated = useCallback(() => {
+    updateUndoRedoState();
+    if (rendererRef.current) {
+      rendererRef.current.scheduleRerender();
+    }
+  }, []);
+
   const {
     gridManager,
     canUndo,
     canRedo,
-    placeBlueprint,
-    eraseRect,
-    undo,
-    redo,
-  } = useGridManager();
+    updateUndoRedoState,
+    tryPlaceBlueprint,
+    tryEraseRect,
+    tryUndo,
+    tryRedo,
+  } = useGridManager(gridStateUpdated);
 
   // ===== INITIALIZATION =====
   useEffect(() => {
@@ -125,18 +133,14 @@ const App: React.FC = () => {
       if (cursorActionRef.current === 'erasing') {
         const erasedRect = renderer.stopDragging();
         if (erasedRect) {
-          if (eraseRect(erasedRect)) {
-            renderer.scheduleRerender();
-          }
+          tryEraseRect(erasedRect);
         }
       } else if (cursorActionRef.current === 'placing') {
         const tile = renderer.getMouseCoords(event);
         if (tile) {
           const blueprint = getSelectedBlueprint();
           if (blueprint) {
-            if (placeBlueprint(tile, blueprint)) {
-              renderer.scheduleRerender();
-            }
+            tryPlaceBlueprint(tile, blueprint);
           }
         }
       }
@@ -187,7 +191,7 @@ const App: React.FC = () => {
       !event.shiftKey
     ) {
       event.preventDefault();
-      handleUndo();
+      tryUndo();
       return;
     }
 
@@ -198,7 +202,7 @@ const App: React.FC = () => {
         (event.key === 'z' || event.key === 'Z'))
     ) {
       event.preventDefault();
-      handleRedo();
+      tryRedo();
       return;
     }
 
@@ -262,22 +266,6 @@ const App: React.FC = () => {
     ];
   };
 
-  const handleUndo = () => {
-    if (undo()) {
-      if (rendererRef.current) {
-        rendererRef.current.scheduleRerender();
-      }
-    }
-  };
-
-  const handleRedo = () => {
-    if (redo()) {
-      if (rendererRef.current) {
-        rendererRef.current.scheduleRerender();
-      }
-    }
-  };
-
   return (
     <div id="app-container" className="d-flex">
       <div
@@ -313,8 +301,8 @@ const App: React.FC = () => {
               rendererRef.current.zoomOut();
             }
           }}
-          onUndoClick={handleUndo}
-          onRedoClick={handleRedo}
+          onUndoClick={tryUndo}
+          onRedoClick={tryRedo}
           canUndo={canUndo}
           canRedo={canRedo}
           selectSubcategory={selectSubcategory}
