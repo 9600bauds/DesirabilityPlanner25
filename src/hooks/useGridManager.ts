@@ -1,52 +1,80 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import GridStateManager, {
-  blueprintPlacement,
+  BlueprintPlacement,
 } from '../classes/GridStateManager';
 import Blueprint from '../types/Blueprint';
 import { Rectangle, Tile } from '../utils/geometry';
 import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
+import { decodeData, encodeData } from '../utils/encoding';
+import { UINT16_TO_COORD, URL_STATE_INDEX } from '../utils/constants';
 
 export function useGridManager(gridStateUpdated: () => void) {
   const gridManagerRef = useRef<GridStateManager>(new GridStateManager());
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
+  const setUrlState = (index: string, url: string | null) => {
+    const urlInterface = new URL(window.location.href);
+    if (!url) {
+      urlInterface.searchParams.delete(index);
+    } else {
+      urlInterface.searchParams.set(index, url);
+    }
+    // I think this is just to prevent bloating the history stack of the browser but I'm not entirely sure.
+    window.history.replaceState({}, '', urlInterface.toString());
+  };
+
+  const getUrlState = (index: string) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(index);
+  };
+
   useEffect(() => {
     // Try to retrieve the URL state, but only once, during initialization
-    const urlParams = new URLSearchParams(window.location.search);
-    const str = urlParams.get('buildings');
+    const compressedState = getUrlState(URL_STATE_INDEX);
+    if (!compressedState) return;
 
-    if (str) {
-      const blueprintsToAdd: Array<blueprintPlacement> = [];
-      const buildingStrings = str.split('␞');
-      for (const buildingString of buildingStrings) {
-        const [id, x, y] = buildingString.split('␟');
-        if (!(id in ALL_BLUEPRINTS)) {
-          console.error(
-            `Remaking gridstate from string encountered invalid ID of ${id}!`
+    const blueprintsToAdd: Array<BlueprintPlacement> = [];
+    try {
+      const decoded = decodeData(compressedState);
+      for (const [bpKey, positions] of Object.entries(decoded)) {
+        if (!(bpKey in ALL_BLUEPRINTS)) {
+          console.warn(
+            `Remaking gridstate from string encountered invalid ID of ${bpKey}!`
           );
           continue;
         }
-        const position = new Tile(parseInt(x), parseInt(y));
-        const blueprint = ALL_BLUEPRINTS[id];
-        blueprintsToAdd.push({
-          position,
-          blueprint,
+        const blueprint = ALL_BLUEPRINTS[bpKey];
+        positions.forEach((pos) => {
+          const coord = UINT16_TO_COORD(pos);
+          blueprintsToAdd.push({
+            position: Tile.fromCoordinate(coord),
+            blueprint,
+          });
         });
       }
-      gridManagerRef.current.tryPlaceBlueprints(blueprintsToAdd);
+    } catch (error) {
+      console.error('Could not decode saved URL:', error);
+    }
+
+    if (!blueprintsToAdd.length) {
+      setUrlState(URL_STATE_INDEX, null);
+      return;
+    }
+    if (!tryPlaceBlueprints(blueprintsToAdd)) {
+      setUrlState(URL_STATE_INDEX, null);
+      return;
     }
   }, []);
 
   const updateUrl = () => {
-    const gridStateString = gridManagerRef.current.activeGridState.toString();
-    const url = new URL(window.location.href);
-    if (gridStateString.length > 0) {
-      url.searchParams.set('buildings', gridStateString);
+    const compressed = gridManagerRef.current.activeGridState.compressed();
+    if (Object.keys(compressed).length <= 0) {
+      setUrlState(URL_STATE_INDEX, null);
     } else {
-      url.searchParams.delete('buildings');
+      const encoded = encodeData(compressed);
+      setUrlState(URL_STATE_INDEX, encoded);
     }
-    window.history.replaceState({}, '', url.toString());
   };
 
   // So App can update these states as necessary
@@ -62,6 +90,15 @@ export function useGridManager(gridStateUpdated: () => void) {
         position,
         blueprint
       );
+      if (success) gridStateUpdated();
+      return success;
+    },
+    [gridStateUpdated]
+  );
+
+  const tryPlaceBlueprints = useCallback(
+    (placements: Array<BlueprintPlacement>) => {
+      const success = gridManagerRef.current.tryPlaceBlueprints(placements);
       if (success) gridStateUpdated();
       return success;
     },

@@ -1,5 +1,5 @@
 import { HouseBlueprint } from '../interfaces/HouseBlueprint';
-import { COORD_TO_INT16 } from '../utils/constants';
+import { COORD_TO_UINT16 } from '../utils/constants';
 import { Tile } from '../utils/geometry';
 import Building from './Building';
 
@@ -18,7 +18,7 @@ class House extends Building {
   public maxDesirabilityFromGrid(tileValues: Int16Array): number {
     let max = Number.MIN_SAFE_INTEGER;
     for (const tile of this.tilesOccupied.toArray()) {
-      max = Math.max(max, tileValues[COORD_TO_INT16(tile.x, tile.y)]);
+      max = Math.max(max, tileValues[COORD_TO_UINT16(tile.toCoordinate())]);
     }
     return max;
   }

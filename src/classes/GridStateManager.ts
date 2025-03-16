@@ -3,7 +3,7 @@ import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 import Building from './Building';
 
-export interface blueprintPlacement {
+export interface BlueprintPlacement {
   position: Tile;
   blueprint: Blueprint;
 }
@@ -110,19 +110,24 @@ class GridStateManager {
     return true;
   };
 
-  public tryPlaceBlueprints(placements: Array<blueprintPlacement>): boolean {
+  public tryPlaceBlueprints(placements: Array<BlueprintPlacement>): boolean {
     // Create all buildings first
     const newBuildings: Building[] = [];
 
     for (const { position, blueprint } of placements) {
-      const newBuilding = createBuilding(position, blueprint);
+      try {
+        const newBuilding = createBuilding(position, blueprint);
 
-      // Check if each building can be placed
-      if (!this.isBuildingValid(newBuilding)) {
+        // Check if each building can be placed
+        if (!this.isBuildingValid(newBuilding)) {
+          return false;
+        }
+
+        newBuildings.push(newBuilding);
+      } catch (error) {
+        console.error(error);
         return false;
       }
-
-      newBuildings.push(newBuilding);
     }
 
     // If all buildings can be placed, create a new state with all of them

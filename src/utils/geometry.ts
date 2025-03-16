@@ -1,10 +1,7 @@
 import { COORD_TO_PX, GRID_SIZE } from './constants';
 import * as Collections from 'typescript-collections';
 
-export interface GridPoint {
-  x: number;
-  y: number;
-}
+export type Coordinate = [x: number, y: number];
 
 export class Tile {
   public x: number;
@@ -13,6 +10,14 @@ export class Tile {
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+  }
+
+  static fromCoordinate(coord: Coordinate) {
+    return new Tile(coord[0], coord[1]);
+  }
+
+  toCoordinate(): Coordinate {
+    return [this.x, this.y];
   }
 
   toString(): string {

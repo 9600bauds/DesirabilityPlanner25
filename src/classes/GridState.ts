@@ -1,5 +1,6 @@
 import Building from './Building';
-import { GRID_SIZE } from '../utils/constants';
+import { COORD_TO_UINT16, GRID_SIZE } from '../utils/constants';
+import { CompressedGridState } from '../types/CompressedGridState';
 
 class GridState {
   private readonly grid: Int16Array;
@@ -58,12 +59,20 @@ class GridState {
     return new GridState(newGrid, newBuildings);
   }
 
-  public toString() {
-    const buildingStrings = [];
+  public compressed() {
+    const placements: CompressedGridState = {};
     for (const building of this.getPlacedBuildings()) {
-      buildingStrings.push(building.id);
+      const key = building.bpKey;
+      if (!(key in placements)) {
+        placements[key] = new Uint16Array();
+      }
+      // You can't push() to an uint16array, so we need a temp array.
+      // Wasteful but unprofilably insignificant so I shall not optimize it.
+      const tempArray = Array.from(placements[key]);
+      tempArray.push(COORD_TO_UINT16(building.origin.toCoordinate()));
+      placements[key] = new Uint16Array(tempArray);
     }
-    return buildingStrings.join('␞');
+    return placements;
   }
 }
 

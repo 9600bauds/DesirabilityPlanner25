@@ -8,7 +8,7 @@ import {
   GRID_SIZE,
   COORD_TO_PX,
   PX_TO_COORD,
-  COORD_TO_INT16,
+  COORD_TO_UINT16,
   ROTATION_RADS,
   GRID_MAX_X,
   GRID_MAX_Y,
@@ -17,7 +17,7 @@ import {
   CELL_PX,
 } from '../utils/constants';
 import { smallestFontSizeInBounds } from '../utils/fonts';
-import { Tile, Rectangle, GridPoint } from '../utils/geometry';
+import { Tile, Rectangle, Coordinate } from '../utils/geometry';
 import Building from './Building';
 class CanvasRenderer {
   // Settings
@@ -57,8 +57,8 @@ class CanvasRenderer {
   private dragStartTile?: Tile;
   private dragBox?: Rectangle;
 
-  get viewCenter(): DOMPoint {
-    return new DOMPoint(this.clientWidth / 2, this.clientHeight / 2);
+  get viewCenter(): Coordinate {
+    return [this.clientWidth / 2, this.clientHeight / 2];
   }
 
   constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
@@ -119,7 +119,7 @@ class CanvasRenderer {
     resizeObserver.observe(parentContainer);
 
     // Center view
-    this.centerViewAt({ x: GRID_CENTER_PX, y: GRID_CENTER_PX });
+    this.centerViewAt([GRID_CENTER_PX, GRID_CENTER_PX]);
 
     // Go ahead and get us started here
     this.scheduleRerender();
@@ -194,34 +194,29 @@ class CanvasRenderer {
   /*
    * Coordinate transformations
    */
-  private grid2canvas = (
-    point: GridPoint,
-    rotate = this.isRotated
-  ): DOMPoint => {
+  private grid2canvas = (tile: Tile, rotate = this.isRotated): Coordinate => {
+    let point = tile.toCoordinate();
     if (rotate) point = ROTATE_AROUND_ORIGIN(point);
-    return new DOMPoint(
-      COORD_TO_PX(point.x) * this.zoomLevel + this.offsetX,
-      COORD_TO_PX(point.y) * this.zoomLevel + this.offsetY
-    );
+    return [
+      COORD_TO_PX(point[0]) * this.zoomLevel + this.offsetX,
+      COORD_TO_PX(point[1]) * this.zoomLevel + this.offsetY,
+    ];
   };
 
-  private canvas2grid = (
-    dompoint: DOMPoint,
-    rotate = this.isRotated
-  ): GridPoint => {
-    const x = (dompoint.x - this.offsetX) / this.zoomLevel;
-    const y = (dompoint.y - this.offsetY) / this.zoomLevel;
-    let point = { x, y };
+  private canvas2grid = (coord: Coordinate, rotate = this.isRotated): Tile => {
+    const x = (coord[0] - this.offsetX) / this.zoomLevel;
+    const y = (coord[1] - this.offsetY) / this.zoomLevel;
+    let point: Coordinate = [x, y];
     if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
-    return point;
+    return Tile.fromCoordinate(point);
   };
 
-  private pointToTile = (point: DOMPoint): Tile | undefined => {
+  private pointToTile = (point: Coordinate): Tile | undefined => {
     if (
-      point.x < 0 ||
-      point.y < 0 ||
-      point.x >= this.clientWidth ||
-      point.y >= this.clientHeight
+      point[0] < 0 ||
+      point[1] < 0 ||
+      point[0] >= this.clientWidth ||
+      point[1] >= this.clientHeight
     ) {
       return undefined; //This is outside our viewport!
     }
@@ -241,7 +236,7 @@ class CanvasRenderer {
   };
 
   public getMouseCoords = (event: MouseEvent): Tile | undefined => {
-    return this.pointToTile(new DOMPoint(event.clientX, event.clientY));
+    return this.pointToTile([event.clientX, event.clientY]);
   };
 
   // Get the range of tiles currently visible in the viewport
@@ -253,10 +248,11 @@ class CanvasRenderer {
     // However, fixing that is tricky without messing with the SIMD optimization. And there are much more significant optimizations we should do, first.
     let minX: number, minY: number, maxX: number, maxY: number;
     if (!this.isRotated) {
-      const topLeft = this.canvas2grid(new DOMPoint(0, 0));
-      const bottomRight = this.canvas2grid(
-        new DOMPoint(this.clientWidth, this.clientHeight)
-      );
+      const topLeft = this.canvas2grid([0, 0]);
+      const bottomRight = this.canvas2grid([
+        this.clientWidth,
+        this.clientHeight,
+      ]);
 
       minX = topLeft.x;
       minY = topLeft.y;
@@ -265,10 +261,10 @@ class CanvasRenderer {
     } else {
       // For a rotated grid, we need the 4 corners
       const corners = [
-        this.canvas2grid(new DOMPoint(0, 0)), // top-left
-        this.canvas2grid(new DOMPoint(this.clientWidth, 0)), // top-right
-        this.canvas2grid(new DOMPoint(0, this.clientHeight)), // bottom-left
-        this.canvas2grid(new DOMPoint(this.clientWidth, this.clientHeight)), // bottom-right
+        this.canvas2grid([0, 0]), // top-left
+        this.canvas2grid([this.clientWidth, 0]), // top-right
+        this.canvas2grid([0, this.clientHeight]), // bottom-left
+        this.canvas2grid([this.clientWidth, this.clientHeight]), // bottom-right
       ];
       minX = Math.min(...corners.map((p) => p.x));
       minY = Math.min(...corners.map((p) => p.y));
@@ -312,20 +308,20 @@ class CanvasRenderer {
     this.isRotated = !this.isRotated;
 
     // Recenter view
-    this.centerViewAt(oldCenter);
+    this.centerViewAt(oldCenter.toCoordinate());
 
     this.scheduleRerender();
   };
 
-  public centerViewAt = (point: GridPoint) => {
+  public centerViewAt = (point: Coordinate) => {
     const center = this.viewCenter;
 
     if (this.isRotated) {
       point = ROTATE_AROUND_ORIGIN(point);
     }
 
-    this.offsetX = center.x - point.x * this.zoomLevel;
-    this.offsetY = center.y - point.y * this.zoomLevel;
+    this.offsetX = center[0] - point[0] * this.zoomLevel;
+    this.offsetY = center[1] - point[1] * this.zoomLevel;
 
     this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
   };
@@ -343,7 +339,7 @@ class CanvasRenderer {
     this.zoomLevel *= factor;
 
     // Recenter view
-    this.centerViewAt(oldCenter);
+    this.centerViewAt(oldCenter.toCoordinate());
 
     this.scheduleRerender(); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
   };
@@ -673,7 +669,7 @@ class CanvasRenderer {
     let idx = 0;
     for (let y = bounds.startY; y <= bounds.endY; y++) {
       for (let x = bounds.startX; x <= bounds.endX; x++) {
-        const thisVal = tileValues[COORD_TO_INT16(x, y)];
+        const thisVal = tileValues[COORD_TO_UINT16([x, y])];
         const rgb = getDesirabilityRGB(thisVal);
         imageData.data[idx++] = rgb.r;
         imageData.data[idx++] = rgb.g;
@@ -739,15 +735,15 @@ class CanvasRenderer {
 
     for (let x = bounds.startX; x <= bounds.endX; x++) {
       for (let y = bounds.startY; y <= bounds.endY; y++) {
-        const desirabilityValue = tileValues[COORD_TO_INT16(x, y)];
+        const desirabilityValue = tileValues[COORD_TO_UINT16([x, y])];
 
         if (desirabilityValue === 0) continue;
 
         // Get the center point of this tile in canvas space
-        let centerPoint = {
-          x: COORD_TO_PX(x + 0.5),
-          y: COORD_TO_PX(y + 0.5),
-        };
+        let centerPoint: Coordinate = [
+          COORD_TO_PX(x + 0.5),
+          COORD_TO_PX(y + 0.5),
+        ];
 
         if (this.isRotated) {
           centerPoint = ROTATE_AROUND_ORIGIN(centerPoint);
@@ -755,8 +751,8 @@ class CanvasRenderer {
 
         // Draw the text at screen coordinates without any rotation
         const valueText = desirabilityValue.toString();
-        ctx.strokeText(valueText, centerPoint.x, centerPoint.y);
-        ctx.fillText(valueText, centerPoint.x, centerPoint.y);
+        ctx.strokeText(valueText, centerPoint[0], centerPoint[1]);
+        ctx.fillText(valueText, centerPoint[0], centerPoint[1]);
       }
     }
   };
@@ -853,13 +849,13 @@ class CanvasRenderer {
         // We also make ourselves a bit wider and a bit shorter because it looks better with rotated buildings.
         labelHeight -= labelHeight * 0.2;
         labelWidth += labelWidth * 0.2;
-        const buildingCenter = {
-          x: building.origin.x + building.width / 2,
-          y: building.origin.y + building.height / 2,
-        };
+        const buildingCenter = new Tile(
+          building.origin.x + building.width / 2,
+          building.origin.y + building.height / 2
+        );
         labelOrigin = this.grid2canvas(buildingCenter);
-        labelOrigin.x -= labelWidth / 2;
-        labelOrigin.y -= labelHeight / 2;
+        labelOrigin[0] -= labelWidth / 2;
+        labelOrigin[1] -= labelHeight / 2;
       }
 
       let fontSize;
@@ -880,8 +876,8 @@ class CanvasRenderer {
           id='label-${building.id}'
           class='building-label'
           style="
-            left: ${labelOrigin.x}px;
-            top: ${labelOrigin.y}px;
+            left: ${labelOrigin[0]}px;
+            top: ${labelOrigin[1]}px;
             width: ${labelWidth}px;
             height: ${labelHeight}px;
             padding: 3px;

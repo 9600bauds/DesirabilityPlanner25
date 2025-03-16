@@ -4,11 +4,12 @@ import * as Collections from 'typescript-collections';
 import DesireBox from './desireBox';
 import BuildingGraphic, { fillPath } from '../interfaces/BuildingGraphic';
 import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
-import { COORD_TO_PX } from '../utils/constants';
+import { COORD_TO_PX, GRID_MAX_X, GRID_MAX_Y } from '../utils/constants';
 import { ALL_CATEGORIES } from '../data/CATEGORIES';
 import colors from '../utils/colors';
 
 class Building {
+  bpKey: string;
   id: string;
   origin: Tile;
   width: number;
@@ -25,6 +26,17 @@ class Building {
   graphic?: BuildingGraphic;
 
   constructor(origin: Tile, blueprint: Blueprint) {
+    if (
+      origin.x < 0 ||
+      origin.y < 0 ||
+      origin.x > GRID_MAX_X ||
+      origin.y > GRID_MAX_Y
+    ) {
+      throw new Error(
+        `Tried to create a building outside the edges of the grid! x:${origin.x} y:${origin.y}`
+      );
+    }
+
     //Todo: Assigning key should probably be done in-situ for ALL_BLUEPRINTS
     const key = Object.keys(ALL_BLUEPRINTS).find(
       (key) => ALL_BLUEPRINTS[key] === blueprint
@@ -34,7 +46,8 @@ class Building {
         'Building blueprint did not have a key in the blueprints lookup!'
       );
     }
-    this.id = `${key}␟${origin.x}␟${origin.y}`;
+    this.bpKey = key;
+    this.id = `${key};${origin.x};${origin.y}`;
     this.origin = origin;
     this.height = blueprint.height;
     this.width = blueprint.width;
