@@ -34,7 +34,7 @@ class Building {
         'Building blueprint did not have a key in the blueprints lookup!'
       );
     }
-    this.id = `${key}-(${origin.x},${origin.y})`;
+    this.id = `${key}␟${origin.x}␟${origin.y}`;
     this.origin = origin;
     this.height = blueprint.height;
     this.width = blueprint.width;

@@ -3,6 +3,11 @@ import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 import Building from './Building';
 
+export interface blueprintPlacement {
+  position: Tile;
+  blueprint: Blueprint;
+}
+
 class GridStateManager {
   private states: GridState[] = [];
   private stateIndex: number = 0;
@@ -14,7 +19,7 @@ class GridStateManager {
     this.stateIndex = 0;
   }
 
-  private get activeGridState(): GridState {
+  public get activeGridState(): GridState {
     return this.states[this.stateIndex];
   }
 
@@ -105,9 +110,7 @@ class GridStateManager {
     return true;
   };
 
-  public tryPlaceBlueprints(
-    placements: Array<{ position: Tile; blueprint: Blueprint }>
-  ): boolean {
+  public tryPlaceBlueprints(placements: Array<blueprintPlacement>): boolean {
     // Create all buildings first
     const newBuildings: Building[] = [];
 

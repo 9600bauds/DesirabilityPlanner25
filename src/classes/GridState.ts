@@ -57,6 +57,14 @@ class GridState {
 
     return new GridState(newGrid, newBuildings);
   }
+
+  public toString() {
+    const buildingStrings = [];
+    for (const building of this.getPlacedBuildings()) {
+      buildingStrings.push(building.id);
+    }
+    return buildingStrings.join('␞');
+  }
 }
 
 export default GridState;

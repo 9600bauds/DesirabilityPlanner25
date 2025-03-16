@@ -20,6 +20,7 @@ const App: React.FC = () => {
     if (rendererRef.current) {
       rendererRef.current.scheduleRerender();
     }
+    updateUrl();
   }, []);
 
   const {
@@ -27,6 +28,7 @@ const App: React.FC = () => {
     canUndo,
     canRedo,
     updateUndoRedoState,
+    updateUrl,
     tryPlaceBlueprint,
     tryEraseRect,
     tryUndo,
@@ -69,6 +71,8 @@ const App: React.FC = () => {
       }
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
