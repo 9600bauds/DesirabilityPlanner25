@@ -4,7 +4,7 @@ import GridStateManager, {
 } from '../classes/GridStateManager';
 import Blueprint from '../types/Blueprint';
 import { Rectangle, Tile } from '../utils/geometry';
-import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
+import { ALL_BLUEPRINTS, BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
 import { decodeData, encodeData } from '../utils/encoding';
 import { UINT16_TO_COORD, URL_STATE_INDEX } from '../utils/constants';
 
@@ -37,14 +37,15 @@ export function useGridManager(gridStateUpdated: () => void) {
     const blueprintsToAdd: Array<BlueprintPlacement> = [];
     try {
       const decoded = decodeData(compressedState);
-      for (const [bpKey, positions] of Object.entries(decoded)) {
-        if (!(bpKey in ALL_BLUEPRINTS)) {
+      for (const [bpID, positions] of Object.entries(decoded)) {
+        const realNumber = parseInt(bpID);
+        if (!BLUEPRINTS_BY_ID.has(realNumber)) {
           console.warn(
-            `Remaking gridstate from string encountered invalid ID of ${bpKey}!`
+            `Remaking gridstate from string encountered invalid ID of ${bpID}!`
           );
           continue;
         }
-        const blueprint = ALL_BLUEPRINTS[bpKey];
+        const blueprint = BLUEPRINTS_BY_ID.get(realNumber)!;
         positions.forEach((pos) => {
           const coord = UINT16_TO_COORD(pos);
           blueprintsToAdd.push({

@@ -1,1 +1,1 @@
-export type CompressedGridState = Record<string, Uint16Array>;
+export type CompressedGridState = Record<number, Uint16Array>;

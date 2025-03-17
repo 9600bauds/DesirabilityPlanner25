@@ -9,7 +9,7 @@ import { ALL_CATEGORIES } from '../data/CATEGORIES';
 import colors from '../utils/colors';
 
 class Building {
-  bpKey: string;
+  bpID: number;
   id: string;
   origin: Tile;
   width: number;
@@ -37,17 +37,8 @@ class Building {
       );
     }
 
-    //Todo: Assigning key should probably be done in-situ for ALL_BLUEPRINTS
-    const key = Object.keys(ALL_BLUEPRINTS).find(
-      (key) => ALL_BLUEPRINTS[key] === blueprint
-    );
-    if (!key) {
-      throw new Error(
-        'Building blueprint did not have a key in the blueprints lookup!'
-      );
-    }
-    this.bpKey = key;
-    this.id = `${key};${origin.x};${origin.y}`;
+    this.bpID = blueprint.id;
+    this.id = `${blueprint.id};${origin.x};${origin.y}`;
     this.origin = origin;
     this.height = blueprint.height;
     this.width = blueprint.width;

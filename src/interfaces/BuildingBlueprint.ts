@@ -4,6 +4,7 @@ import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
 import { ALL_CATEGORIES } from '../data/CATEGORIES';
 
 export interface BuildingBlueprint {
+  id: number;
   label?: string;
   fillColor?: string;
   invisible?: boolean; //If true, this building and its children have no graphic.
