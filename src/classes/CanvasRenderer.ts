@@ -139,6 +139,14 @@ class CanvasRenderer {
     this.previewLayers = {};
   };
 
+  public updateRenderContext(newContext: Partial<RenderContext>): void {
+    // Update only the properties that were provided
+    this.renderContext = {
+      ...this.renderContext,
+      ...newContext,
+    };
+  }
+
   private fastClearCtx = (
     ctx: CanvasRenderingContext2D,
     rotate = this.isRotated
@@ -501,6 +509,11 @@ class CanvasRenderer {
     }
 
     const selectedBlueprint = this.renderContext.getSelectedBlueprint();
+    console.log(
+      'Previewing! Selected bp: ',
+      selectedBlueprint,
+      this.renderContext.getSelectedBlueprint
+    );
     const placedBuildings = this.renderContext.getBuildings();
     const baseValues = this.renderContext.getBaseValues(); // These are the precomputed desirability values from the "true" gridstate.
 

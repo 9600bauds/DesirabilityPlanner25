@@ -10,8 +10,10 @@ const App: React.FC = () => {
   // ===== APPLICATION STATE (or refs, I guess?) =====
   const [cursorAction, setCursorAction] = useState<CursorAction>('panning');
 
-  const selectedSubcategoryRef = useRef<Subcategory | null>(null);
-  const selectedBlueprintIndexRef = useRef<number>(0);
+  const [selectedSubcategory, setSelectedSubcategory] =
+    useState<Subcategory | null>(null);
+  const [selectedBlueprintIndex, setSelectedBlueprintIndex] =
+    useState<number>(0);
 
   const canvasContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
@@ -175,18 +177,8 @@ const App: React.FC = () => {
 
       // Handle 'r' key for blueprint rotation
       if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
-        const subcategory = selectedSubcategoryRef.current;
-        if (subcategory) {
-          selectedBlueprintIndexRef.current =
-            (selectedBlueprintIndexRef.current + 1) %
-            subcategory.blueprints.length;
-
-          // Since changing a ref doesn't trigger re-renders, manually notify the renderer
-          if (rendererRef.current && cursorAction === 'placing') {
-            event.preventDefault();
-            rendererRef.current.schedulePreview();
-          }
-        }
+        event.preventDefault();
+        selectNextBlueprintIndex();
       }
 
       // Handle Control key for building transparency
@@ -207,6 +199,8 @@ const App: React.FC = () => {
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mousemove', handleMouseMove);
 
+    console.log('Redid mouse events!');
+
     // Clean up
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -214,11 +208,18 @@ const App: React.FC = () => {
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [cursorAction, tryUndo, tryRedo, tryEraseRect, tryPlaceBlueprint]);
+  }, [
+    cursorAction,
+    selectedSubcategory,
+    selectedBlueprintIndex,
+    tryUndo,
+    tryRedo,
+    tryEraseRect,
+    tryPlaceBlueprint,
+  ]);
 
   const updateCursor = useCallback(() => {
     if (!canvasContainer.current) return;
-
     if (cursorAction === 'placing') {
       document.body.style.cursor = 'auto';
       canvasContainer.current.style.cursor = 'copy';
@@ -235,7 +236,6 @@ const App: React.FC = () => {
       }
     }
   }, [cursorAction]);
-
   // Actually update the cursor automatically too
   useEffect(() => {
     updateCursor();
@@ -246,31 +246,36 @@ const App: React.FC = () => {
 
   const selectSubcategory = (subcat: Subcategory) => {
     setCursorAction('placing');
-    selectedSubcategoryRef.current = subcat;
-    selectedBlueprintIndexRef.current = 0;
-    // Notify renderer if needed
-    if (rendererRef.current) {
-      rendererRef.current.schedulePreview();
-    }
+    setSelectedSubcategory(subcat);
+    setSelectedBlueprintIndex(0);
   };
-
   const deselectSubcategory = () => {
-    selectedSubcategoryRef.current = null;
-    selectedBlueprintIndexRef.current = 0;
-    // Notify renderer if needed
-    if (rendererRef.current) {
-      rendererRef.current.schedulePreview();
+    setSelectedSubcategory(null);
+    setSelectedBlueprintIndex(0);
+  };
+  const selectNextBlueprintIndex = () => {
+    if (selectedSubcategory) {
+      const newIndex =
+        (selectedBlueprintIndex + 1) % selectedSubcategory.blueprints.length;
+      setSelectedBlueprintIndex(newIndex);
     }
   };
 
-  const getSelectedBlueprint = (): Blueprint | null => {
-    if (!selectedSubcategoryRef.current) {
-      return null;
+  // useCallback gives us a stable reference between rerenders, so we can pass it down to the rendercontext
+  const getSelectedBlueprint = useCallback((): Blueprint | null => {
+    if (!selectedSubcategory) return null;
+    return selectedSubcategory.blueprints[selectedBlueprintIndex];
+  }, [selectedSubcategory, selectedBlueprintIndex]);
+  // When our blueprint is updated: Keep the rendercontext updated with the latest reference
+  useEffect(() => {
+    if (rendererRef.current) {
+      rendererRef.current.updateRenderContext({
+        getSelectedBlueprint,
+      });
+      // Also tell it to preview the change for good measure
+      rendererRef.current.schedulePreview();
     }
-    return selectedSubcategoryRef.current.blueprints[
-      selectedBlueprintIndexRef.current
-    ];
-  };
+  }, [getSelectedBlueprint]);
 
   return (
     <div id="app-container" className="d-flex">
