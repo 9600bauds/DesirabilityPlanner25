@@ -62,6 +62,7 @@ class CanvasRenderer {
   }
 
   constructor(parentContainer: HTMLDivElement, renderContext: RenderContext) {
+    console.log('Recreating canvasrenderer!');
     const createCtx = (
       id: string,
       zIndex: number
@@ -126,6 +127,7 @@ class CanvasRenderer {
   }
 
   public destroy = () => {
+    console.log('Destroying canvasrenderer!');
     this.parentContainer.removeChild(this.labelContainer);
     for (const ctx of Object.values(this.mainLayers)) {
       this.parentContainer.removeChild(ctx.canvas);

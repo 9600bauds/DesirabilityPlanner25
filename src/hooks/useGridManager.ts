@@ -36,7 +36,7 @@ export function useGridManager(gridStateUpdated: () => void) {
     try {
       const decoded = decodeData(compressedState);
       if (!decoded.length) {
-        setUrlState(URL_STATE_INDEX, null);
+        setUrlState(URL_STATE_INDEX, null); //Clear an empty result
         return;
       }
       gridManagerRef.current.loadUInt8Array(decoded);
@@ -51,7 +51,7 @@ export function useGridManager(gridStateUpdated: () => void) {
     if (compressed.length <= 0) {
       setUrlState(URL_STATE_INDEX, null);
     } else {
-      const encoded = encodeData(compressed);
+      const encoded = encodeData(compressed); //Clear an empty board
       setUrlState(URL_STATE_INDEX, encoded);
     }
   };

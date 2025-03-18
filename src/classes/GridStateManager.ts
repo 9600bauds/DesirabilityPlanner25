@@ -163,6 +163,8 @@ class GridStateManager {
     return true;
   };
 
+  // Export the current active grid state to a uint8array (effectively a Buffer).
+  // The array has 1 uint8 for each building's bpID, 1 for its origin X, and 1 for its Y.
   public getUInt8Array() {
     const buildings = this.activeGridState.getPlacedBuildings();
     const arr = new Uint8Array(buildings.size * 3);
@@ -175,6 +177,8 @@ class GridStateManager {
     return arr;
   }
 
+  // Load and try to place all buildings expressed in a uint8array (effectively a Buffer).
+  // The array has 1 uint8 for each building's bpID, 1 for its origin X, and 1 for its Y.
   public loadUInt8Array(arr: Uint8Array<ArrayBuffer>) {
     const blueprintsToAdd: Array<BlueprintPlacement> = [];
     // Process array in groups of 3 (bpID, x, y)
@@ -190,16 +194,8 @@ class GridStateManager {
           blueprint,
         });
       } catch (error) {
-        console.warn(
-          'Failed to load a saved building of id',
-          bpID,
-          'x',
-          x,
-          'y',
-          y,
-          ': ',
-          error
-        );
+        //prettier-ignore
+        console.warn('Failed to load a saved building of id', bpID, 'x', x, 'y', y, ': ', error);
       }
     }
     this.tryPlaceBlueprints(blueprintsToAdd);
