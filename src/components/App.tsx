@@ -38,7 +38,7 @@ const App: React.FC = () => {
     tryRedo,
   } = useGridManager(gridStateUpdated);
 
-  // ===== INITIALIZATION =====
+  // Initialize the renderer once, on mount
   useEffect(() => {
     if (!canvasContainer.current) {
       throw new Error(
@@ -70,6 +70,65 @@ const App: React.FC = () => {
       }
     };
   }, []);
+
+  const selectSubcategory = (subcat: Subcategory) => {
+    setCursorAction('placing');
+    setSelectedSubcategory(subcat);
+    setSelectedBlueprintIndex(0);
+  };
+  const deselectSubcategory = () => {
+    setSelectedSubcategory(null);
+    setSelectedBlueprintIndex(0);
+  };
+  const selectNextBlueprintIndex = () => {
+    if (selectedSubcategory) {
+      const newIndex =
+        (selectedBlueprintIndex + 1) % selectedSubcategory.blueprints.length;
+      setSelectedBlueprintIndex(newIndex);
+    }
+  };
+
+  // useCallback gives us a stable reference between rerenders, so we can pass it down to the rendercontext
+  const getSelectedBlueprint = useCallback((): Blueprint | null => {
+    if (!selectedSubcategory) return null;
+    return selectedSubcategory.blueprints[selectedBlueprintIndex];
+  }, [selectedSubcategory, selectedBlueprintIndex]);
+  // When our blueprint is updated: Keep the rendercontext updated with the latest reference
+  useEffect(() => {
+    if (rendererRef.current) {
+      rendererRef.current.updateRenderContext({
+        getSelectedBlueprint,
+      });
+      // Also tell it to preview the change for good measure
+      rendererRef.current.schedulePreview();
+    }
+  }, [getSelectedBlueprint]);
+
+  const updateCursor = useCallback(() => {
+    if (!canvasContainer.current) return;
+    if (cursorAction === 'placing') {
+      document.body.style.cursor = 'auto';
+      canvasContainer.current.style.cursor = 'copy';
+    } else if (cursorAction === 'erasing') {
+      document.body.style.cursor = 'auto';
+      canvasContainer.current.style.cursor = 'cell';
+    } else if (cursorAction === 'panning') {
+      if (rendererRef.current?.isPanning) {
+        document.body.style.cursor = 'grabbing';
+        canvasContainer.current.style.cursor = 'grabbing';
+      } else {
+        document.body.style.cursor = 'auto';
+        canvasContainer.current.style.cursor = 'grab';
+      }
+    }
+  }, [cursorAction]);
+  // Actually update the cursor automatically too
+  useEffect(() => {
+    updateCursor();
+    if (cursorAction !== 'placing') {
+      deselectSubcategory();
+    }
+  }, [cursorAction, updateCursor]);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     const renderer = rendererRef.current;
@@ -112,48 +171,13 @@ const App: React.FC = () => {
       renderer.schedulePreview();
     }
   };
+  // Some of our mouse events are applied to the document and the window. React does not have an easy way to do this.
+  // As such, we need useEffects() to remove and re-apply these events whenever any of their state dependencies change.
+
+  // 1. Keyboard Events
   useEffect(() => {
-    const handleMouseUp = (event: MouseEvent) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
-
-      if (event.button === 0) {
-        //Left click
-        renderer.stopPanning();
-        if (cursorAction === 'erasing') {
-          const erasedRect = renderer.stopDragging();
-          if (erasedRect) {
-            tryEraseRect(erasedRect);
-          }
-        } else if (cursorAction === 'placing') {
-          const tile = renderer.getMouseCoords(event);
-          if (tile) {
-            const blueprint = getSelectedBlueprint();
-            if (blueprint) {
-              tryPlaceBlueprint(tile, blueprint);
-            }
-          }
-        }
-        updateCursor();
-      }
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
-
-      const tileChanged = renderer.checkForTileChange(event);
-
-      if (cursorAction === 'panning') {
-        renderer.handlePanning(event);
-      }
-      if (tileChanged) {
-        handleTileChange();
-      }
-    };
-
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Handle keyboard shortcuts for undo/redo
+      // Undo/Redo keyboard shortcuts
       if (
         event.ctrlKey &&
         (event.key === 'z' || event.key === 'Z') &&
@@ -175,13 +199,13 @@ const App: React.FC = () => {
         return;
       }
 
-      // Handle 'r' key for blueprint rotation
+      // Blueprint rotation
       if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
         event.preventDefault();
         selectNextBlueprintIndex();
       }
 
-      // Handle Control key for building transparency
+      // Building transparency
       if (event.key === 'Control' && !event.repeat && rendererRef.current) {
         rendererRef.current.setBuildingTransparency(true);
       }
@@ -193,89 +217,81 @@ const App: React.FC = () => {
       }
     };
 
-    // Add event listeners
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('mousemove', handleMouseMove);
 
-    console.log('Redid mouse events!');
-
-    // Clean up
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [tryUndo, tryRedo, selectNextBlueprintIndex, rendererRef]);
+
+  // 2. Mouse Up Events
+  useEffect(() => {
+    const handleMouseUp = (event: MouseEvent) => {
+      const renderer = rendererRef.current;
+      if (!renderer) return;
+
+      if (event.button === 0) {
+        //Left click
+        renderer.stopPanning();
+
+        if (cursorAction === 'erasing') {
+          const erasedRect = renderer.stopDragging();
+          if (erasedRect) {
+            tryEraseRect(erasedRect);
+          }
+        } else if (cursorAction === 'placing') {
+          const tile = renderer.getMouseCoords(event);
+          if (tile) {
+            const blueprint = getSelectedBlueprint();
+            if (blueprint) {
+              tryPlaceBlueprint(tile, blueprint);
+            }
+          }
+        }
+
+        updateCursor();
+      }
+    };
+
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
       window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [
     cursorAction,
-    selectedSubcategory,
-    selectedBlueprintIndex,
-    tryUndo,
-    tryRedo,
+    getSelectedBlueprint,
     tryEraseRect,
     tryPlaceBlueprint,
+    updateCursor,
+    rendererRef,
   ]);
 
-  const updateCursor = useCallback(() => {
-    if (!canvasContainer.current) return;
-    if (cursorAction === 'placing') {
-      document.body.style.cursor = 'auto';
-      canvasContainer.current.style.cursor = 'copy';
-    } else if (cursorAction === 'erasing') {
-      document.body.style.cursor = 'auto';
-      canvasContainer.current.style.cursor = 'cell';
-    } else if (cursorAction === 'panning') {
-      if (rendererRef.current?.isPanning) {
-        document.body.style.cursor = 'grabbing';
-        canvasContainer.current.style.cursor = 'grabbing';
-      } else {
-        document.body.style.cursor = 'auto';
-        canvasContainer.current.style.cursor = 'grab';
+  // 3. Mouse Move Events
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      const renderer = rendererRef.current;
+      if (!renderer) return;
+
+      const tileChanged = renderer.checkForTileChange(event);
+
+      if (cursorAction === 'panning') {
+        renderer.handlePanning(event);
       }
-    }
-  }, [cursorAction]);
-  // Actually update the cursor automatically too
-  useEffect(() => {
-    updateCursor();
-    if (cursorAction !== 'placing') {
-      deselectSubcategory();
-    }
-  }, [cursorAction, updateCursor]);
 
-  const selectSubcategory = (subcat: Subcategory) => {
-    setCursorAction('placing');
-    setSelectedSubcategory(subcat);
-    setSelectedBlueprintIndex(0);
-  };
-  const deselectSubcategory = () => {
-    setSelectedSubcategory(null);
-    setSelectedBlueprintIndex(0);
-  };
-  const selectNextBlueprintIndex = () => {
-    if (selectedSubcategory) {
-      const newIndex =
-        (selectedBlueprintIndex + 1) % selectedSubcategory.blueprints.length;
-      setSelectedBlueprintIndex(newIndex);
-    }
-  };
+      if (tileChanged) {
+        handleTileChange();
+      }
+    };
 
-  // useCallback gives us a stable reference between rerenders, so we can pass it down to the rendercontext
-  const getSelectedBlueprint = useCallback((): Blueprint | null => {
-    if (!selectedSubcategory) return null;
-    return selectedSubcategory.blueprints[selectedBlueprintIndex];
-  }, [selectedSubcategory, selectedBlueprintIndex]);
-  // When our blueprint is updated: Keep the rendercontext updated with the latest reference
-  useEffect(() => {
-    if (rendererRef.current) {
-      rendererRef.current.updateRenderContext({
-        getSelectedBlueprint,
-      });
-      // Also tell it to preview the change for good measure
-      rendererRef.current.schedulePreview();
-    }
-  }, [getSelectedBlueprint]);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [cursorAction, handleTileChange, rendererRef]);
 
   return (
     <div id="app-container" className="d-flex">
