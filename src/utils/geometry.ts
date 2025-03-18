@@ -8,6 +8,9 @@ export class Tile {
   public y: number;
 
   constructor(x: number, y: number) {
+    if (x === undefined || y === undefined) {
+      throw new Error('Tried to initialize tile with undefined coordinate!');
+    }
     this.x = x;
     this.y = y;
   }

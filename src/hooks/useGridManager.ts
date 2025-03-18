@@ -4,9 +4,8 @@ import GridStateManager, {
 } from '../classes/GridStateManager';
 import Blueprint from '../types/Blueprint';
 import { Rectangle, Tile } from '../utils/geometry';
-import { ALL_BLUEPRINTS, BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
 import { decodeData, encodeData } from '../utils/encoding';
-import { UINT16_TO_COORD, URL_STATE_INDEX } from '../utils/constants';
+import { URL_STATE_INDEX } from '../utils/constants';
 
 export function useGridManager(gridStateUpdated: () => void) {
   const gridManagerRef = useRef<GridStateManager>(new GridStateManager());
@@ -34,43 +33,22 @@ export function useGridManager(gridStateUpdated: () => void) {
     const compressedState = getUrlState(URL_STATE_INDEX);
     if (!compressedState) return;
 
-    const blueprintsToAdd: Array<BlueprintPlacement> = [];
     try {
       const decoded = decodeData(compressedState);
-      for (const [bpID, positions] of Object.entries(decoded)) {
-        const realNumber = parseInt(bpID);
-        if (!BLUEPRINTS_BY_ID.has(realNumber)) {
-          console.warn(
-            `Remaking gridstate from string encountered invalid ID of ${bpID}!`
-          );
-          continue;
-        }
-        const blueprint = BLUEPRINTS_BY_ID.get(realNumber)!;
-        positions.forEach((pos) => {
-          const coord = UINT16_TO_COORD(pos);
-          blueprintsToAdd.push({
-            position: Tile.fromCoordinate(coord),
-            blueprint,
-          });
-        });
+      if (!decoded.length) {
+        setUrlState(URL_STATE_INDEX, null);
+        return;
       }
+      gridManagerRef.current.loadUInt8Array(decoded);
+      updateUrl(); // Immediately update our URL, in case something needs fixing
     } catch (error) {
       console.error('Could not decode saved URL:', error);
-    }
-
-    if (!blueprintsToAdd.length) {
-      setUrlState(URL_STATE_INDEX, null);
-      return;
-    }
-    if (!tryPlaceBlueprints(blueprintsToAdd)) {
-      setUrlState(URL_STATE_INDEX, null);
-      return;
     }
   }, []);
 
   const updateUrl = () => {
-    const compressed = gridManagerRef.current.activeGridState.compressed();
-    if (Object.keys(compressed).length <= 0) {
+    const compressed = gridManagerRef.current.getUInt8Array();
+    if (compressed.length <= 0) {
       setUrlState(URL_STATE_INDEX, null);
     } else {
       const encoded = encodeData(compressed);
@@ -97,7 +75,7 @@ export function useGridManager(gridStateUpdated: () => void) {
     [gridStateUpdated]
   );
 
-  const tryPlaceBlueprints = useCallback(
+  const _tryPlaceBlueprints = useCallback(
     (placements: Array<BlueprintPlacement>) => {
       const success = gridManagerRef.current.tryPlaceBlueprints(placements);
       if (success) gridStateUpdated();

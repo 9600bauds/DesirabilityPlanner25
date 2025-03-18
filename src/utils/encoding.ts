@@ -1,6 +1,3 @@
-import { encode, decode } from 'cbor-x';
-import { CompressedGridState } from '../types/CompressedGridState';
-
 const uint8ToBinary = (uint8: Uint8Array): string => {
   let result = '';
   for (let i = 0; i < uint8.length; i++) {
@@ -29,13 +26,9 @@ const urlToBase64 = (str: string): string => {
   return atob(paddedBase64);
 };
 
-export function encodeData(data: CompressedGridState): string {
+export function encodeData(data: Uint8Array): string {
   try {
-    // Type the encoded result explicitly as Uint8Array
-    const encoded = encode(data) as Uint8Array;
-
-    // Convert and encode in one operation
-    return base64ToUrl(uint8ToBinary(encoded));
+    return base64ToUrl(uint8ToBinary(data));
   } catch (error) {
     console.error('Error encoding data:', error);
     throw new Error(
@@ -44,14 +37,11 @@ export function encodeData(data: CompressedGridState): string {
   }
 }
 
-export function decodeData(str: string): CompressedGridState {
+export function decodeData(str: string): Uint8Array {
   try {
-    // Decode string to binary, then to Uint8Array
     const binary = urlToBase64(str);
     const bytes = binaryToUint8(binary);
-
-    // Decode CBOR with explicit type assertion
-    return decode(bytes) as CompressedGridState;
+    return bytes;
   } catch (error) {
     console.error('Error decoding data:', error);
     throw new Error(

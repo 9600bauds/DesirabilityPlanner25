@@ -2,6 +2,7 @@ import Blueprint, { createBuilding } from '../types/Blueprint';
 import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 import Building from './Building';
+import { BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
 
 export interface BlueprintPlacement {
   position: Tile;
@@ -161,6 +162,48 @@ class GridStateManager {
 
     return true;
   };
+
+  public getUInt8Array() {
+    const buildings = this.activeGridState.getPlacedBuildings();
+    const arr = new Uint8Array(buildings.size * 3);
+    let currIndex = 0;
+    for (const building of buildings) {
+      arr[currIndex++] = building.bpID;
+      arr[currIndex++] = building.origin.x;
+      arr[currIndex++] = building.origin.y;
+    }
+    return arr;
+  }
+
+  public loadUInt8Array(arr: Uint8Array<ArrayBuffer>) {
+    const blueprintsToAdd: Array<BlueprintPlacement> = [];
+    // Process array in groups of 3 (bpID, x, y)
+    for (let i = 0; i < arr.length; i += 3) {
+      const bpID = arr[i];
+      const x = arr[i + 1];
+      const y = arr[i + 2];
+      try {
+        const blueprint = BLUEPRINTS_BY_ID.get(bpID)!;
+        const position = new Tile(x, y);
+        blueprintsToAdd.push({
+          position,
+          blueprint,
+        });
+      } catch (error) {
+        console.warn(
+          'Failed to load a saved building of id',
+          bpID,
+          'x',
+          x,
+          'y',
+          y,
+          ': ',
+          error
+        );
+      }
+    }
+    this.tryPlaceBlueprints(blueprintsToAdd);
+  }
 }
 
 export default GridStateManager;
