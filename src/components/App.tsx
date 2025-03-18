@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import Sidebar from './Sidebar';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
@@ -8,9 +8,10 @@ import { useGridManager } from '../hooks/useGridManager';
 
 const App: React.FC = () => {
   // ===== APPLICATION STATE (or refs, I guess?) =====
+  const [cursorAction, setCursorAction] = useState<CursorAction>('panning');
+
   const selectedSubcategoryRef = useRef<Subcategory | null>(null);
   const selectedBlueprintIndexRef = useRef<number>(0);
-  const cursorActionRef = useRef<CursorAction>('panning');
 
   const canvasContainer = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<CanvasRenderer | null>(null);
@@ -55,12 +56,8 @@ const App: React.FC = () => {
           renderContext
         );
       }
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('keyup', handleKeyUp);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('mousemove', handleMouseMove);
     } catch (error) {
-      console.error('Error initializing data:', error);
+      console.error('Error initializing renderer:', error);
     }
 
     // Clean up on unmount
@@ -69,40 +66,8 @@ const App: React.FC = () => {
         rendererRef.current.destroy();
         rendererRef.current = null;
       }
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
-
-  const setCursorAction = (newAction: CursorAction) => {
-    cursorActionRef.current = newAction;
-    if (newAction !== 'placing') {
-      deselectSubcategory();
-    }
-    updateCursor();
-  };
-
-  const updateCursor = () => {
-    if (!canvasContainer.current) return;
-
-    if (cursorActionRef.current === 'placing') {
-      document.body.style.cursor = 'auto';
-      canvasContainer.current.style.cursor = 'copy';
-    } else if (cursorActionRef.current === 'erasing') {
-      document.body.style.cursor = 'auto';
-      canvasContainer.current.style.cursor = 'cell';
-    } else if (cursorActionRef.current === 'panning') {
-      if (rendererRef.current?.isPanning) {
-        document.body.style.cursor = 'grabbing';
-        canvasContainer.current.style.cursor = 'grabbing';
-      } else {
-        document.body.style.cursor = 'auto';
-        canvasContainer.current.style.cursor = 'grab';
-      }
-    }
-  };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     const renderer = rendererRef.current;
@@ -110,62 +75,22 @@ const App: React.FC = () => {
 
     if (event.button === 2) {
       // Right click
-      if (cursorActionRef.current === 'placing') {
+      if (cursorAction === 'placing') {
         setCursorAction('panning');
-      } else if (cursorActionRef.current === 'erasing') {
+      } else if (cursorAction === 'erasing') {
         setCursorAction('panning');
         renderer.stopDragging();
       }
     } else if (event.button === 0) {
       // Left click
-      if (cursorActionRef.current === 'panning') {
+      if (cursorAction === 'panning') {
         renderer.startPanning(event.nativeEvent);
-      } else if (cursorActionRef.current === 'erasing') {
+      } else if (cursorAction === 'erasing') {
         renderer.startDragging();
       }
       updateCursor();
     }
   };
-
-  const handleMouseUp = (event: MouseEvent) => {
-    const renderer = rendererRef.current;
-    if (!renderer) return;
-
-    if (event.button === 0) {
-      //Left click
-      renderer.stopPanning();
-      if (cursorActionRef.current === 'erasing') {
-        const erasedRect = renderer.stopDragging();
-        if (erasedRect) {
-          tryEraseRect(erasedRect);
-        }
-      } else if (cursorActionRef.current === 'placing') {
-        const tile = renderer.getMouseCoords(event);
-        if (tile) {
-          const blueprint = getSelectedBlueprint();
-          if (blueprint) {
-            tryPlaceBlueprint(tile, blueprint);
-          }
-        }
-      }
-      updateCursor();
-    }
-  };
-
-  const handleMouseMove = (event: MouseEvent) => {
-    const renderer = rendererRef.current;
-    if (!renderer) return;
-
-    const tileChanged = renderer.checkForTileChange(event);
-
-    if (cursorActionRef.current === 'panning') {
-      renderer.handlePanning(event);
-    }
-    if (tileChanged) {
-      handleTileChange();
-    }
-  };
-
   const handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
     const renderer = rendererRef.current;
     if (!renderer) return;
@@ -175,68 +100,149 @@ const App: React.FC = () => {
       handleTileChange();
     }
   };
-
   const handleTileChange = () => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
-    if (cursorActionRef.current === 'erasing') {
+    if (cursorAction === 'erasing') {
       renderer.handleDragging();
-    } else if (cursorActionRef.current === 'placing') {
+    } else if (cursorAction === 'placing') {
       renderer.schedulePreview();
     }
   };
+  useEffect(() => {
+    const handleMouseUp = (event: MouseEvent) => {
+      const renderer = rendererRef.current;
+      if (!renderer) return;
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    // Handle keyboard shortcuts for undo/redo
-    if (
-      event.ctrlKey &&
-      (event.key === 'z' || event.key === 'Z') &&
-      !event.shiftKey
-    ) {
-      event.preventDefault();
-      tryUndo();
-      return;
-    }
+      if (event.button === 0) {
+        //Left click
+        renderer.stopPanning();
+        if (cursorAction === 'erasing') {
+          const erasedRect = renderer.stopDragging();
+          if (erasedRect) {
+            tryEraseRect(erasedRect);
+          }
+        } else if (cursorAction === 'placing') {
+          const tile = renderer.getMouseCoords(event);
+          if (tile) {
+            const blueprint = getSelectedBlueprint();
+            if (blueprint) {
+              tryPlaceBlueprint(tile, blueprint);
+            }
+          }
+        }
+        updateCursor();
+      }
+    };
 
-    if (
-      (event.ctrlKey && (event.key === 'y' || event.key === 'Y')) ||
-      (event.ctrlKey &&
-        event.shiftKey &&
-        (event.key === 'z' || event.key === 'Z'))
-    ) {
-      event.preventDefault();
-      tryRedo();
-      return;
-    }
+    const handleMouseMove = (event: MouseEvent) => {
+      const renderer = rendererRef.current;
+      if (!renderer) return;
 
-    // Handle 'r' key for blueprint rotation
-    if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
-      const subcategory = selectedSubcategoryRef.current;
-      if (subcategory) {
-        selectedBlueprintIndexRef.current =
-          (selectedBlueprintIndexRef.current + 1) %
-          subcategory.blueprints.length;
+      const tileChanged = renderer.checkForTileChange(event);
 
-        // Since changing a ref doesn't trigger re-renders, manually notify the renderer
-        if (rendererRef.current && cursorActionRef.current === 'placing') {
-          event.preventDefault();
-          rendererRef.current.schedulePreview();
+      if (cursorAction === 'panning') {
+        renderer.handlePanning(event);
+      }
+      if (tileChanged) {
+        handleTileChange();
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Handle keyboard shortcuts for undo/redo
+      if (
+        event.ctrlKey &&
+        (event.key === 'z' || event.key === 'Z') &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        tryUndo();
+        return;
+      }
+
+      if (
+        (event.ctrlKey && (event.key === 'y' || event.key === 'Y')) ||
+        (event.ctrlKey &&
+          event.shiftKey &&
+          (event.key === 'z' || event.key === 'Z'))
+      ) {
+        event.preventDefault();
+        tryRedo();
+        return;
+      }
+
+      // Handle 'r' key for blueprint rotation
+      if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
+        const subcategory = selectedSubcategoryRef.current;
+        if (subcategory) {
+          selectedBlueprintIndexRef.current =
+            (selectedBlueprintIndexRef.current + 1) %
+            subcategory.blueprints.length;
+
+          // Since changing a ref doesn't trigger re-renders, manually notify the renderer
+          if (rendererRef.current && cursorAction === 'placing') {
+            event.preventDefault();
+            rendererRef.current.schedulePreview();
+          }
         }
       }
-    }
 
-    // Handle Control key for building transparency
-    if (event.key === 'Control' && !event.repeat && rendererRef.current) {
-      rendererRef.current.setBuildingTransparency(true);
-    }
-  };
+      // Handle Control key for building transparency
+      if (event.key === 'Control' && !event.repeat && rendererRef.current) {
+        rendererRef.current.setBuildingTransparency(true);
+      }
+    };
 
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key === 'Control' && rendererRef.current) {
-      rendererRef.current.setBuildingTransparency(false);
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === 'Control' && rendererRef.current) {
+        rendererRef.current.setBuildingTransparency(false);
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Clean up
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [cursorAction, tryUndo, tryRedo, tryEraseRect, tryPlaceBlueprint]);
+
+  const updateCursor = useCallback(() => {
+    if (!canvasContainer.current) return;
+
+    if (cursorAction === 'placing') {
+      document.body.style.cursor = 'auto';
+      canvasContainer.current.style.cursor = 'copy';
+    } else if (cursorAction === 'erasing') {
+      document.body.style.cursor = 'auto';
+      canvasContainer.current.style.cursor = 'cell';
+    } else if (cursorAction === 'panning') {
+      if (rendererRef.current?.isPanning) {
+        document.body.style.cursor = 'grabbing';
+        canvasContainer.current.style.cursor = 'grabbing';
+      } else {
+        document.body.style.cursor = 'auto';
+        canvasContainer.current.style.cursor = 'grab';
+      }
     }
-  };
+  }, [cursorAction]);
+
+  // Actually update the cursor automatically too
+  useEffect(() => {
+    updateCursor();
+    if (cursorAction !== 'placing') {
+      deselectSubcategory();
+    }
+  }, [cursorAction, updateCursor]);
 
   const preventRightclickMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
