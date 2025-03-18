@@ -244,10 +244,6 @@ const App: React.FC = () => {
     }
   }, [cursorAction, updateCursor]);
 
-  const preventRightclickMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
-
   const selectSubcategory = (subcat: Subcategory) => {
     setCursorAction('placing');
     selectedSubcategoryRef.current = subcat;
@@ -283,7 +279,9 @@ const App: React.FC = () => {
         id="canvas-container"
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
-        onContextMenu={preventRightclickMenu}
+        onContextMenu={(event) => {
+          event.preventDefault(); //Prevent rightclick menu
+        }}
       />
       <div
         id="sidebar-container"
