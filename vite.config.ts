@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'; // Import the React plugin
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(), // Add the React plugin here
-  ],
+  base: '/DesirabilityPlanner25/',
+  plugins: [react()],
 });
