@@ -5,4 +5,8 @@ import react from '@vitejs/plugin-react'; // Import the React plugin
 export default defineConfig({
   base: '/DesirabilityPlanner25/',
   plugins: [react()],
+  server: {
+    host: '0.0.0.0', // Listen on all network interfaces
+    port: 5173, // Default Vite port (you can change this if needed)
+  },
 });
