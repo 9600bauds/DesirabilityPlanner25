@@ -75,7 +75,7 @@ class CanvasRenderer {
 
       const ctx = canvas.getContext('2d', {
         alpha: true,
-        desynchronized: true,
+        //desynchronized: true, //Seems to cause issues in mobile?
       }) as CanvasRenderingContext2D;
       return ctx;
     };
@@ -165,10 +165,10 @@ class CanvasRenderer {
   };
 
   private hideLayer = (layer: CanvasRenderingContext2D) => {
-    layer.canvas.style.opacity = '0%';
+    layer.canvas.style.opacity = '0';
   };
   private showLayer = (layer: CanvasRenderingContext2D) => {
-    layer.canvas.style.opacity = '100%';
+    layer.canvas.style.opacity = '1';
   };
 
   private hideLayers = (layers: Record<string, CanvasRenderingContext2D>) => {
@@ -438,9 +438,9 @@ class CanvasRenderer {
     this.transparentBuildings = newSetting;
 
     if (this.transparentBuildings) {
-      this.mainLayers.buildings.canvas.style.opacity = '50%';
+      this.mainLayers.buildings.canvas.style.opacity = '0.5';
     } else {
-      this.mainLayers.buildings.canvas.style.opacity = '100%';
+      this.mainLayers.buildings.canvas.style.opacity = '1';
     }
     //Todo: Also transparentize the preview? Is this shortcut even needed?
   };
