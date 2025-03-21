@@ -130,16 +130,20 @@ const App: React.FC = () => {
     }
   }, [cursorAction]);
 
-  const handleTileChange = useCallback(() => {
-    const renderer = rendererRef.current;
-    if (!renderer) return;
+  const handleTileChange = useCallback(
+    (newTile: Tile | undefined) => {
+      const renderer = rendererRef.current;
+      if (!renderer) return;
+      renderer.lastMouseoverTile = newTile;
 
-    if (cursorAction === 'erasing') {
-      renderer.handleDragging();
-    } else if (cursorAction === 'placing') {
-      renderer.schedulePreview();
-    }
-  }, [cursorAction]);
+      if (cursorAction === 'erasing') {
+        renderer.handleDragging(newTile);
+      } else if (cursorAction === 'placing') {
+        renderer.schedulePreview();
+      }
+    },
+    [cursorAction]
+  );
 
   // ===== INITIALIZATION EFFECTS =====
 
@@ -296,6 +300,7 @@ const App: React.FC = () => {
         }
 
         updateCursor();
+        renderer.schedulePreview();
       }
     };
 
@@ -318,14 +323,13 @@ const App: React.FC = () => {
       const renderer = rendererRef.current;
       if (!renderer) return;
 
-      const tileChanged = renderer.checkForTileChange(event);
-
       if (cursorAction === 'panning') {
         renderer.handlePanning(event);
       }
 
+      const [tileChanged, newTile] = renderer.checkForTileChange(event);
       if (tileChanged) {
-        handleTileChange();
+        handleTileChange(newTile);
       }
     };
 
@@ -355,9 +359,10 @@ const App: React.FC = () => {
         if (cursorAction === 'panning') {
           renderer.startPanning(event.nativeEvent);
         } else if (cursorAction === 'erasing') {
-          renderer.startDragging();
+          renderer.startDragging(event.nativeEvent);
         }
         updateCursor();
+        renderer.schedulePreview();
       }
     },
     [cursorAction, updateCursor]
@@ -368,9 +373,11 @@ const App: React.FC = () => {
       const renderer = rendererRef.current;
       if (!renderer) return;
 
-      const tileChanged = renderer.checkForTileChange(event.nativeEvent);
+      const [tileChanged, newTile] = renderer.checkForTileChange(
+        event.nativeEvent
+      );
       if (tileChanged) {
-        handleTileChange();
+        handleTileChange(newTile);
       }
     },
     [handleTileChange]

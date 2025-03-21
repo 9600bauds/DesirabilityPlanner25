@@ -50,7 +50,7 @@ class CanvasRenderer {
   public isPanning: boolean = false;
   private lastPanCursorX: number = 0;
   private lastPanCursorY: number = 0;
-  private lastMouseoverTile?: Tile;
+  public lastMouseoverTile?: Tile;
 
   // Dragging state
   public isDragging: boolean = false;
@@ -379,15 +379,18 @@ class CanvasRenderer {
   };
 
   // Drag handling
-  public startDragging = () => {
+  public startDragging = (event: MouseEvent): void => {
     this.isDragging = true;
-    this.dragStartTile = this.lastMouseoverTile;
-    this.updateDragBox(this.lastMouseoverTile);
+    const tile = this.getMouseCoords(event);
+    if (tile) {
+      this.dragStartTile = tile;
+      this.updateDragBox(tile);
+    }
   };
 
-  public handleDragging = () => {
-    if (!this.isDragging) return;
-    this.updateDragBox(this.lastMouseoverTile);
+  public handleDragging = (newPos: Tile | undefined) => {
+    if (!this.isDragging || !newPos) return;
+    this.updateDragBox(newPos);
   };
 
   private updateDragBox = (newPos: Tile | undefined) => {
@@ -410,7 +413,9 @@ class CanvasRenderer {
   };
 
   // Mouse handling
-  public checkForTileChange = (event?: MouseEvent) => {
+  public checkForTileChange = (
+    event?: MouseEvent
+  ): [boolean, Tile | undefined] => {
     const previousTile = this.lastMouseoverTile;
     const newTile = event && this.getMouseCoords(event);
     let tileChanged: boolean;
@@ -429,8 +434,7 @@ class CanvasRenderer {
       }
     }
 
-    this.lastMouseoverTile = newTile;
-    return tileChanged;
+    return [tileChanged, newTile];
   };
 
   // Building transparency
