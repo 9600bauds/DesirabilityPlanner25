@@ -1,5 +1,6 @@
-import Building from '../classes/Building';
+import { InteractionState } from '../types/Interaction';
 import Blueprint from '../types/Blueprint';
+import Building from '../classes/Building';
 import { Tile } from '../utils/geometry';
 
 interface RenderContext {
@@ -7,6 +8,7 @@ interface RenderContext {
   getBuildings: () => Set<Building>;
   getSelectedBlueprint: () => Blueprint | null;
   isTileOccupied: (tile: Tile) => boolean;
+  getInteractionState: () => InteractionState;
 }
 
 export default RenderContext;

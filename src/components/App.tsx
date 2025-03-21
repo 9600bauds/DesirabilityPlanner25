@@ -3,16 +3,29 @@ import Sidebar from './Sidebar';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
 import Blueprint from '../types/Blueprint';
-import CursorAction from '../types/CursorAction';
+import {
+  InteractionState,
+  InteractionType,
+  isInteractionActive,
+} from '../types/Interaction';
 import GridStateManager from '../classes/GridStateManager';
-import { Rectangle, Tile } from '../utils/geometry';
+import { Rectangle, Tile, Coordinate } from '../utils/geometry';
 import { decodeData, encodeData } from '../utils/encoding';
 import { URL_STATE_INDEX } from '../utils/constants';
 import { useUrlState } from '../hooks/useUrlState';
 
 const App: React.FC = () => {
+  // ===== INTERACTION STATE =====
+  const [interaction, setInteraction] = useState<InteractionState>({
+    type: 'panning',
+    startPixel: null,
+    startTile: null,
+    currentPixel: null,
+    currentTile: null,
+    dragBox: null,
+  });
+
   // ===== APPLICATION STATE =====
-  const [cursorAction, setCursorAction] = useState<CursorAction>('panning');
   const [selectedSubcategory, setSelectedSubcategory] =
     useState<Subcategory | null>(null);
   const [selectedBlueprintIndex, setSelectedBlueprintIndex] =
@@ -87,13 +100,8 @@ const App: React.FC = () => {
 
   // ===== BLUEPRINT SELECTION =====
   const selectSubcategory = useCallback((subcat: Subcategory) => {
-    setCursorAction('placing');
+    setInteractionType('placing');
     setSelectedSubcategory(subcat);
-    setSelectedBlueprintIndex(0);
-  }, []);
-
-  const deselectSubcategory = useCallback(() => {
-    setSelectedSubcategory(null);
     setSelectedBlueprintIndex(0);
   }, []);
 
@@ -110,17 +118,31 @@ const App: React.FC = () => {
     return selectedSubcategory.blueprints[selectedBlueprintIndex];
   }, [selectedSubcategory, selectedBlueprintIndex]);
 
+  // ===== PREVIEW EFFECTS =====
+  useEffect(() => {
+    if (rendererRef.current) {
+      rendererRef.current.schedulePreview();
+    }
+  }, [
+    interaction.currentTile,
+    selectedBlueprintIndex,
+    selectedSubcategory,
+    interaction.type,
+  ]);
+
   // ===== CURSOR MANAGEMENT =====
-  const updateCursor = useCallback(() => {
+  // Update cursor style based on interaction state
+  useEffect(() => {
     if (!canvasContainer.current) return;
-    if (cursorAction === 'placing') {
+
+    if (interaction.type === 'placing') {
       document.body.style.cursor = 'auto';
       canvasContainer.current.style.cursor = 'copy';
-    } else if (cursorAction === 'erasing') {
+    } else if (interaction.type === 'erasing') {
       document.body.style.cursor = 'auto';
       canvasContainer.current.style.cursor = 'cell';
-    } else if (cursorAction === 'panning') {
-      if (rendererRef.current?.isPanning) {
+    } else if (interaction.type === 'panning') {
+      if (isInteractionActive(interaction)) {
         document.body.style.cursor = 'grabbing';
         canvasContainer.current.style.cursor = 'grabbing';
       } else {
@@ -128,21 +150,130 @@ const App: React.FC = () => {
         canvasContainer.current.style.cursor = 'grab';
       }
     }
-  }, [cursorAction]);
+  }, [interaction.type, isInteractionActive(interaction)]);
 
-  const handleTileChange = useCallback(
-    (newTile: Tile | undefined) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
-      renderer.lastMouseoverTile = newTile;
+  // ===== INTERACTION MANAGEMENT =====
 
-      if (cursorAction === 'erasing') {
-        renderer.handleDragging(newTile);
-      } else if (cursorAction === 'placing') {
-        renderer.schedulePreview();
+  /**
+   * Set the interaction type (panning, erasing, placing)
+   */
+  const setInteractionType = useCallback((type: InteractionType) => {
+    setInteraction((prev) => ({
+      ...prev,
+      type,
+      // If we're switching types, cancel any active interaction
+      startPixel: null,
+      startTile: null,
+      dragBox: null,
+    }));
+  }, []);
+
+  /**
+   * Start a new interaction
+   */
+  const startInteraction = useCallback(
+    (event: MouseEvent, type: InteractionType) => {
+      if (!rendererRef.current) return;
+
+      const pixel: Coordinate = [event.clientX, event.clientY];
+      const tile = rendererRef.current.getMouseCoords(event);
+
+      setInteraction({
+        type,
+        startPixel: pixel,
+        startTile: tile || null,
+        currentPixel: pixel,
+        currentTile: tile || null,
+        dragBox: tile ? new Rectangle(tile, 1, 1) : null,
+      });
+    },
+    []
+  );
+
+  /**
+   * Update an ongoing interaction with highly optimized state updates
+   */
+  const updateInteraction = useCallback(
+    (event: MouseEvent) => {
+      if (!rendererRef.current) return;
+
+      const newPixel: Coordinate = [event.clientX, event.clientY];
+
+      if (interaction.type === 'panning') {
+        if (interaction.currentPixel && isInteractionActive(interaction)) {
+          const deltaX = newPixel[0] - interaction.currentPixel[0];
+          const deltaY = newPixel[1] - interaction.currentPixel[1];
+          if (deltaX !== 0 || deltaY !== 0) {
+            rendererRef.current.updateOffset(deltaX, deltaY);
+          }
+        }
+        // Just update the currentPixel for next delta calculation, but don't trigger
+        // any preview renders since this is handled directly by updateOffset
+        setInteraction((prev) => ({
+          ...prev,
+          currentPixel: newPixel,
+        }));
+      } else {
+        const newTile = rendererRef.current.getMouseCoords(
+          event,
+          isInteractionActive(interaction)
+        );
+        const tileChanged =
+          // Either one is null but not both
+          (newTile === null) !== (interaction.currentTile === null) ||
+          // Both non-null but different values
+          (newTile !== null &&
+            interaction.currentTile !== null &&
+            !newTile.equals(interaction.currentTile));
+
+        // Only update state if something meaningful has changed
+        if (tileChanged) {
+          const newDragBox =
+            interaction.startTile && newTile
+              ? Rectangle.fromTiles(interaction.startTile, newTile)
+              : interaction.dragBox;
+
+          // Update the state with the new tile and other calculated values
+          setInteraction((prev) => ({
+            ...prev,
+            currentTile: newTile || null,
+            currentPixel: newPixel,
+            dragBox: newDragBox,
+          }));
+        }
       }
     },
-    [cursorAction]
+    [interaction]
+  );
+
+  /**
+   * End the current interaction
+   */
+  const endInteraction = useCallback(
+    (event?: MouseEvent) => {
+      if (!rendererRef.current) return interaction;
+
+      // If there's a final event, update one last time
+      if (event) {
+        updateInteraction(event);
+      }
+
+      // Get a snapshot of the final state
+      const finalState = { ...interaction };
+
+      // Reset active interaction state while preserving type and current position
+      setInteraction((prev) => ({
+        type: prev.type,
+        startPixel: null,
+        startTile: null,
+        currentPixel: null,
+        currentTile: null,
+        dragBox: null,
+      }));
+
+      return finalState;
+    },
+    [interaction, updateInteraction]
   );
 
   // ===== INITIALIZATION EFFECTS =====
@@ -178,52 +309,55 @@ const App: React.FC = () => {
       );
     }
 
-    try {
-      if (!rendererRef.current) {
-        const renderContext = {
-          getBaseValues: gridManagerRef.current.getBaseValues,
-          getBuildings: gridManagerRef.current.getBuildings,
-          getSelectedBlueprint: getSelectedBlueprint,
-          isTileOccupied: gridManagerRef.current.isTileOccupied,
-        };
-        rendererRef.current = new CanvasRenderer(
-          canvasContainer.current,
-          renderContext
-        );
-      }
-    } catch (error) {
-      console.error('Error initializing renderer:', error);
-    }
+    const renderContext = {
+      getBaseValues: gridManagerRef.current.getBaseValues,
+      getBuildings: gridManagerRef.current.getBuildings,
+      getSelectedBlueprint: getSelectedBlueprint,
+      isTileOccupied: gridManagerRef.current.isTileOccupied,
+      getInteractionState: () => interaction,
+    };
+    rendererRef.current = new CanvasRenderer(
+      canvasContainer.current,
+      renderContext
+    );
+
+    const resizeObserver = new ResizeObserver(() => {
+      rendererRef.current?.updateDimensions(
+        canvasContainer.current!.clientWidth,
+        canvasContainer.current!.clientHeight
+      );
+    });
+    resizeObserver.observe(canvasContainer.current);
 
     return () => {
       if (rendererRef.current) {
         rendererRef.current.destroy();
         rendererRef.current = null;
       }
+      resizeObserver.disconnect();
     };
   }, []); // Empty dependency array means this runs once on mount
 
-  // Update renderer context when blueprint selection changes
+  // Update renderer context when the interaction state changes
+  useEffect(() => {
+    if (rendererRef.current) {
+      rendererRef.current.updateRenderContext({
+        getInteractionState: () => interaction,
+      });
+    }
+  }, [interaction]);
+
+  // Update renderer context when the selected blueprint changes
   useEffect(() => {
     if (rendererRef.current) {
       rendererRef.current.updateRenderContext({
         getSelectedBlueprint,
       });
-      rendererRef.current.schedulePreview();
     }
   }, [getSelectedBlueprint]);
 
-  // Update cursor when cursor action changes
-  useEffect(() => {
-    updateCursor();
-    if (cursorAction !== 'placing') {
-      deselectSubcategory();
-    }
-  }, [cursorAction, updateCursor, deselectSubcategory]);
-
   // Some of our mouse events are applied to the document and the window. React does not have an easy way to do this.
   // As such, we need useEffects() to remove and re-apply these events whenever any of their state dependencies change.
-  // 1. Keyboard Events
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Undo/Redo keyboard shortcuts
@@ -275,113 +409,68 @@ const App: React.FC = () => {
     };
   }, [tryUndo, tryRedo, selectNextBlueprintIndex]);
 
-  // 2. Mouse Up Events
+  // ===== EVENT HANDLERS =====
+
+  // Mouse down handler - start interactions
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button === 2) {
+        // Right click - switch to panning mode
+        setInteractionType('panning');
+      } else if (event.button === 0) {
+        // Left click - start interaction based on current type
+        startInteraction(event.nativeEvent, interaction.type);
+      }
+    },
+    [interaction.type, setInteractionType, startInteraction]
+  );
+
+  // Mouse move effect - handle all movement
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      updateInteraction(event);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [updateInteraction]);
+
+  // Mouse up effect - complete interactions
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
+      if (event.button === 0 && isInteractionActive(interaction)) {
+        const finalState = endInteraction(event);
 
-      if (event.button === 0) {
-        renderer.stopPanning();
-
-        if (cursorAction === 'erasing') {
-          const erasedRect = renderer.stopDragging();
-          if (erasedRect) {
-            tryEraseRect(erasedRect);
-          }
-        } else if (cursorAction === 'placing') {
-          const tile = renderer.getMouseCoords(event);
-          if (tile) {
-            const blueprint = getSelectedBlueprint();
-            if (blueprint) {
-              tryPlaceBlueprint(tile, blueprint);
-            }
+        // Process the result based on interaction type
+        if (finalState.type === 'erasing' && finalState.dragBox) {
+          tryEraseRect(finalState.dragBox);
+        } else if (finalState.type === 'placing' && finalState.currentTile) {
+          const blueprint = getSelectedBlueprint();
+          if (blueprint) {
+            tryPlaceBlueprint(finalState.currentTile, blueprint);
           }
         }
-
-        updateCursor();
-        renderer.schedulePreview();
       }
     };
 
     window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
+    return () => window.removeEventListener('mouseup', handleMouseUp);
   }, [
-    cursorAction,
+    endInteraction,
     getSelectedBlueprint,
+    interaction,
     tryEraseRect,
     tryPlaceBlueprint,
-    updateCursor,
   ]);
 
-  // 3. Mouse Move Events
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
+  // ===== SIDEBAR HANDLERS =====
+  const handlePanClick = useCallback(() => {
+    setInteractionType('panning');
+  }, [setInteractionType]);
 
-      if (cursorAction === 'panning') {
-        renderer.handlePanning(event);
-      }
-
-      const [tileChanged, newTile] = renderer.checkForTileChange(event);
-      if (tileChanged) {
-        handleTileChange(newTile);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [cursorAction, handleTileChange]);
-
-  // These mouseevent handlers are used directly in components, so we don't need to do any voodoo with them.
-  const handleMouseDown = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
-
-      if (event.button === 2) {
-        // Right click
-        if (cursorAction === 'placing') {
-          setCursorAction('panning');
-        } else if (cursorAction === 'erasing') {
-          setCursorAction('panning');
-          renderer.stopDragging();
-        }
-      } else if (event.button === 0) {
-        // Left click
-        if (cursorAction === 'panning') {
-          renderer.startPanning(event.nativeEvent);
-        } else if (cursorAction === 'erasing') {
-          renderer.startDragging(event.nativeEvent);
-        }
-        updateCursor();
-        renderer.schedulePreview();
-      }
-    },
-    [cursorAction, updateCursor]
-  );
-
-  const handleMouseLeave = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      const renderer = rendererRef.current;
-      if (!renderer) return;
-
-      const [tileChanged, newTile] = renderer.checkForTileChange(
-        event.nativeEvent
-      );
-      if (tileChanged) {
-        handleTileChange(newTile);
-      }
-    },
-    [handleTileChange]
-  );
+  const handleEraserClick = useCallback(() => {
+    setInteractionType('erasing');
+  }, [setInteractionType]);
 
   // ===== RENDER =====
   return (
@@ -390,8 +479,7 @@ const App: React.FC = () => {
         ref={canvasContainer}
         id="canvas-container"
         onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onContextMenu={(event) => {
+        onContextMenu={(event: React.MouseEvent<HTMLDivElement>) => {
           event.preventDefault(); //Prevent rightclick menu
         }}
       />
@@ -405,12 +493,8 @@ const App: React.FC = () => {
               rendererRef.current.toggleGridRotation();
             }
           }}
-          onPanClick={() => {
-            setCursorAction('panning');
-          }}
-          onEraserClick={() => {
-            setCursorAction('erasing');
-          }}
+          onPanClick={handlePanClick}
+          onEraserClick={handleEraserClick}
           onZoomInClick={() => {
             if (rendererRef.current) {
               rendererRef.current.zoomIn();
@@ -426,6 +510,7 @@ const App: React.FC = () => {
           canUndo={canUndo}
           canRedo={canRedo}
           selectSubcategory={selectSubcategory}
+          currentInteractionType={interaction.type}
         />
       </div>
     </div>

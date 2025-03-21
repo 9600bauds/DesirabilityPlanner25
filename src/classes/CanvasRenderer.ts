@@ -5,7 +5,6 @@ import colors, { getDesirabilityRGB } from '../utils/colors';
 import {
   GRID_CENTER_PX,
   GRID_TOTAL_PX,
-  GRID_SIZE,
   COORD_TO_PX,
   PX_TO_COORD,
   COORD_TO_UINT16,
@@ -19,6 +18,8 @@ import {
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, Coordinate } from '../utils/geometry';
 import Building from './Building';
+import { isInteractionActive } from '../types/Interaction';
+
 class CanvasRenderer {
   // Settings
   private transparentBuildings: boolean = false;
@@ -45,17 +46,6 @@ class CanvasRenderer {
   private zoomLevel: number = 1.0;
   private offsetX: number = 0;
   private offsetY: number = 0;
-
-  // Mouse state
-  public isPanning: boolean = false;
-  private lastPanCursorX: number = 0;
-  private lastPanCursorY: number = 0;
-  public lastMouseoverTile?: Tile;
-
-  // Dragging state
-  public isDragging: boolean = false;
-  private dragStartTile?: Tile;
-  private dragBox?: Rectangle;
 
   get viewCenter(): Coordinate {
     return [this.clientWidth / 2, this.clientHeight / 2];
@@ -114,10 +104,6 @@ class CanvasRenderer {
     this.mainLayers.tileNumbers = createCtx('tilenumbers-main', 12);
     this.mainLayers.tiles = createCtx('tiles-main', 11);
 
-    // Todo: React can probably do this better. Also todo: Debounce this
-    const resizeObserver = new ResizeObserver(() => this.canvasSizeUpdated());
-    resizeObserver.observe(parentContainer);
-
     // Center view
     this.centerViewAt([GRID_CENTER_PX, GRID_CENTER_PX]);
 
@@ -145,63 +131,34 @@ class CanvasRenderer {
     };
   }
 
-  private fastClearCtx = (
-    ctx: CanvasRenderingContext2D,
-    rotate = this.isRotated
-  ) => {
-    //Setting the width every time is apparently the fastest way to clear the canvas? Even if the size didn't change?
-    ctx.canvas.width = this.clientWidth * this.devicePixelRatio;
-    ctx.canvas.height = this.clientHeight * this.devicePixelRatio;
+  // === COORDINATE TRANSFORMATIONS ===
 
-    ctx.translate(
-      this.offsetX * this.devicePixelRatio,
-      this.offsetY * this.devicePixelRatio
-    );
-    ctx.scale(
-      this.zoomLevel * this.devicePixelRatio,
-      this.zoomLevel * this.devicePixelRatio
-    );
-    if (rotate) ctx.rotate(ROTATION_RADS);
-  };
-
-  private hideLayer = (layer: CanvasRenderingContext2D) => {
-    layer.canvas.style.opacity = '0';
-  };
-  private showLayer = (layer: CanvasRenderingContext2D) => {
-    layer.canvas.style.opacity = '1';
-  };
-
-  private hideLayers = (layers: Record<string, CanvasRenderingContext2D>) => {
-    for (const ctx of Object.values(layers)) {
-      this.hideLayer(ctx);
-    }
-  };
-
-  public scheduleRerender = (): void => {
-    if (!this.pendingRerender) {
-      this.pendingRerender = requestAnimationFrame(
-        this.fullRerender.bind(this)
-      );
-    }
-  };
-
-  public schedulePreview = (): void => {
-    if (!this.pendingPreview) {
-      this.pendingPreview = requestAnimationFrame(this.preview.bind(this));
-    }
-  };
-
-  // Size handling
-  public canvasSizeUpdated = () => {
-    this.clientWidth = this.parentContainer.clientWidth;
-    this.clientHeight = this.parentContainer.clientHeight;
-
-    this.scheduleRerender();
-  };
-
-  /*
-   * Coordinate transformations
+  /**
+   * Convert a screen coordinate to a grid tile
    */
+  public getMouseCoords = (
+    event: MouseEvent,
+    allowOutsideViewport = false
+  ): Tile | null => {
+    const point: Coordinate = [event.clientX, event.clientY];
+    if (
+      !allowOutsideViewport &&
+      (point[0] < 0 ||
+        point[1] < 0 ||
+        point[0] >= this.clientWidth ||
+        point[1] >= this.clientHeight)
+    ) {
+      return null; //This is outside our viewport!
+    }
+
+    const gridPt = this.canvas2grid(point);
+    // Convert to tile coordinates
+    const tileX = Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPt.x)));
+    const tileY = Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPt.y)));
+
+    return new Tile(tileX, tileY);
+  };
+
   private grid2canvas = (tile: Tile, rotate = this.isRotated): Coordinate => {
     let point = tile.toCoordinate();
     if (rotate) point = ROTATE_AROUND_ORIGIN(point);
@@ -217,34 +174,6 @@ class CanvasRenderer {
     let point: Coordinate = [x, y];
     if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
     return Tile.fromCoordinate(point);
-  };
-
-  private pointToTile = (point: Coordinate): Tile | undefined => {
-    if (
-      point[0] < 0 ||
-      point[1] < 0 ||
-      point[0] >= this.clientWidth ||
-      point[1] >= this.clientHeight
-    ) {
-      return undefined; //This is outside our viewport!
-    }
-
-    const gridPt = this.canvas2grid(point);
-
-    // Convert to tile coordinates
-    const tileX = PX_TO_COORD(gridPt.x);
-    const tileY = PX_TO_COORD(gridPt.y);
-
-    // Check if the tile is within grid bounds
-    if (tileX >= 0 && tileX < GRID_SIZE && tileY >= 0 && tileY < GRID_SIZE) {
-      return new Tile(tileX, tileY);
-    }
-
-    return undefined;
-  };
-
-  public getMouseCoords = (event: MouseEvent): Tile | undefined => {
-    return this.pointToTile([event.clientX, event.clientY]);
   };
 
   // Get the range of tiles currently visible in the viewport
@@ -307,9 +236,17 @@ class CanvasRenderer {
     return { coordsRect, tilesRect };
   };
 
-  /*
-   * Canvas transforms
+  // === VIEWPORT MANIPULATION ===
+
+  /**
+   * Update the viewport offset directly (for panning)
    */
+  public updateOffset(deltaX: number, deltaY: number): void {
+    this.offsetX += deltaX;
+    this.offsetY += deltaY;
+    this.scheduleRerender();
+  }
+
   public toggleGridRotation = (): void => {
     const oldCenter = this.canvas2grid(this.viewCenter);
 
@@ -352,89 +289,13 @@ class CanvasRenderer {
     this.scheduleRerender(); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
   };
 
-  // Panning methods
-  public startPanning = (event: MouseEvent) => {
-    this.isPanning = true;
-    this.lastPanCursorX = event.clientX;
-    this.lastPanCursorY = event.clientY;
-  };
-
-  public handlePanning = (event: MouseEvent) => {
-    if (!this.isPanning) return;
-
-    const deltaX = event.clientX - this.lastPanCursorX;
-    const deltaY = event.clientY - this.lastPanCursorY;
-
-    this.offsetX += deltaX;
-    this.offsetY += deltaY;
-
-    this.lastPanCursorX = event.clientX;
-    this.lastPanCursorY = event.clientY;
-
-    this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
-  };
-
-  public stopPanning = () => {
-    this.isPanning = false;
-  };
-
-  // Drag handling
-  public startDragging = (event: MouseEvent): void => {
-    this.isDragging = true;
-    const tile = this.getMouseCoords(event);
-    if (tile) {
-      this.dragStartTile = tile;
-      this.updateDragBox(tile);
+  // Size handling
+  public updateDimensions = (width: number, height: number): void => {
+    if (width !== this.clientWidth || height !== this.clientHeight) {
+      this.clientWidth = width;
+      this.clientHeight = height;
+      this.scheduleRerender();
     }
-  };
-
-  public handleDragging = (newPos: Tile | undefined) => {
-    if (!this.isDragging || !newPos) return;
-    this.updateDragBox(newPos);
-  };
-
-  private updateDragBox = (newPos: Tile | undefined) => {
-    if (this.dragStartTile && newPos) {
-      this.dragBox = Rectangle.fromTiles(this.dragStartTile, newPos);
-    }
-    this.schedulePreview();
-  };
-
-  public stopDragging = () => {
-    if (!this.isDragging) return;
-
-    const returnBox = this.dragBox;
-    this.dragBox = undefined;
-    this.isDragging = false;
-
-    this.scheduleRerender(); //Todo... Maybe do the deletion here?
-
-    return returnBox;
-  };
-
-  // Mouse handling
-  public checkForTileChange = (
-    event?: MouseEvent
-  ): [boolean, Tile | undefined] => {
-    const previousTile = this.lastMouseoverTile;
-    const newTile = event && this.getMouseCoords(event);
-    let tileChanged: boolean;
-
-    if (!newTile) {
-      if (previousTile) {
-        tileChanged = true; //We went from something to nothing, thus, change
-      } else {
-        tileChanged = false; //We went from nothing to nothing, thus, no change
-      }
-    } else {
-      if (!previousTile) {
-        tileChanged = true; //We went from nothing to something, thus, change
-      } else {
-        tileChanged = !newTile.equals(previousTile); //We change only if the new tile is not the same as the previous one
-      }
-    }
-
-    return [tileChanged, newTile];
   };
 
   // Building transparency
@@ -446,89 +307,105 @@ class CanvasRenderer {
     } else {
       this.mainLayers.buildings.canvas.style.opacity = '1';
     }
-    //Todo: Also transparentize the preview? Is this shortcut even needed?
   };
 
-  /*
-   * Actual rendering methods
+  // === RENDERING METHODS ===
+
+  /**
+   * Schedule a full rerender
    */
-  private fullRerender = (): void => {
-    this.pendingRerender = null;
-    this.pendingPreview = null; //Cancel any previews too
-
-    this.hideLayers(this.previewLayers);
-
-    const viewport = this.getViewport();
-    if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
-      return; //We are fully offscreen! //todo: prevent this from happening to begin with!
-    }
-
-    const placedBuildings = this.renderContext.getBuildings();
-    const baseValues = this.renderContext.getBaseValues(); // These are the precomputed desirability values from the "true" gridstate.
-
-    this.renderTiles(this.mainLayers.tiles, baseValues, viewport.tilesRect);
-
-    if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
-      this.renderTileNumbers(
-        this.mainLayers.tileNumbers,
-        baseValues,
-        viewport.tilesRect
+  public scheduleRerender = (): void => {
+    if (!this.pendingRerender) {
+      this.pendingRerender = requestAnimationFrame(
+        this.fullRerender.bind(this)
       );
-      this.showLayer(this.mainLayers.tileNumbers);
-    } else {
-      this.hideLayer(this.mainLayers.tileNumbers);
     }
-
-    this.renderGridlines(this.mainLayers.gridLines, viewport.tilesRect);
-
-    this.renderBuildingOutlines(
-      this.mainLayers.outlines,
-      viewport.tilesRect,
-      placedBuildings
-    );
-
-    this.renderBuildings(
-      this.mainLayers.buildings,
-      viewport.tilesRect,
-      placedBuildings
-    );
-
-    this.renderBuildingLabels(
-      this.labelContainer,
-      viewport.tilesRect,
-      placedBuildings,
-      baseValues
-    );
   };
 
+  /**
+   * Schedule a preview update
+   */
+  public schedulePreview = (): void => {
+    if (!this.pendingPreview) {
+      this.pendingPreview = requestAnimationFrame(this.preview.bind(this));
+    }
+  };
+
+  private fastClearCtx = (
+    ctx: CanvasRenderingContext2D,
+    rotate = this.isRotated
+  ) => {
+    //Setting the width every time is apparently the fastest way to clear the canvas? Even if the size didn't change?
+    ctx.canvas.width = this.clientWidth * this.devicePixelRatio;
+    ctx.canvas.height = this.clientHeight * this.devicePixelRatio;
+
+    ctx.translate(
+      this.offsetX * this.devicePixelRatio,
+      this.offsetY * this.devicePixelRatio
+    );
+    ctx.scale(
+      this.zoomLevel * this.devicePixelRatio,
+      this.zoomLevel * this.devicePixelRatio
+    );
+    if (rotate) ctx.rotate(ROTATION_RADS);
+  };
+
+  private hideLayer = (layer: CanvasRenderingContext2D) => {
+    layer.canvas.style.opacity = '0';
+  };
+  private showLayer = (layer: CanvasRenderingContext2D) => {
+    layer.canvas.style.opacity = '1';
+  };
+
+  private hideLayers = (layers: Record<string, CanvasRenderingContext2D>) => {
+    for (const ctx of Object.values(layers)) {
+      this.hideLayer(ctx);
+    }
+  };
+
+  /**
+   * Preview method that uses external interaction state
+   */
   private preview = () => {
     this.pendingPreview = null;
-    if (this.pendingRerender) return; //Let's not preview anything if we're going to full update anyways.
+    if (this.pendingRerender) return;
+
+    // Get current interaction state from render context
+    const interactionState = this.renderContext.getInteractionState();
 
     const viewport = this.getViewport();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
-      return; //We are fully offscreen! //todo: prevent this from happening to begin with!
+      return;
     }
 
     const selectedBlueprint = this.renderContext.getSelectedBlueprint();
     const placedBuildings = this.renderContext.getBuildings();
-    const baseValues = this.renderContext.getBaseValues(); // These are the precomputed desirability values from the "true" gridstate.
+    const baseValues = this.renderContext.getBaseValues();
 
     const buildingsBeingAdded: Set<Building> = new Set();
-    if (this.lastMouseoverTile && selectedBlueprint) {
-      // Yes, we re-create this building each time too.
-      buildingsBeingAdded.add(
-        createBuilding(this.lastMouseoverTile, selectedBlueprint)
-      );
-    }
     const buildingsBeingRemoved: Set<Building> = new Set();
-    if (this.isDragging && this.dragBox) {
+
+    // Process based on interaction type and tile state
+    if (
+      interactionState.type === 'placing' &&
+      interactionState.currentTile &&
+      selectedBlueprint
+    ) {
+      buildingsBeingAdded.add(
+        createBuilding(interactionState.currentTile, selectedBlueprint)
+      );
+    } else if (
+      interactionState.type === 'erasing' &&
+      isInteractionActive(interactionState) &&
+      interactionState.dragBox
+    ) {
       for (const building of placedBuildings) {
-        if (building.interceptsRectangle(this.dragBox)) {
+        if (building.interceptsRectangle(interactionState.dragBox)) {
           buildingsBeingRemoved.add(building);
         }
       }
     }
+
     const modifiedValues = new Int16Array(baseValues); // Let's clone the base values so we can do our own calculations.
     const modifiedAreas: Set<Rectangle> = new Set();
     const buildingsToRender = new Set<Building>(); // We don't rerender the base buildings
@@ -637,10 +514,14 @@ class CanvasRenderer {
     }
 
     this.renderOverlays(this.previewLayers.overlays, overlaysToRender);
-    if (this.isDragging && this.dragBox) {
+    if (
+      interactionState.type === 'erasing' &&
+      isInteractionActive(interactionState) &&
+      interactionState.dragBox
+    ) {
       this.renderDragBox(
         this.previewLayers.overlays,
-        this.dragBox,
+        interactionState.dragBox,
         colors.redHighTransparency,
         colors.redVeryLowTransparency
       );
@@ -652,6 +533,58 @@ class CanvasRenderer {
       viewport.tilesRect,
       labelsToRender,
       modifiedValues
+    );
+  };
+
+  /*
+   * Actual rendering methods
+   */
+  private fullRerender = (): void => {
+    this.pendingRerender = null;
+    this.pendingPreview = null; //Cancel any previews too
+
+    this.hideLayers(this.previewLayers);
+
+    const viewport = this.getViewport();
+    if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
+      return; //We are fully offscreen! //todo: prevent this from happening to begin with!
+    }
+
+    const placedBuildings = this.renderContext.getBuildings();
+    const baseValues = this.renderContext.getBaseValues(); // These are the precomputed desirability values from the "true" gridstate.
+
+    this.renderTiles(this.mainLayers.tiles, baseValues, viewport.tilesRect);
+
+    if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+      this.renderTileNumbers(
+        this.mainLayers.tileNumbers,
+        baseValues,
+        viewport.tilesRect
+      );
+      this.showLayer(this.mainLayers.tileNumbers);
+    } else {
+      this.hideLayer(this.mainLayers.tileNumbers);
+    }
+
+    this.renderGridlines(this.mainLayers.gridLines, viewport.tilesRect);
+
+    this.renderBuildingOutlines(
+      this.mainLayers.outlines,
+      viewport.tilesRect,
+      placedBuildings
+    );
+
+    this.renderBuildings(
+      this.mainLayers.buildings,
+      viewport.tilesRect,
+      placedBuildings
+    );
+
+    this.renderBuildingLabels(
+      this.labelContainer,
+      viewport.tilesRect,
+      placedBuildings,
+      baseValues
     );
   };
 

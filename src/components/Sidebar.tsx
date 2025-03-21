@@ -2,6 +2,7 @@
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
 import Subcategory from '../interfaces/Subcategory';
+import { InteractionType } from '../types/Interaction';
 
 interface SidebarProps {
   onRotateClick: () => void;
@@ -14,6 +15,7 @@ interface SidebarProps {
   canUndo: boolean;
   canRedo: boolean;
   selectSubcategory: (subcat: Subcategory) => void;
+  currentInteractionType: InteractionType;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -27,6 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   canUndo,
   canRedo,
   selectSubcategory,
+  currentInteractionType,
 }) => {
   return (
     <div
@@ -62,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </button>
       <button
         id="pan-btn"
-        className="btn btn-primary rounded-circle mb-2"
+        className={`btn ${currentInteractionType === 'panning' ? 'btn-success' : 'btn-primary'} rounded-circle mb-2`}
         onClick={onPanClick}
         title="Pan Tool"
       >
@@ -70,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </button>
       <button
         id="eraser-btn"
-        className="btn btn-primary rounded-circle mb-2"
+        className={`btn ${currentInteractionType === 'erasing' ? 'btn-success' : 'btn-primary'} rounded-circle mb-2`}
         onClick={onEraserClick}
         title="Eraser Tool"
       >
