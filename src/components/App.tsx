@@ -13,6 +13,8 @@ import { Rectangle, Tile, Coordinate } from '../utils/geometry';
 import { decodeData, encodeData } from '../utils/encoding';
 import { URL_STATE_INDEX } from '../utils/constants';
 import { useUrlState } from '../hooks/useUrlState';
+import { getClientCoordinates } from '../utils/events';
+import { InteractionEvent } from '../types/InteractionEvent';
 
 const App: React.FC = () => {
   // ===== INTERACTION STATE =====
@@ -172,18 +174,18 @@ const App: React.FC = () => {
    * Start a new interaction
    */
   const startInteraction = useCallback(
-    (event: MouseEvent, type: InteractionType) => {
+    (event: InteractionEvent, type: InteractionType) => {
       if (!rendererRef.current) return;
 
-      const pixel: Coordinate = [event.clientX, event.clientY];
-      const tile = rendererRef.current.getMouseCoords(event);
+      const pixel: Coordinate = getClientCoordinates(event);
+      const tile: Tile | null = rendererRef.current.getMouseCoords(event);
 
       setInteraction({
         type,
         startPixel: pixel,
-        startTile: tile || null,
+        startTile: tile,
         currentPixel: pixel,
-        currentTile: tile || null,
+        currentTile: tile,
         dragBox: tile ? new Rectangle(tile, 1, 1) : null,
       });
     },
@@ -194,11 +196,10 @@ const App: React.FC = () => {
    * Update an ongoing interaction with highly optimized state updates
    */
   const updateInteraction = useCallback(
-    (event: MouseEvent) => {
+    (event: InteractionEvent) => {
       if (!rendererRef.current) return;
 
-      const newPixel: Coordinate = [event.clientX, event.clientY];
-
+      const newPixel: Coordinate = getClientCoordinates(event);
       if (interaction.type === 'panning') {
         if (interaction.currentPixel && isInteractionActive(interaction)) {
           const deltaX = newPixel[0] - interaction.currentPixel[0];
@@ -216,7 +217,7 @@ const App: React.FC = () => {
       } else {
         const newTile = rendererRef.current.getMouseCoords(
           event,
-          isInteractionActive(interaction)
+          isInteractionActive(interaction) // If the interaction is already active, then we are not limited to coordinates inside the viewport, we can off-road
         );
         const tileChanged =
           // Either one is null but not both
@@ -250,10 +251,10 @@ const App: React.FC = () => {
    * End the current interaction
    */
   const endInteraction = useCallback(
-    (event?: MouseEvent) => {
-      if (!rendererRef.current) return interaction;
+    (event?: InteractionEvent) => {
+      if (!rendererRef.current || !isInteractionActive(interaction)) return;
 
-      // If there's a final event, update one last time
+      // If there's a final event, update once more to get the final position
       if (event) {
         updateInteraction(event);
       }
@@ -271,9 +272,25 @@ const App: React.FC = () => {
         dragBox: null,
       }));
 
+      // Process the result based on interaction type
+      if (finalState.type === 'erasing' && finalState.dragBox) {
+        tryEraseRect(finalState.dragBox);
+      } else if (finalState.type === 'placing' && finalState.currentTile) {
+        const blueprint = getSelectedBlueprint();
+        if (blueprint) {
+          tryPlaceBlueprint(finalState.currentTile, blueprint);
+        }
+      }
+
       return finalState;
     },
-    [interaction, updateInteraction]
+    [
+      interaction,
+      updateInteraction,
+      tryEraseRect,
+      tryPlaceBlueprint,
+      getSelectedBlueprint,
+    ]
   );
 
   // ===== INITIALIZATION EFFECTS =====
@@ -424,6 +441,13 @@ const App: React.FC = () => {
     },
     [interaction.type, setInteractionType, startInteraction]
   );
+  const handleTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      startInteraction(event.nativeEvent, interaction.type);
+    },
+    [interaction.type, startInteraction]
+  );
 
   // Mouse move effect - handle all movement
   useEffect(() => {
@@ -434,34 +458,49 @@ const App: React.FC = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [updateInteraction]);
+  useEffect(() => {
+    const handleTouchMove = (event: TouchEvent) => {
+      event.preventDefault();
+      updateInteraction(event);
+    };
+
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => window.removeEventListener('touchmove', handleTouchMove);
+  }, [updateInteraction, interaction]);
+
+  const handleMouseLeave = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      updateInteraction(event.nativeEvent);
+    },
+    [updateInteraction]
+  );
 
   // Mouse up effect - complete interactions
   useEffect(() => {
     const handleMouseUp = (event: MouseEvent) => {
       if (event.button === 0 && isInteractionActive(interaction)) {
-        const finalState = endInteraction(event);
-
-        // Process the result based on interaction type
-        if (finalState.type === 'erasing' && finalState.dragBox) {
-          tryEraseRect(finalState.dragBox);
-        } else if (finalState.type === 'placing' && finalState.currentTile) {
-          const blueprint = getSelectedBlueprint();
-          if (blueprint) {
-            tryPlaceBlueprint(finalState.currentTile, blueprint);
-          }
-        }
+        endInteraction(event);
+      }
+    };
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => window.removeEventListener('mouseup', handleMouseUp);
+  }, [endInteraction, interaction]);
+  useEffect(() => {
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (isInteractionActive(interaction)) {
+        event.preventDefault();
+        endInteraction(event);
       }
     };
 
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [
-    endInteraction,
-    getSelectedBlueprint,
-    interaction,
-    tryEraseRect,
-    tryPlaceBlueprint,
-  ]);
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    window.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
+    return () => {
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [endInteraction, interaction]);
 
   // ===== SIDEBAR HANDLERS =====
   const handlePanClick = useCallback(() => {
@@ -479,6 +518,8 @@ const App: React.FC = () => {
         ref={canvasContainer}
         id="canvas-container"
         onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
         onContextMenu={(event: React.MouseEvent<HTMLDivElement>) => {
           event.preventDefault(); //Prevent rightclick menu
         }}

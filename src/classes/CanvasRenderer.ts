@@ -19,6 +19,8 @@ import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, Coordinate } from '../utils/geometry';
 import Building from './Building';
 import { isInteractionActive } from '../types/Interaction';
+import { getClientCoordinates } from '../utils/events';
+import { InteractionEvent } from '../types/InteractionEvent';
 
 class CanvasRenderer {
   // Settings
@@ -137,10 +139,10 @@ class CanvasRenderer {
    * Convert a screen coordinate to a grid tile
    */
   public getMouseCoords = (
-    event: MouseEvent,
+    event: InteractionEvent,
     allowOutsideViewport = false
   ): Tile | null => {
-    const point: Coordinate = [event.clientX, event.clientY];
+    const point = getClientCoordinates(event);
     if (
       !allowOutsideViewport &&
       (point[0] < 0 ||
@@ -367,6 +369,7 @@ class CanvasRenderer {
    * Preview method that uses external interaction state
    */
   private preview = () => {
+    console.log('previewing...');
     this.pendingPreview = null;
     if (this.pendingRerender) return;
 
