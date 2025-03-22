@@ -234,12 +234,6 @@ const App: React.FC = () => {
       // Get a snapshot of the final state
       const finalState = { ...interaction };
 
-      // Reset active interaction state while preserving type and current position
-      setInteraction((prev) => ({
-        ...initialInteractionState,
-        type: prev.type,
-      }));
-
       // Process the result based on interaction type
       if (finalState.type === 'erasing' && finalState.dragBox) {
         tryEraseRect(finalState.dragBox);
@@ -249,6 +243,14 @@ const App: React.FC = () => {
           tryPlaceBlueprint(finalState.currentTile, blueprint);
         }
       }
+
+      // Reset active interaction state while preserving type and current position
+      setInteraction((prev) => ({
+        ...initialInteractionState,
+        type: prev.type,
+        currentPixel: prev.currentPixel,
+        currentTile: prev.currentTile,
+      }));
 
       return finalState;
     },
