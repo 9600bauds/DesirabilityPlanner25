@@ -40,3 +40,8 @@
   -webkit-text-stroke: 3px white;
   paint-order: stroke fill;
 }
+
+.selectedSubcategory {
+  color: #004085;
+  background-color: #b8daff;
+}

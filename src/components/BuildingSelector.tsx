@@ -6,15 +6,28 @@ import { ALL_CATEGORIES } from '../data/CATEGORIES';
 
 interface BuildingSelectorProps {
   selectSubcategory: (subcat: Subcategory) => void;
+  selectedSubcategory: Subcategory | null;
 }
 
-const BuildingSelector = ({ selectSubcategory }: BuildingSelectorProps) => {
-  const optionsToButtons = (category: MenuCategory) => {
+const BuildingSelector = ({
+  selectSubcategory,
+  selectedSubcategory,
+}: BuildingSelectorProps) => {
+  const optionsToButtons = (
+    category: MenuCategory,
+    selectedSubcategory: Subcategory | null
+  ) => {
     const menuItems: React.ReactNode[] = []; // Create an empty array
 
     category.subCategories.forEach((subcat: Subcategory, key: string) => {
+      const className =
+        selectedSubcategory === subcat ? 'selectedSubcategory' : '';
       menuItems.push(
-        <MenuItem key={key} onClick={() => selectSubcategory(subcat)}>
+        <MenuItem
+          key={key}
+          className={className}
+          onClick={() => selectSubcategory(subcat)}
+        >
           {subcat.displayName}
         </MenuItem>
       );
@@ -36,7 +49,7 @@ const BuildingSelector = ({ selectSubcategory }: BuildingSelectorProps) => {
               </MenuButton>
             }
           >
-            {optionsToButtons(category)}
+            {optionsToButtons(category, selectedSubcategory)}
           </Menu>
         );
       })}

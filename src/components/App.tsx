@@ -30,6 +30,7 @@ const App: React.FC = () => {
     useState<number>(0);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [canRotateBlueprint, setCanRotateBlueprint] = useState(false);
 
   // ===== REFS =====
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -117,6 +118,7 @@ const App: React.FC = () => {
   }, [selectedSubcategory, selectedBlueprintIndex]);
 
   // ===== PREVIEW EFFECTS =====
+  // Schedule a preview whenever any of these is updated!
   useEffect(() => {
     if (rendererRef.current) {
       rendererRef.current.schedulePreview();
@@ -126,6 +128,7 @@ const App: React.FC = () => {
     selectedBlueprintIndex,
     selectedSubcategory,
     interaction.type,
+    isInteractionActive(interaction),
   ]);
 
   // ===== CURSOR MANAGEMENT =====
@@ -510,9 +513,14 @@ const App: React.FC = () => {
           }}
           onUndoClick={tryUndo}
           onRedoClick={tryRedo}
+          onRotateBlueprintClick={selectNextBlueprintIndex}
           canUndo={canUndo}
           canRedo={canRedo}
+          canRotateBlueprint={
+            (selectedSubcategory?.blueprints?.length ?? 0) > 1 // Evil hack that accounts for nullness
+          }
           selectSubcategory={selectSubcategory}
+          selectedSubcategory={selectedSubcategory}
           currentInteractionType={interaction.type}
         />
       </div>

@@ -12,9 +12,12 @@ interface SidebarProps {
   onZoomOutClick: () => void;
   onUndoClick: () => void;
   onRedoClick: () => void;
+  onRotateBlueprintClick: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  canRotateBlueprint: boolean;
   selectSubcategory: (subcat: Subcategory) => void;
+  selectedSubcategory: Subcategory | null;
   currentInteractionType: InteractionType;
 }
 
@@ -26,9 +29,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   onZoomOutClick,
   onUndoClick,
   onRedoClick,
+  onRotateBlueprintClick,
   canUndo,
   canRedo,
+  canRotateBlueprint,
   selectSubcategory,
+  selectedSubcategory,
   currentInteractionType,
 }) => {
   return (
@@ -59,9 +65,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         id="rotate-btn"
         className="btn btn-primary rounded-circle mb-2"
         onClick={onRotateClick}
-        title="Rotate Grid"
+        title="Align North"
       >
-        <i className="material-icons">rotate_right</i>
+        <i className="material-icons">explore</i>
       </button>
       <button
         id="pan-btn"
@@ -95,7 +101,20 @@ const Sidebar: React.FC<SidebarProps> = ({
       >
         <i className="material-icons">zoom_out</i>
       </button>
-      <BuildingSelector selectSubcategory={selectSubcategory} />
+      <button
+        id="rotate-bp-btn"
+        className="btn btn-primary rounded-circle mb-2"
+        onClick={onRotateBlueprintClick}
+        disabled={!canRotateBlueprint}
+        title="Rotate Blueprint (R) (also toggles between venue variants and 1x1/2x2 houses)"
+      >
+        <i className="material-icons">rotate_right</i>
+      </button>
+
+      <BuildingSelector
+        selectSubcategory={selectSubcategory}
+        selectedSubcategory={selectedSubcategory}
+      />
     </div>
   );
 };
