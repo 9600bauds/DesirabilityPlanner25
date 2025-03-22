@@ -1,4 +1,4 @@
-import { InteractionState } from '../types/Interaction';
+import { InteractionState } from '../types/InteractionState';
 import Blueprint from '../types/Blueprint';
 import Building from '../classes/Building';
 import { Tile } from '../utils/geometry';

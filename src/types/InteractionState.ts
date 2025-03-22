@@ -17,3 +17,12 @@ export interface InteractionState {
 export const isInteractionActive = (state: InteractionState): boolean => {
   return state.startTile !== null;
 };
+
+export const initialInteractionState = {
+  type: 'panning' as InteractionType,
+  startPixel: null,
+  startTile: null,
+  currentPixel: null,
+  currentTile: null,
+  dragBox: null,
+};

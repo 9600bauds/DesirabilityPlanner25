@@ -4,10 +4,11 @@ import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
 import Blueprint from '../types/Blueprint';
 import {
+  initialInteractionState,
   InteractionState,
   InteractionType,
   isInteractionActive,
-} from '../types/Interaction';
+} from '../types/InteractionState';
 import GridStateManager from '../classes/GridStateManager';
 import { Rectangle, Tile, Coordinate } from '../utils/geometry';
 import { decodeData, encodeData } from '../utils/encoding';
@@ -18,14 +19,9 @@ import { InteractionEvent } from '../types/InteractionEvent';
 
 const App: React.FC = () => {
   // ===== INTERACTION STATE =====
-  const [interaction, setInteraction] = useState<InteractionState>({
-    type: 'panning',
-    startPixel: null,
-    startTile: null,
-    currentPixel: null,
-    currentTile: null,
-    dragBox: null,
-  });
+  const [interaction, setInteraction] = useState<InteractionState>(
+    initialInteractionState
+  );
 
   // ===== APPLICATION STATE =====
   const [selectedSubcategory, setSelectedSubcategory] =
@@ -200,49 +196,25 @@ const App: React.FC = () => {
       if (!rendererRef.current) return;
 
       const newPixel: Coordinate = getClientCoordinates(event);
-      if (interaction.type === 'panning') {
-        if (interaction.currentPixel && isInteractionActive(interaction)) {
-          const deltaX = newPixel[0] - interaction.currentPixel[0];
-          const deltaY = newPixel[1] - interaction.currentPixel[1];
-          if (deltaX !== 0 || deltaY !== 0) {
-            rendererRef.current.updateOffset(deltaX, deltaY);
-          }
-        }
-        // Just update the currentPixel for next delta calculation, but don't trigger
-        // any preview renders since this is handled directly by updateOffset
-        setInteraction((prev) => ({
-          ...prev,
-          currentPixel: newPixel,
-        }));
-      } else {
-        const newTile = rendererRef.current.getMouseCoords(
-          event,
-          isInteractionActive(interaction) // If the interaction is already active, then we are not limited to coordinates inside the viewport, we can off-road
-        );
-        const tileChanged =
-          // Either one is null but not both
-          (newTile === null) !== (interaction.currentTile === null) ||
-          // Both non-null but different values
-          (newTile !== null &&
-            interaction.currentTile !== null &&
-            !newTile.equals(interaction.currentTile));
+      const newTile = rendererRef.current.getMouseCoords(
+        event,
+        isInteractionActive(interaction) // If the interaction is already active, then we are not limited to coordinates inside the viewport, we can off-road
+      );
+      const newDragBox =
+        interaction.startTile && newTile
+          ? Rectangle.fromTiles(interaction.startTile, newTile)
+          : interaction.dragBox;
 
-        // Only update state if something meaningful has changed
-        if (tileChanged) {
-          const newDragBox =
-            interaction.startTile && newTile
-              ? Rectangle.fromTiles(interaction.startTile, newTile)
-              : interaction.dragBox;
-
-          // Update the state with the new tile and other calculated values
-          setInteraction((prev) => ({
-            ...prev,
-            currentTile: newTile || null,
-            currentPixel: newPixel,
-            dragBox: newDragBox,
-          }));
-        }
+      if (interaction.type === 'panning' && isInteractionActive(interaction)) {
+        rendererRef.current.panningUpdate(newPixel, interaction.currentPixel);
       }
+
+      setInteraction((prev) => ({
+        ...prev,
+        currentTile: newTile,
+        currentPixel: newPixel,
+        dragBox: newDragBox,
+      }));
     },
     [interaction]
   );
@@ -264,12 +236,8 @@ const App: React.FC = () => {
 
       // Reset active interaction state while preserving type and current position
       setInteraction((prev) => ({
+        ...initialInteractionState,
         type: prev.type,
-        startPixel: null,
-        startTile: null,
-        currentPixel: null,
-        currentTile: null,
-        dragBox: null,
       }));
 
       // Process the result based on interaction type
@@ -355,23 +323,15 @@ const App: React.FC = () => {
     };
   }, []); // Empty dependency array means this runs once on mount
 
-  // Update renderer context when the interaction state changes
+  // Update renderer context when necessary
   useEffect(() => {
     if (rendererRef.current) {
       rendererRef.current.updateRenderContext({
         getInteractionState: () => interaction,
-      });
-    }
-  }, [interaction]);
-
-  // Update renderer context when the selected blueprint changes
-  useEffect(() => {
-    if (rendererRef.current) {
-      rendererRef.current.updateRenderContext({
         getSelectedBlueprint,
       });
     }
-  }, [getSelectedBlueprint]);
+  }, [interaction, getSelectedBlueprint]);
 
   // Some of our mouse events are applied to the document and the window. React does not have an easy way to do this.
   // As such, we need useEffects() to remove and re-apply these events whenever any of their state dependencies change.

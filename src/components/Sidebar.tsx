@@ -2,7 +2,7 @@
 import React from 'react';
 import BuildingSelector from './BuildingSelector';
 import Subcategory from '../interfaces/Subcategory';
-import { InteractionType } from '../types/Interaction';
+import { InteractionType } from '../types/InteractionState';
 
 interface SidebarProps {
   onRotateClick: () => void;

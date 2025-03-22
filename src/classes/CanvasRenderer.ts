@@ -18,7 +18,7 @@ import {
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, Coordinate } from '../utils/geometry';
 import Building from './Building';
-import { isInteractionActive } from '../types/Interaction';
+import { isInteractionActive } from '../types/InteractionState';
 import { getClientCoordinates } from '../utils/events';
 import { InteractionEvent } from '../types/InteractionEvent';
 
@@ -243,6 +243,15 @@ class CanvasRenderer {
   /**
    * Update the viewport offset directly (for panning)
    */
+  public panningUpdate(newPixel: Coordinate, oldPixel: Coordinate | null) {
+    if (!oldPixel) return;
+    const deltaX = newPixel[0] - oldPixel[0];
+    const deltaY = newPixel[1] - oldPixel[1];
+    if (deltaX !== 0 || deltaY !== 0) {
+      this.updateOffset(deltaX, deltaY);
+    }
+  }
+
   public updateOffset(deltaX: number, deltaY: number): void {
     this.offsetX += deltaX;
     this.offsetY += deltaY;
@@ -369,7 +378,6 @@ class CanvasRenderer {
    * Preview method that uses external interaction state
    */
   private preview = () => {
-    console.log('previewing...');
     this.pendingPreview = null;
     if (this.pendingRerender) return;
 
