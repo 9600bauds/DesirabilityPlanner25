@@ -489,10 +489,7 @@ const App: React.FC = () => {
           event.preventDefault(); //Prevent rightclick menu
         }}
       />
-      <div
-        id="sidebar-container"
-        style={{ minWidth: '150px', width: '20vw', height: '100vh' }}
-      >
+      <div id="sidebar-container">
         <Sidebar
           onRotateClick={() => {
             if (rendererRef.current) {
