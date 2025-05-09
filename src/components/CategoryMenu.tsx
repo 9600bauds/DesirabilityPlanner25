@@ -15,11 +15,16 @@ const CategoryMenu = ({
   category,
   selectedSubcategory,
 }: CategoryMenuProps) => {
+  let isCategorySelected = false;
+
   const menuItems: React.ReactNode[] = []; // Create an empty array
 
   category.subCategories.forEach((subcat: Subcategory, key: string) => {
-    const className =
-      selectedSubcategory === subcat ? 'selectedSubcategory' : '';
+    let className = '';
+    if (selectedSubcategory === subcat) {
+      isCategorySelected = true;
+      className = 'selectedSubcategory';
+    }
     menuItems.push(
       <MenuItem
         key={key}
@@ -40,6 +45,7 @@ const CategoryMenu = ({
           id={category.id}
           iconPath={category.iconPath}
           title={category.displayName}
+          isActive={isCategorySelected}
         />
       }
     >
