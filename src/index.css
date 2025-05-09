@@ -11,26 +11,36 @@
   min-width: 150px;
   width: 20vw;
   height: 100vh;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
   box-sizing: border-box;
-  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem
 }
 
-#top-controls{ /* Todo: Some padding before and after */
+#top-controls,
+#bottom-controls {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.25rem;
-}
-
-#bottom-controls{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 0.15rem;
+  flex-shrink: 1; /* Allow these containers to shrink if needed */
+  overflow: hidden; /* Prevent their own content from overflowing if grid items are too big */
+}
+
+#top-controls {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+
+#bottom-controls {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
 }
 
 .grid-button {
-  aspect-ratio: 3 / 4; /* Slightly taller than wide */
   width: 100%;
-  padding: 0;
+  height: 100%;
+  padding: 0.1rem;
 }
 
 .button-icon {
