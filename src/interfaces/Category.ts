@@ -1,6 +1,7 @@
 import Subcategory from './Subcategory';
 
-export interface MenuCategory {
+export interface Category {
+  id: string;
   displayName: string;
   symbol: string;
   baseColor: string;

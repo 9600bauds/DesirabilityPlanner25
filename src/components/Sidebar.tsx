@@ -1,9 +1,9 @@
-// src/components/Sidebar.tsx
 import React from 'react';
-import BuildingSelector from './BuildingSelector';
 import Subcategory from '../interfaces/Subcategory';
 import { InteractionType } from '../types/InteractionState';
 import ScalingButton from './ScalingButton';
+import { ALL_CATEGORIES } from '../data/CATEGORIES';
+import CategoryMenu from './CategoryMenu';
 
 interface SidebarProps {
   onRotateClick: () => void;
@@ -42,53 +42,33 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div id="sidebar">
       <div id="top-controls">
         <ScalingButton
-          key="undo" // TODO: Can we obviate these for simplicity?
           id="undo"
           onClick={onUndoClick}
           disabled={!canUndo}
           title="Undo (Ctrl+Z)"
         />
         <ScalingButton
-          key="redo"
           id="redo"
           onClick={onRedoClick}
           disabled={!canRedo}
           title="Redo (Ctrl+Y, Ctrl+Shift+Z)"
         />
         <ScalingButton
-          key="pan"
           id="pan"
           onClick={onPanClick}
           title="Pan Tool"
           isActive={currentInteractionType === 'panning'}
         />
         <ScalingButton
-          key="eraser"
           id="eraser"
           onClick={onEraserClick}
           title="Eraser Tool"
           isActive={currentInteractionType === 'erasing'}
         />
+        <ScalingButton id="zoomout" onClick={onZoomOutClick} title="Zoom Out" />
+        <ScalingButton id="zoomin" onClick={onZoomInClick} title="Zoom In" />
+        <ScalingButton id="north" onClick={onRotateClick} title="Align North" />
         <ScalingButton
-          key="zoomout"
-          id="zoomout"
-          onClick={onZoomOutClick}
-          title="Zoom Out"
-        />
-        <ScalingButton
-          key="zoomin"
-          id="zoomin"
-          onClick={onZoomInClick}
-          title="Zoom In"
-        />
-        <ScalingButton
-          key="rotate"
-          id="rotate"
-          onClick={onRotateClick}
-          title="Align North"
-        />
-        <ScalingButton
-          key="rotate"
           id="rotate"
           onClick={onRotateBlueprintClick}
           disabled={!canRotateBlueprint}
@@ -96,10 +76,16 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
       </div>
 
-      <BuildingSelector
-        selectSubcategory={selectSubcategory}
-        selectedSubcategory={selectedSubcategory}
-      />
+      <div id="bottom-controls">
+        {Object.values(ALL_CATEGORIES).map((category) => (
+          <CategoryMenu
+            key={category.id}
+            selectSubcategory={selectSubcategory}
+            category={category}
+            selectedSubcategory={selectedSubcategory}
+          />
+        ))}
+      </div>
     </div>
   );
 };
