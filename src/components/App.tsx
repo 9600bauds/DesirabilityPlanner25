@@ -489,38 +489,36 @@ const App: React.FC = () => {
           event.preventDefault(); //Prevent rightclick menu
         }}
       />
-      <div id="sidebar-container">
-        <Sidebar
-          onRotateClick={() => {
-            if (rendererRef.current) {
-              rendererRef.current.toggleGridRotation();
-            }
-          }}
-          onPanClick={handlePanClick}
-          onEraserClick={handleEraserClick}
-          onZoomInClick={() => {
-            if (rendererRef.current) {
-              rendererRef.current.zoomIn();
-            }
-          }}
-          onZoomOutClick={() => {
-            if (rendererRef.current) {
-              rendererRef.current.zoomOut();
-            }
-          }}
-          onUndoClick={tryUndo}
-          onRedoClick={tryRedo}
-          onRotateBlueprintClick={selectNextBlueprintIndex}
-          canUndo={canUndo}
-          canRedo={canRedo}
-          canRotateBlueprint={
-            (selectedSubcategory?.blueprints?.length ?? 0) > 1 // Evil hack that accounts for nullness
+      <Sidebar
+        onRotateClick={() => {
+          if (rendererRef.current) {
+            rendererRef.current.toggleGridRotation();
           }
-          selectSubcategory={selectSubcategory}
-          selectedSubcategory={selectedSubcategory}
-          currentInteractionType={interaction.type}
-        />
-      </div>
+        }}
+        onPanClick={handlePanClick}
+        onEraserClick={handleEraserClick}
+        onZoomInClick={() => {
+          if (rendererRef.current) {
+            rendererRef.current.zoomIn();
+          }
+        }}
+        onZoomOutClick={() => {
+          if (rendererRef.current) {
+            rendererRef.current.zoomOut();
+          }
+        }}
+        onUndoClick={tryUndo}
+        onRedoClick={tryRedo}
+        onRotateBlueprintClick={selectNextBlueprintIndex}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        canRotateBlueprint={
+          (selectedSubcategory?.blueprints?.length ?? 0) > 1 // Evil hack that accounts for nullness
+        }
+        selectSubcategory={selectSubcategory}
+        selectedSubcategory={selectedSubcategory}
+        currentInteractionType={interaction.type}
+      />
     </div>
   );
 };

@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   currentInteractionType,
 }) => {
   return (
-    <div id="sidebar">
+    <div id="sidebar-container">
       <div id="top-controls">
         <ScalingButton
           id="undo"
