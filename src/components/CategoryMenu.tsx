@@ -36,7 +36,11 @@ const CategoryMenu = ({
       key={category.id}
       overflow="auto"
       menuButton={
-        <ScalingButton id={category.id} title={category.displayName} />
+        <ScalingButton
+          id={category.id}
+          iconPath={category.iconPath}
+          title={category.displayName}
+        />
       }
     >
       {menuItems}

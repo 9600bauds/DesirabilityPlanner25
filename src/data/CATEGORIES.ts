@@ -31,6 +31,7 @@ export function populateCategories() {
 export const ALL_CATEGORIES: Record<string, Category> = {
   HOUSE: {
     id: 'HOUSE',
+    iconPath: 'HOUSE',
     displayName: 'Housing',
     symbol: '🏠',
     baseColor: 'rgb(84, 194, 51)',
@@ -38,6 +39,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   BEAUTY: {
     id: 'BEAUTY',
+    iconPath: 'BEAUTY',
     displayName: 'Beautification',
     symbol: '🌼',
     baseColor: 'rgb(225, 215, 0)',
@@ -45,6 +47,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   FOOD: {
     id: 'FOOD',
+    iconPath: 'FOOD',
     displayName: 'Food and Farming',
     symbol: '🐐',
     baseColor: 'rgb(173, 65, 33)',
@@ -52,6 +55,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   FUN: {
     id: 'FUN',
+    iconPath: 'FUN',
     displayName: 'Entertainment',
     symbol: '🎶',
     baseColor: 'rgb(224, 142, 187)',
@@ -59,6 +63,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   HEALTH: {
     id: 'HEALTH',
+    iconPath: 'HEALTH',
     displayName: 'Health and Sanitation',
     symbol: '⛲',
     baseColor: 'rgb(32, 68, 146)',
@@ -66,6 +71,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   INDUSTRY: {
     id: 'INDUSTRY',
+    iconPath: 'INDUSTRY',
     displayName: 'Industrial Buildings',
     symbol: '🧱',
     baseColor: 'rgb(189, 97, 57)',
@@ -73,6 +79,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   RELIGION: {
     id: 'RELIGION',
+    iconPath: 'RELIGION',
     displayName: 'Religion',
     symbol: '👁️',
     baseColor: 'rgb(149, 44, 170)',
@@ -80,6 +87,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   GOVT: {
     id: 'GOVT',
+    iconPath: 'GOVT',
     displayName: 'Municipal Buildings',
     symbol: '🏛️',
     baseColor: 'rgb(209, 209, 209)',
@@ -87,6 +95,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   STORAGE: {
     id: 'STORAGE',
+    iconPath: 'STORAGE',
     displayName: 'Storage and Distribution',
     symbol: '🏺',
     baseColor: 'rgb(245, 226, 180)',
@@ -94,6 +103,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   EDUCATION: {
     id: 'EDUCATION',
+    iconPath: 'EDUCATION',
     displayName: 'Education',
     symbol: '🪶',
     baseColor: 'rgb(2, 92, 14)',
@@ -101,6 +111,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   MILITARY: {
     id: 'MILITARY',
+    iconPath: 'MILITARY',
     displayName: 'Military Structures',
     symbol: '⛵',
     baseColor: 'rgb(126, 13, 13)',

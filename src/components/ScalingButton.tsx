@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 
 interface ScalingButtonProps {
   id: string;
+  iconPath?: string; // If not defined, uses id instead
   title: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
@@ -13,6 +14,7 @@ const ScalingButton = forwardRef<HTMLButtonElement, ScalingButtonProps>(
   (
     {
       id,
+      iconPath,
       title,
       onClick,
       onKeyDown,
@@ -39,7 +41,7 @@ const ScalingButton = forwardRef<HTMLButtonElement, ScalingButtonProps>(
         {...rest}
       >
         <img
-          src={`/DesirabilityPlanner25/icons/${id}.png`}
+          src={`${import.meta.env.BASE_URL}/icons/${iconPath || id}.png`}
           alt={title}
           className="button-icon"
         />
