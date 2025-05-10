@@ -30,7 +30,6 @@ const App: React.FC = () => {
     useState<number>(0);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-  const [canRotateBlueprint, setCanRotateBlueprint] = useState(false);
 
   // ===== REFS =====
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -101,6 +100,11 @@ const App: React.FC = () => {
   const selectSubcategory = useCallback((subcat: Subcategory) => {
     setInteractionType('placing');
     setSelectedSubcategory(subcat);
+    setSelectedBlueprintIndex(0);
+  }, []);
+
+  const deselectSubcategory = useCallback(() => {
+    setSelectedSubcategory(null);
     setSelectedBlueprintIndex(0);
   }, []);
 
@@ -337,6 +341,14 @@ const App: React.FC = () => {
       });
     }
   }, [interaction, getSelectedBlueprint]);
+  // Clear our selected blueprint whenever we change our interaction to non-placing
+  useEffect(() => {
+    if (!canvasContainer.current) return;
+
+    if (interaction.type !== 'placing') {
+      deselectSubcategory();
+    }
+  }, [interaction.type]);
 
   // Some of our mouse events are applied to the document and the window. React does not have an easy way to do this.
   // As such, we need useEffects() to remove and re-apply these events whenever any of their state dependencies change.
