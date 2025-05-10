@@ -30,11 +30,16 @@
 #top-controls {
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(4, minmax(0, 1fr));
+  flex-basis: 0;
+  flex-grow: 4; /* Represents 40% of the growable space */
+                   
 }
 
 #bottom-controls {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(4, minmax(0, 1fr));
+  flex-basis: 0;
+  flex-grow: 6; /* Represents 60% of the growable space */
 }
 
 .grid-button {
