@@ -4,6 +4,14 @@
   --divider-base: #5a3a1a; 
   --divider-highlight: #c8a064; 
   --divider-shadow: #3c240e;
+  --menu-bg: #d8a060;
+  --menu-bg-hover: #cc8d44;
+  --menu-bg-selected: #b56931;
+  --menu-text-color: #4a3b2a;
+  --menu-text-darker: #302010;
+  --menu-highlight: #f0c080;
+  --menu-shadow: #a07040;
+  --menu-border-width: 2px;
   --divider-width: 4px;
   --row-gap: 0.3em;
   --column-gap: 0.5em;
@@ -139,7 +147,53 @@
   paint-order: stroke fill;
 }
 
-.selectedSubcategory {
-  color: #004085;
-  background-color: #b8daff;
+.szh-menu {
+  background-color: transparent;
+  border: none; 
+  box-shadow: none; /* Optional: subtle drop shadow for the whole menu */
+}
+
+.szh-menu__item {
+  box-sizing: border-box;
+  background-color: var(--menu-bg);
+  color: var(--menu-text-color);
+  font-family: "Delius", cursive;
+  font-style: normal;
+  font-weight: bold;
+  border-style: solid;
+  border-width: var(--menu-border-width);
+  border-top-color: var(--menu-highlight);
+  border-left-color: var(--menu-highlight);
+  border-bottom-color: var(--menu-shadow);
+  border-right-color: var(--menu-shadow);
+  transition:
+    background-color 0.1s ease-in-out,
+    border-color 0.1s ease-in-out;
+}
+.szh-menu__item:not(:last-child) {
+    margin-bottom: 0.25em; /* Creates the vertical gap between items */
+}
+
+.szh-menu__item--hover,
+.szh-menu__item--active,
+.szh-menu__item--focus,
+.szh-menu__item.selectedSubcategory,
+.szh-menu__item.selectedSubcategory:hover {
+  color: var(--menu-text-darker);
+  /* Invert bevel for a "pressed" look */
+  border-top-color: var(--menu-shadow);
+  border-left-color: var(--menu-shadow);
+  border-bottom-color: var(--menu-highlight);
+  border-right-color: var(--menu-highlight);
+}
+
+.szh-menu__item--hover,
+.szh-menu__item--active,
+.szh-menu__item--focus {
+  background-color: var(--menu-bg-hover);
+}
+
+.szh-menu__item.selectedSubcategory,
+.szh-menu__item.selectedSubcategory:hover {
+  background-color: var(--menu-bg-selected);
 }

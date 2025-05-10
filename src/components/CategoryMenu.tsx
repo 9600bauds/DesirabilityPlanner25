@@ -40,6 +40,8 @@ const CategoryMenu = ({
     <Menu
       key={category.id}
       overflow="auto"
+      portal={true}
+      direction="left"
       menuButton={
         <ScalingButton
           id={category.id}
