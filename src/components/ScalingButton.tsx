@@ -24,8 +24,8 @@ const ScalingButton = forwardRef<HTMLButtonElement, ScalingButtonProps>(
     }, // Destructured props
     buttonRef // The forwarded ref itself
   ) => {
-    const baseClass = 'btn';
-    const activeClass = isActive ? 'btn-success' : 'btn-outline-secondary';
+    const baseClass = 'btn border-0'; // Need to wrestle borders away from Bootstrap like this
+    const activeClass = isActive ? 'selected' : '';
     const layoutClasses =
       'd-flex align-items-center justify-content-center grid-button';
 

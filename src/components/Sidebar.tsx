@@ -41,17 +41,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div id="sidebar-container">
       <div id="top-controls">
+        <ScalingButton id="zoomout" onClick={onZoomOutClick} title="Zoom Out" />
+        <ScalingButton id="zoomin" onClick={onZoomInClick} title="Zoom In" />
+        <ScalingButton id="north" onClick={onRotateClick} title="Align North" />
         <ScalingButton
-          id="undo"
-          onClick={onUndoClick}
-          disabled={!canUndo}
-          title="Undo (Ctrl+Z)"
-        />
-        <ScalingButton
-          id="redo"
-          onClick={onRedoClick}
-          disabled={!canRedo}
-          title="Redo (Ctrl+Y, Ctrl+Shift+Z)"
+          id="rotate"
+          onClick={onRotateBlueprintClick}
+          disabled={!canRotateBlueprint}
+          title="Rotate Blueprint (R) (also toggles between venue variants and 1x1/2x2 houses)"
         />
         <ScalingButton
           id="pan"
@@ -65,14 +62,17 @@ const Sidebar: React.FC<SidebarProps> = ({
           title="Eraser Tool"
           isActive={currentInteractionType === 'erasing'}
         />
-        <ScalingButton id="zoomout" onClick={onZoomOutClick} title="Zoom Out" />
-        <ScalingButton id="zoomin" onClick={onZoomInClick} title="Zoom In" />
-        <ScalingButton id="north" onClick={onRotateClick} title="Align North" />
         <ScalingButton
-          id="rotate"
-          onClick={onRotateBlueprintClick}
-          disabled={!canRotateBlueprint}
-          title="Rotate Blueprint (R) (also toggles between venue variants and 1x1/2x2 houses)"
+          id="undo"
+          onClick={onUndoClick}
+          disabled={!canUndo}
+          title="Undo (Ctrl+Z)"
+        />
+        <ScalingButton
+          id="redo"
+          onClick={onRedoClick}
+          disabled={!canRedo}
+          title="Redo (Ctrl+Y, Ctrl+Shift+Z)"
         />
       </div>
 
