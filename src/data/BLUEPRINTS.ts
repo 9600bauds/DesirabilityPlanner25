@@ -2,6 +2,7 @@ import Blueprint from '../types/Blueprint';
 import { Tile } from '../utils/geometry';
 
 export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
+  // Category: ROAD
   Road: {
     id: 1,
     label: 'Road',
@@ -9,6 +10,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     width: 1,
     cost: [1, 3, 4, 5, 6],
     employeesRequired: 0,
+    category: 'ROAD',
   },
 
   // Category: BEAUTY
@@ -61,28 +63,6 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     employeesRequired: 0,
     desireBox: { baseDesirability: 3, stepDist: 1, stepVal: -1, maxRange: 3 },
     category: 'BEAUTY',
-  },
-
-  // Category: EDUCATION
-  Library: {
-    id: 21,
-    label: 'Library',
-    height: 3,
-    width: 3,
-    cost: [90, 360, 450, 540, 675],
-    employeesRequired: 30,
-    desireBox: { baseDesirability: 8, stepDist: 2, stepVal: -2, maxRange: 6 },
-    category: 'EDUCATION',
-  },
-  'Scribe School': {
-    id: 22,
-    label: 'Scribe School',
-    height: 2,
-    width: 2,
-    cost: [30, 120, 150, 180, 225],
-    employeesRequired: 10,
-    desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
-    category: 'EDUCATION',
   },
 
   // Category: FOOD
@@ -382,7 +362,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'HEALTH',
   },
 
-  // Category: HOUSE
+  // Category: HOUSING_BASIC
   'Crude Hut_2x2': {
     id: 121,
     label: 'Crude<br>Hut',
@@ -395,7 +375,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
       maxRange: 2,
     },
     desirabilityToEvolve: -10,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Crude Hut_1x1': {
     id: 122,
@@ -409,7 +389,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
       maxRange: 2,
     },
     desirabilityToEvolve: -10,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Sturdy Hut_2x2': {
     id: 123,
@@ -425,7 +405,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: -10,
     desirabilityToDevolve: -12,
     desirabilityToEvolve: -5,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Sturdy Hut_1x1': {
     id: 124,
@@ -441,7 +421,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: -10,
     desirabilityToDevolve: -12,
     desirabilityToEvolve: -5,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Meager Shanty_2x2': {
     id: 125,
@@ -457,7 +437,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: -5,
     desirabilityToDevolve: -7,
     desirabilityToEvolve: 0,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Meager Shanty_1x1': {
     id: 126,
@@ -473,7 +453,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: -5,
     desirabilityToDevolve: -7,
     desirabilityToEvolve: 0,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Common Shanty_2x2': {
     id: 127,
@@ -489,7 +469,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 0,
     desirabilityToDevolve: -2,
     desirabilityToEvolve: 4,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Common Shanty_1x1': {
     id: 128,
@@ -505,7 +485,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 0,
     desirabilityToDevolve: -2,
     desirabilityToEvolve: 4,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Rough Cottage_2x2': {
     id: 129,
@@ -521,7 +501,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 4,
     desirabilityToDevolve: 2,
     desirabilityToEvolve: 9,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Rough Cottage_1x1': {
     id: 130,
@@ -537,7 +517,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 4,
     desirabilityToDevolve: 2,
     desirabilityToEvolve: 9,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Ordinary Cottage_2x2': {
     id: 131,
@@ -553,7 +533,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 9,
     desirabilityToDevolve: 7,
     desirabilityToEvolve: 13,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Ordinary Cottage_1x1': {
     id: 132,
@@ -569,7 +549,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 9,
     desirabilityToDevolve: 7,
     desirabilityToEvolve: 13,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Modest Homestead_2x2': {
     id: 133,
@@ -585,7 +565,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 13,
     desirabilityToDevolve: 11,
     desirabilityToEvolve: 17,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Modest Homestead_1x1': {
     id: 134,
@@ -601,7 +581,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 13,
     desirabilityToDevolve: 11,
     desirabilityToEvolve: 17,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Spacious Homestead_2x2': {
     id: 135,
@@ -617,7 +597,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 17,
     desirabilityToDevolve: 15,
     desirabilityToEvolve: 21,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Spacious Homestead_1x1': {
     id: 136,
@@ -633,7 +613,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 17,
     desirabilityToDevolve: 15,
     desirabilityToEvolve: 21,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Modest Apartment_2x2': {
     id: 137,
@@ -643,7 +623,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 21,
     desirabilityToDevolve: 19,
     desirabilityToEvolve: 26,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Modest Apartment_1x1': {
     id: 138,
@@ -653,7 +633,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 21,
     desirabilityToDevolve: 19,
     desirabilityToEvolve: 26,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Spacious Apartment_2x2': {
     id: 139,
@@ -663,7 +643,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 26,
     desirabilityToDevolve: 23,
     desirabilityToEvolve: 33,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Spacious Apartment_1x1': {
     id: 140,
@@ -673,7 +653,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 26,
     desirabilityToDevolve: 23,
     desirabilityToEvolve: 33,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Common Residence': {
     id: 151,
@@ -683,7 +663,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 33,
     desirabilityToDevolve: 30,
     desirabilityToEvolve: 41,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Spacious Residence': {
     id: 152,
@@ -693,7 +673,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 41,
     desirabilityToDevolve: 37,
     desirabilityToEvolve: 50,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Elegant Residence': {
     id: 153,
@@ -709,7 +689,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 50,
     desirabilityToDevolve: 45,
     desirabilityToEvolve: 55,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Fancy Residence': {
     id: 154,
@@ -725,10 +705,10 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 55,
     desirabilityToDevolve: 50,
     desirabilityToEvolve: 60,
-    category: 'HOUSE',
+    category: 'HOUSING_BASIC',
   },
   'Common Manor': {
-    id: 155,
+    id: 160,
     label: 'Common<br>Manor',
     height: 3,
     width: 3,
@@ -741,10 +721,10 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 60,
     desirabilityToDevolve: 52,
     desirabilityToEvolve: 65,
-    category: 'HOUSE',
+    category: 'HOUSING_FANCY',
   },
   'Spacious Manor': {
-    id: 156,
+    id: 161,
     label: 'Spacious<br>Manor',
     height: 3,
     width: 3,
@@ -757,10 +737,10 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 65,
     desirabilityToDevolve: 55,
     desirabilityToEvolve: 70,
-    category: 'HOUSE',
+    category: 'HOUSING_FANCY',
   },
   'Elegant Manor': {
-    id: 157,
+    id: 162,
     label: 'Elegant<br>Manor',
     height: 3,
     width: 3,
@@ -773,10 +753,10 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 70,
     desirabilityToDevolve: 62,
     desirabilityToEvolve: 76,
-    category: 'HOUSE',
+    category: 'HOUSING_FANCY',
   },
   'Stately Manor': {
-    id: 158,
+    id: 163,
     label: 'Stately<br>Manor',
     height: 3,
     width: 3,
@@ -789,10 +769,10 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 76,
     desirabilityToDevolve: 70,
     desirabilityToEvolve: 82,
-    category: 'HOUSE',
+    category: 'HOUSING_FANCY',
   },
   'Modest Estate': {
-    id: 159,
+    id: 164,
     label: 'Modest<br>Estate',
     height: 4,
     width: 4,
@@ -805,10 +785,10 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desirabilityToBeStable: 82,
     desirabilityToDevolve: 72,
     desirabilityToEvolve: 92,
-    category: 'HOUSE',
+    category: 'HOUSING_FANCY',
   },
   'Palatial Estate': {
-    id: 160,
+    id: 165,
     label: 'Palatial<br>Estate',
     height: 4,
     width: 4,
@@ -820,7 +800,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     },
     desirabilityToBeStable: 92,
     desirabilityToDevolve: 87,
-    category: 'HOUSE',
+    category: 'HOUSING_FANCY',
   },
 
   // Category: INDUSTRY
@@ -1174,7 +1154,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'MILITARY',
   },
 
-  // Category: RELIGION
+  // Category: RELIGION_EDUCATION
   'Festival Pavilion': {
     id: 221,
     label: 'Festi&#8203;val Pavi&#8203;lion',
@@ -1183,7 +1163,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     cost: [100, 400, 500, 600, 750],
     employeesRequired: 0,
     desireBox: { baseDesirability: 16, stepDist: 2, stepVal: -3, maxRange: 5 },
-    category: 'RELIGION',
+    category: 'RELIGION_EDUCATION',
   },
   Shrine: {
     id: 222,
@@ -1193,7 +1173,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     cost: [20, 80, 100, 120, 150],
     employeesRequired: 0,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
-    category: 'RELIGION',
+    category: 'RELIGION_EDUCATION',
   },
   Temple: {
     id: 223,
@@ -1203,7 +1183,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     cost: [30, 120, 150, 180, 225],
     employeesRequired: 8,
     desireBox: { baseDesirability: 6, stepDist: 2, stepVal: -2, maxRange: 6 },
-    category: 'RELIGION',
+    category: 'RELIGION_EDUCATION',
   },
   'Temple Complex Altar': {
     id: 224,
@@ -1212,7 +1192,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     height: 3,
     width: 3,
     desireBox: { baseDesirability: 20, stepDist: 2, stepVal: -4, maxRange: 6 },
-    category: 'RELIGION',
+    category: 'RELIGION_EDUCATION',
   },
   'Temple Complex_1': {
     id: 225,
@@ -1226,7 +1206,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
       { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(3, 2) },
       { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(6, 2) },
     ],
-    category: 'RELIGION',
+    category: 'RELIGION_EDUCATION',
   },
   'Temple Complex_2': {
     id: 226,
@@ -1240,7 +1220,27 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
       { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(2, 3) },
       { childKey: 'Temple Complex Altar', relativeOrigin: new Tile(2, 6) },
     ],
-    category: 'RELIGION',
+    category: 'RELIGION_EDUCATION',
+  },
+  Library: {
+    id: 227,
+    label: 'Library',
+    height: 3,
+    width: 3,
+    cost: [90, 360, 450, 540, 675],
+    employeesRequired: 30,
+    desireBox: { baseDesirability: 8, stepDist: 2, stepVal: -2, maxRange: 6 },
+    category: 'RELIGION_EDUCATION',
+  },
+  'Scribe School': {
+    id: 228,
+    label: 'Scribe School',
+    height: 2,
+    width: 2,
+    cost: [30, 120, 150, 180, 225],
+    employeesRequired: 10,
+    desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
+    category: 'RELIGION_EDUCATION',
   },
 
   // Category: STORAGE
