@@ -1,6 +1,7 @@
 import { Menu, MenuItem } from '@szhsin/react-menu';
 import { Category } from '../interfaces/Category';
 import '@szhsin/react-menu/dist/index.css';
+import './CategoryMenu.css';
 import Subcategory from '../interfaces/Subcategory';
 import ScalingButton from './ScalingButton';
 

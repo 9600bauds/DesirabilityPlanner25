@@ -4,6 +4,7 @@ import { InteractionType } from '../types/InteractionState';
 import ScalingButton from './ScalingButton';
 import { ALL_CATEGORIES } from '../data/CATEGORIES';
 import CategoryMenu from './CategoryMenu';
+import './Sidebar.css';
 
 interface SidebarProps {
   onRotateClick: () => void;

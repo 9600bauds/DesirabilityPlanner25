@@ -1,0 +1,96 @@
+:root {
+  --sidebar-bg: #aa643b;
+  --selected-highlight: #e48c59;
+  --divider-base: #5a3a1a; 
+  --divider-highlight: #c8a064; 
+  --divider-shadow: #3c240e;
+
+  --divider-width: 4px;
+  --row-gap: 0.3em;
+  --column-gap: 0.5em;
+}
+
+#sidebar-container {
+  min-width: 150px;
+  width: 20vw;
+  height: 100vh;
+  background-color: var(--sidebar-bg);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+#top-controls,
+#bottom-controls {
+  display: grid;
+  row-gap: var(--row-gap);
+  column-gap: var(--column-gap);
+  flex-basis: 0;
+  flex-shrink: 1; /* Allow these containers to shrink if needed */
+  overflow: hidden; /* Prevent their own content from overflowing if grid items are too big */
+  position: relative; /* For positioning pseudo-elements relative to the grid container */
+}
+
+#top-controls {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  flex-grow: 4; /* Represents 40% of the growable space */   
+}
+
+#bottom-controls {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  flex-grow: 6; /* Represents 60% of the growable space */
+}
+
+.grid-button {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background-color: none;
+  position: relative; /* For positioning pseudo-elements relative to the grid container */
+}
+
+.grid-button::after {
+  content: "";
+  position: absolute;
+
+  /* Make it extend from top of row-gap above to bottom of row-gap below */
+  top: calc(var( --column-gap ) / -2);
+  bottom: calc(var( --column-gap ) / -2);
+
+  width: var(--divider-width); 
+  right: calc( (var( --column-gap ) / -2) - (var(--divider-width) / 2) ); /* -(half column-gap) - (half new divider width) */
+
+  background-color: var(--divider-base);
+  box-shadow:
+    inset -1px 0 0 var(--divider-highlight),
+    inset 1px 0 0 var(--divider-shadow);
+}
+
+.grid-button:hover .button-icon, 
+.grid-button.focus .button-icon,
+.grid-button:active .button-icon, 
+.grid-button.active .button-icon {
+  background-color: var(--selected-highlight);
+  box-shadow: inset 0 0 1.5em 0.1em var(--sidebar-bg), inset 0 0 1em 0.3em var(--sidebar-bg);
+}
+
+.grid-button.selected .button-icon {
+  background-color: var(--selected-highlight);
+  box-shadow: inset 0 0 1.5em #000000, inset 0 0 0.75em #000000 /* Yes, this is hideous, but it's this hideous in the game too! */
+}
+.grid-button.selected .button-icon {
+  /* Offset it a bit downwards */
+  margin-top: 0.4em;
+  margin-left: 0.15em;
+}
+
+.button-icon {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 0.2rem;
+}
