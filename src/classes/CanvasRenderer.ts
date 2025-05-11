@@ -143,13 +143,7 @@ class CanvasRenderer {
     allowOutsideViewport = false
   ): Tile | null => {
     const point = getClientCoordinates(event);
-    if (
-      !allowOutsideViewport &&
-      (point[0] < 0 ||
-        point[1] < 0 ||
-        point[0] >= this.clientWidth ||
-        point[1] >= this.clientHeight)
-    ) {
+    if (!allowOutsideViewport && !this.isEventInsideViewport(event)) {
       return null; //This is outside our viewport!
     }
 
@@ -176,6 +170,19 @@ class CanvasRenderer {
     let point: Coordinate = [x, y];
     if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
     return Tile.fromCoordinate(point);
+  };
+
+  public isEventInsideViewport = (event: InteractionEvent) => {
+    const target = event.target;
+    if (!(target instanceof Node)) {
+      // This case should ideally not happen with standard DOM events
+      return false;
+    }
+    const targetNode: Node = target;
+    return (
+      targetNode === this.parentContainer &&
+      this.parentContainer.contains(targetNode)
+    );
   };
 
   // Get the range of tiles currently visible in the viewport
