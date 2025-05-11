@@ -251,12 +251,10 @@ const App: React.FC = () => {
         }
       }
 
-      // Reset active interaction state while preserving type and current position
+      // Reset active interaction state while preserving type
       setInteraction((prev) => ({
         ...initialInteractionState,
         type: prev.type,
-        currentPixel: prev.currentPixel,
-        currentTile: prev.currentTile,
       }));
 
       return finalState;
