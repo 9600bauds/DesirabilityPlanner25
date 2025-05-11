@@ -145,7 +145,7 @@ const App: React.FC = () => {
       canvasContainer.current.style.cursor = 'copy';
     } else if (interaction.type === 'erasing') {
       document.body.style.cursor = 'auto';
-      canvasContainer.current.style.cursor = 'cell';
+      canvasContainer.current.style.cursor = `url(${import.meta.env.BASE_URL}/icons/eraser-cursor.png) 6 28, cell`;
     } else if (interaction.type === 'panning') {
       if (isInteractionActive(interaction)) {
         document.body.style.cursor = 'grabbing';
