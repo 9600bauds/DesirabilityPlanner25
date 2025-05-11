@@ -6,7 +6,7 @@
   --divider-shadow: #3c240e;
 
   --divider-width: 4px;
-  --row-gap: 0.3em;
+  --row-gap: 0.2em;
   --column-gap: 0.5em;
 }
 
@@ -18,78 +18,75 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 1em;
 }
 
-#top-controls,
-#bottom-controls {
+.sidebar-horizontal-separator {
+  opacity: 1; /* Why on Earth does Bootstrap give <hr>s 0.25 opacity? */
+  border: none;
+  height: var(--divider-width);
+  width: 90%;
+  margin: 0.75em auto;
+  background-color: var(--divider-base);
+  box-shadow:
+    inset 0 1px 0 var(--divider-shadow),
+    inset 0 -1px 0 var(--divider-highlight);
+  position: relative;
+}
+
+.button-grid {
   display: grid;
   row-gap: var(--row-gap);
   column-gap: var(--column-gap);
   flex-basis: 0;
-  flex-shrink: 1; /* Allow these containers to shrink if needed */
+  flex-shrink: 1; /* Allow grids to shrink if needed */
   overflow: hidden; /* Prevent their own content from overflowing if grid items are too big */
   position: relative; /* For positioning pseudo-elements relative to the grid container */
 }
+.button-grid > * { /* ".button-grid > *" means: all CHILDREN of the button grid! */
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  position: relative; /* For positioning pseudo-elements relative to the grid container */
+  opacity: 1 !important; /* Bootstrap lowers the opacity of the whole button, which also affects the separator. We'll do this ourselves to just the image. */
+  transition: filter 0.15s ease-in-out, opacity 0.15s ease-in-out;
+}
+.button-grid > *[disabled] .button-icon {
+  filter: grayscale(100%);
+  opacity: 0.65 !important;
+}
+.button-grid > *::after {
+  /* Horizontal separator */
+  content: "";
+  position: absolute;
+  width: var(--divider-width); 
+  background-color: var(--divider-base);
+  box-shadow:
+    inset -1px 0 0 var(--divider-highlight),
+    inset 1px 0 0 var(--divider-shadow);
+  /* Make it extend from top of row-gap above to bottom of row-gap below */
+  top: calc(var(--row-gap) / -2);
+  bottom: calc(var(--row-gap) / -2);
+  /* Put it to the right inbetween both columns */
+  right: calc( (var( --column-gap ) / -2) - (var(--divider-width)) ); /* -(half column-gap) - (divider width) */
+}
 
 #top-controls {
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(4, minmax(0, 1fr));
-  flex-grow: 4; /* Represents 40% of the growable space */   
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  flex-grow: 3; /* Represents 30% of the growable space */   
+}
+
+#bar-controls {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(1, minmax(0, 1fr));
+  flex-grow: 1; /* Represents 10% of the growable space (I think? Seems to be a bit bigger than 10%) */   
 }
 
 #bottom-controls {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(4, minmax(0, 1fr));
   flex-grow: 6; /* Represents 60% of the growable space */
-}
-
-.grid-button {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  position: relative; /* For positioning pseudo-elements relative to the grid container */
-  opacity: 1 !important; /* Bootstrap lowers the opacity of the whole button, which also affects the separator. We'll do this ourselves to just the image. */
-  transition: filter 0.15s ease-in-out, opacity 0.15s ease-in-out;
-}
-.grid-button[disabled] .button-icon {
-  filter: grayscale(100%);
-  opacity: 0.65 !important;
-}
-
-.grid-button::after {
-  content: "";
-  position: absolute;
-
-  /* Make it extend from top of row-gap above to bottom of row-gap below */
-  top: calc(var(--row-gap) / -2);
-  bottom: calc(var(--row-gap) / -2);
-
-  width: var(--divider-width); 
-  right: calc( (var( --column-gap ) / -2) - (var(--divider-width) / 2) ); /* -(half column-gap) - (half new divider width) */
-
-  background-color: var(--divider-base);
-  box-shadow:
-    inset -1px 0 0 var(--divider-highlight),
-    inset 1px 0 0 var(--divider-shadow);
-}
-
-.grid-button:hover .button-icon, 
-.grid-button.focus .button-icon,
-.grid-button:active .button-icon, 
-.grid-button.active .button-icon {
-  background-color: var(--selected-highlight);
-  box-shadow: inset 0 0 1.5em 0.1em var(--sidebar-bg), inset 0 0 1em 0.3em var(--sidebar-bg);
-}
-
-.grid-button.selected .button-icon {
-  background-color: var(--selected-highlight);
-  box-shadow: inset 0 0 1.5em #000000, inset 0 0 0.75em #000000 /* Yes, this is hideous, but it's this hideous in the game too! */
-}
-.grid-button.selected .button-icon {
-  /* Offset it a bit downwards */
-  margin-top: 0.4em;
-  margin-left: 0.15em;
 }
 
 .button-icon {
@@ -99,15 +96,17 @@
   display: block;
   border-radius: 0.2rem;
 }
-
-.sidebar-horizontal-separator {
-  border: none;
-  height: var(--divider-width); /* Use the general divider thickness */
-  width: 90%;
-  margin: 0.75em auto;
-  background-color: var(--divider-base);
-  box-shadow:
-    inset 0 1px 0 var(--divider-highlight),
-    inset 0 -1px 0 var(--divider-shadow);
-  position: relative;
+.grid-button:hover .button-icon, 
+.grid-button.focus .button-icon,
+.grid-button:active .button-icon, 
+.grid-button.active .button-icon {
+  background-color: var(--selected-highlight);
+  box-shadow: inset 0 0 1.5em 0.1em var(--sidebar-bg), inset 0 0 1em 0.3em var(--sidebar-bg);
+}
+.grid-button.selected .button-icon {
+  background-color: var(--selected-highlight);
+  box-shadow: inset 0 0 1.5em #000000, inset 0 0 0.75em #000000; /* Yes, this is hideous, but it's this hideous in the game too! */
+  /* Offset it a bit downwards */
+  margin-top: 0.4em;
+  margin-left: 0.15em;
 }

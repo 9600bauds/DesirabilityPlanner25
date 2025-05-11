@@ -41,9 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   return (
     <div id="sidebar-container">
-      <div id="top-controls">
-        <ScalingButton id="zoomout" onClick={onZoomOutClick} title="Zoom Out" />
-        <ScalingButton id="zoomin" onClick={onZoomInClick} title="Zoom In" />
+      <div id="top-controls" className="button-grid">
         <ScalingButton id="north" onClick={onRotateClick} title="Align North" />
         <ScalingButton
           id="rotate"
@@ -51,6 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           disabled={!canRotateBlueprint}
           title="Rotate Blueprint (R) (also toggles between venue variants and 1x1/2x2 houses)"
         />
+        <ScalingButton id="help" title="Help (todo!)" />
         <ScalingButton
           id="pan"
           onClick={onPanClick}
@@ -63,6 +62,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           title="Eraser Tool"
           isActive={currentInteractionType === 'erasing'}
         />
+      </div>
+      <hr className="sidebar-horizontal-separator" />
+      <div id="bar-controls" className="button-grid">
+        <ScalingButton id="zoomout" onClick={onZoomOutClick} title="Zoom Out" />
+        <ScalingButton id="zoomin" onClick={onZoomInClick} title="Zoom In" />
         <ScalingButton
           id="undo"
           onClick={onUndoClick}
@@ -77,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
       </div>
       <hr className="sidebar-horizontal-separator" />
-      <div id="bottom-controls">
+      <div id="bottom-controls" className="button-grid">
         {Object.values(ALL_CATEGORIES).map((category) => (
           <CategoryMenu
             key={category.id}
