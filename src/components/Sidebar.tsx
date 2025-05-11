@@ -76,7 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           title="Redo (Ctrl+Y, Ctrl+Shift+Z)"
         />
       </div>
-
+      <hr className="sidebar-horizontal-separator" />
       <div id="bottom-controls">
         {Object.values(ALL_CATEGORIES).map((category) => (
           <CategoryMenu

@@ -31,7 +31,7 @@ export function populateCategories() {
 export const ALL_CATEGORIES: Record<string, Category> = {
   HOUSING_BASIC: {
     id: 'HOUSING_BASIC',
-    iconPath: '/categories/nicehouse2',
+    iconPath: '/categories/basichouse',
     displayName: 'Basic Housing',
     baseColor: 'rgb(84, 194, 51)',
     subCategories: new Map(),
