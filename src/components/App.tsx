@@ -501,6 +501,7 @@ const App: React.FC = () => {
           event.preventDefault(); //Prevent rightclick menu
         }}
       />
+      <div id="sidebar-separator"></div>
       <Sidebar
         onRotateClick={() => {
           if (rendererRef.current) {

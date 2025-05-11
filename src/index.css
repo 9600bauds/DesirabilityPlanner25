@@ -41,3 +41,110 @@
   -webkit-text-stroke: 3px white;
   paint-order: stroke fill;
 }
+
+#sidebar-separator {
+  --separator-width: 10px;
+  --colored-band-main-height: 20px;
+  --bevel-thickness: 1px;
+  --white-separator-height: 3px;
+  --black-separator-height: 1px;
+
+  /* --- Color Palette  --- */
+  --black-line-color: #000000;
+  --white-line-color: #F0F0F0;
+  --c1-main: #2c3a4c; --c1-hl: #506077; --c1-sh: #1e2a38; /* Blue */
+  --c2-main: #d76e22; --c2-hl: #f38d32; --c2-sh: #b85912; /* Orange */
+  --c3-main: #278e50; --c3-hl: #3dbb6c; --c3-sh: #1a6e3a; /* Green */
+  --c4-main: #b03021; --c4-hl: #db4c3c; --c4-sh: #922012; /* Red */
+  
+  /* Calculate the start and stop points for the sandwich */
+  --unit-s1-white-top-start: 0px;
+  --unit-s1-white-top-end: var(--white-separator-height);
+  --unit-s2-black-start: var(--unit-s1-white-top-end);
+  --unit-s2-black-end: calc(var(--unit-s2-black-start) + var(--black-separator-height));
+  --unit-s3-white-bottom-start: var(--unit-s2-black-end);
+  --unit-s3-white-bottom-end: calc(var(--unit-s3-white-bottom-start) + var(--white-separator-height));
+  /* Calculate the start and stop points for the colored bar and bevels */
+  --unit-s4-color-hl-start: var(--unit-s3-white-bottom-end);
+  --unit-s4-color-hl-end: calc(var(--unit-s4-color-hl-start) + var(--bevel-thickness));
+  --unit-s4-color-main-start: var(--unit-s4-color-hl-end);
+  --unit-s4-color-main-end: calc(var(--unit-s4-color-main-start) + var(--colored-band-main-height));
+  --unit-s4-color-sh-start: var(--unit-s4-color-main-end);
+  --unit-s4-color-sh-end: calc(var(--unit-s4-color-sh-start) + var(--bevel-thickness)); 
+  --single-unit-height: var(--unit-s4-color-sh-end); /* This is how tall each unit is! Technically redundan var just for legibility */
+
+  /* --- Element Styling --- */
+  width: var(--separator-width);
+  height: 100vh;
+  flex-shrink: 0;
+  position: relative;
+  background-image: repeating-linear-gradient(
+    to bottom,
+
+    /* === UNIT 1 (Color 1 - Blue) === */
+    var(--white-line-color) calc(0 * var(--single-unit-height) + var(--unit-s1-white-top-start)),
+    var(--white-line-color) calc(0 * var(--single-unit-height) + var(--unit-s1-white-top-end)),
+    var(--black-line-color) calc(0 * var(--single-unit-height) + var(--unit-s2-black-start)),
+    var(--black-line-color) calc(0 * var(--single-unit-height) + var(--unit-s2-black-end)),
+    var(--white-line-color) calc(0 * var(--single-unit-height) + var(--unit-s3-white-bottom-start)),
+    var(--white-line-color) calc(0 * var(--single-unit-height) + var(--unit-s3-white-bottom-end)),
+    var(--c1-hl)          calc(0 * var(--single-unit-height) + var(--unit-s4-color-hl-start)),
+    var(--c1-hl)          calc(0 * var(--single-unit-height) + var(--unit-s4-color-hl-end)),
+    var(--c1-main)        calc(0 * var(--single-unit-height) + var(--unit-s4-color-main-start)),
+    var(--c1-main)        calc(0 * var(--single-unit-height) + var(--unit-s4-color-main-end)),
+    var(--c1-sh)          calc(0 * var(--single-unit-height) + var(--unit-s4-color-sh-start)),
+    var(--c1-sh)          calc(0 * var(--single-unit-height) + var(--unit-s4-color-sh-end)),
+
+    /* === UNIT 2 (Color 2 - Orange) === */
+    var(--white-line-color) calc(1 * var(--single-unit-height) + var(--unit-s1-white-top-start)),
+    var(--white-line-color) calc(1 * var(--single-unit-height) + var(--unit-s1-white-top-end)),
+    var(--black-line-color) calc(1 * var(--single-unit-height) + var(--unit-s2-black-start)),
+    var(--black-line-color) calc(1 * var(--single-unit-height) + var(--unit-s2-black-end)),
+    var(--white-line-color) calc(1 * var(--single-unit-height) + var(--unit-s3-white-bottom-start)),
+    var(--white-line-color) calc(1 * var(--single-unit-height) + var(--unit-s3-white-bottom-end)),
+    var(--c2-hl)          calc(1 * var(--single-unit-height) + var(--unit-s4-color-hl-start)),
+    var(--c2-hl)          calc(1 * var(--single-unit-height) + var(--unit-s4-color-hl-end)),
+    var(--c2-main)        calc(1 * var(--single-unit-height) + var(--unit-s4-color-main-start)),
+    var(--c2-main)        calc(1 * var(--single-unit-height) + var(--unit-s4-color-main-end)),
+    var(--c2-sh)          calc(1 * var(--single-unit-height) + var(--unit-s4-color-sh-start)),
+    var(--c2-sh)          calc(1 * var(--single-unit-height) + var(--unit-s4-color-sh-end)),
+
+    /* === UNIT 3 (Color 3 - Green) === */
+    var(--white-line-color) calc(2 * var(--single-unit-height) + var(--unit-s1-white-top-start)),
+    var(--white-line-color) calc(2 * var(--single-unit-height) + var(--unit-s1-white-top-end)),
+    var(--black-line-color) calc(2 * var(--single-unit-height) + var(--unit-s2-black-start)),
+    var(--black-line-color) calc(2 * var(--single-unit-height) + var(--unit-s2-black-end)),
+    var(--white-line-color) calc(2 * var(--single-unit-height) + var(--unit-s3-white-bottom-start)),
+    var(--white-line-color) calc(2 * var(--single-unit-height) + var(--unit-s3-white-bottom-end)),
+    var(--c3-hl)          calc(2 * var(--single-unit-height) + var(--unit-s4-color-hl-start)),
+    var(--c3-hl)          calc(2 * var(--single-unit-height) + var(--unit-s4-color-hl-end)),
+    var(--c3-main)        calc(2 * var(--single-unit-height) + var(--unit-s4-color-main-start)),
+    var(--c3-main)        calc(2 * var(--single-unit-height) + var(--unit-s4-color-main-end)),
+    var(--c3-sh)          calc(2 * var(--single-unit-height) + var(--unit-s4-color-sh-start)),
+    var(--c3-sh)          calc(2 * var(--single-unit-height) + var(--unit-s4-color-sh-end)),
+
+    /* === UNIT 4 (Color 4 - Red) === */
+    var(--white-line-color) calc(3 * var(--single-unit-height) + var(--unit-s1-white-top-start)),
+    var(--white-line-color) calc(3 * var(--single-unit-height) + var(--unit-s1-white-top-end)),
+    var(--black-line-color) calc(3 * var(--single-unit-height) + var(--unit-s2-black-start)),
+    var(--black-line-color) calc(3 * var(--single-unit-height) + var(--unit-s2-black-end)),
+    var(--white-line-color) calc(3 * var(--single-unit-height) + var(--unit-s3-white-bottom-start)),
+    var(--white-line-color) calc(3 * var(--single-unit-height) + var(--unit-s3-white-bottom-end)),
+    var(--c4-hl)          calc(3 * var(--single-unit-height) + var(--unit-s4-color-hl-start)),
+    var(--c4-hl)          calc(3 * var(--single-unit-height) + var(--unit-s4-color-hl-end)),
+    var(--c4-main)        calc(3 * var(--single-unit-height) + var(--unit-s4-color-main-start)),
+    var(--c4-main)        calc(3 * var(--single-unit-height) + var(--unit-s4-color-main-end)),
+    var(--c4-sh)          calc(3 * var(--single-unit-height) + var(--unit-s4-color-sh-start)),
+    var(--c4-sh)          calc(3 * var(--single-unit-height) + var(--unit-s4-color-sh-end))
+  );
+}
+
+/* Overall 1px black border */
+#sidebar-separator::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 1px solid #000000;
+  pointer-events: none;
+  box-sizing: border-box;
+}
