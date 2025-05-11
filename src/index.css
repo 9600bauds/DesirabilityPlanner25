@@ -1,18 +1,17 @@
 #app-container {
   display: flex;
-  width: 100vw;  /* Ensure the app container itself spans the full viewport width */
-  height: 100vh; /* And full height */
+  width: 100dvw;  /* Ensure the app container itself spans the full dynamic viewport width */
+  height: 100dvh; /* And full height */
   overflow: hidden; /* Prevent scrollbars on the app container itself */
 }
 
 #canvas-container {
   contain: content;
   position: relative;
-  height: 100vh;
   background-color: white;
-  flex-grow: 1;     /* << Allow canvas to grow to fill available space */
-  flex-shrink: 1;   /* << Allow canvas to shrink if space is constrained */
-  flex-basis: 0;    /* << Good practice with flex-grow: 1, starts from 0 width and expands */
+  flex-grow: 1; /* Take up remaining space */
+  flex-shrink: 1; /* Allow shrinking */
+  flex-basis: 0%; /* Start from 0 and grow */
 }
 
 .textLayer {
@@ -58,10 +57,10 @@
   --black-separator-height: 1px;
 
   /* --- Element Styling --- */
+  height: 100%;
   width: var(--separator-width);
-  height: 100vh;
-  flex-shrink: 0;
-  flex-grow: 0;
+  flex-shrink: 0; /* Don't shrink */
+  flex-grow: 0;   /* Don't grow */
   border-right:  1px solid #000000;
   border-left:   1px solid #000000;
 
