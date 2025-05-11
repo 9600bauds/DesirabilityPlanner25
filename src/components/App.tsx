@@ -490,7 +490,7 @@ const App: React.FC = () => {
 
   // ===== RENDER =====
   return (
-    <div id="app-container" className="d-flex">
+    <div id="app-container">
       <div
         ref={canvasContainer}
         id="canvas-container"

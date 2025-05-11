@@ -71,24 +71,6 @@
   right: calc( (var( --column-gap ) / -2) - (var(--divider-width)) ); /* -(half column-gap) - (divider width) */
 }
 
-#top-controls {
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  flex-grow: 3; /* Represents 30% of the growable space */   
-}
-
-#bar-controls {
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(1, minmax(0, 1fr));
-  flex-grow: 1; /* Represents 10% of the growable space (I think? Seems to be a bit bigger than 10%) */   
-}
-
-#bottom-controls {
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, minmax(0, 1fr));
-  flex-grow: 6; /* Represents 60% of the growable space */
-}
-
 .button-icon {
   max-width: 100%;
   max-height: 100%;
@@ -109,4 +91,42 @@
   /* Offset it a bit downwards */
   margin-top: 0.4em;
   margin-left: 0.15em;
+}
+
+#top-controls {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  flex-grow: 3;  
+}
+@media (max-aspect-ratio: 3/2) {
+  #top-controls {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+}
+
+#bar-controls {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(1, minmax(0, 1fr));
+  flex-grow: 1;
+}
+@media (max-aspect-ratio: 3/2) {
+  #bar-controls {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    flex-grow: 1.5; /* Make it a bit bigger*/
+  }
+}
+
+#bottom-controls {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  flex-grow: 6;
+}
+@media (max-aspect-ratio: 3/2) {
+  #bottom-controls {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    flex-grow: 5; /* Make it a bit smaller*/
+  }
 }
