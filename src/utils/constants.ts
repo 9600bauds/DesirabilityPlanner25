@@ -5,6 +5,9 @@ export const GRID_MAX_X = GRID_SIZE - 1;
 export const GRID_MAX_Y = GRID_SIZE - 1;
 export const GRID_SIZE_BITS = 8;
 
+export const MIN_ZOOM = 0.1;
+export const MAX_ZOOM = 8.0;
+export const ZOOM_SENSITIVITY_FACTOR = 1.001;
 export const MIN_ZOOM_FOR_LABELS = 0.3;
 export const MIN_LABEL_FONTSIZE_WITHOUT_BREAKS = 8;
 export const MIN_LABEL_FONTSIZE_WITH_BREAKS = 5;

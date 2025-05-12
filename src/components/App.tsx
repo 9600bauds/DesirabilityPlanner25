@@ -31,6 +31,9 @@ const App: React.FC = () => {
     useState<number>(0);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [canZoomIn, setCanZoomIn] = useState(true);
+  const [canZoomOut, setCanZoomOut] = useState(true);
+  const [isGridRotated, setIsGridRotated] = useState(false);
 
   // ===== REFS =====
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -96,6 +99,36 @@ const App: React.FC = () => {
     gridStateUpdated();
     return result;
   }, [gridStateUpdated]);
+
+  const handleRotateGrid = () => {
+    if (rendererRef.current) {
+      rendererRef.current.toggleGridRotation();
+      setIsGridRotated(rendererRef.current.isRotated);
+    }
+  };
+
+  const zoomLevelUpdated = () => {
+    setCanZoomIn(rendererRef?.current?.canZoomIn() ?? false);
+    setCanZoomOut(rendererRef?.current?.canZoomOut() ?? false);
+  };
+  const handleZoomIn = () => {
+    if (rendererRef.current) {
+      rendererRef.current.zoomIn();
+      zoomLevelUpdated();
+    }
+  };
+  const handleZoomOut = () => {
+    if (rendererRef.current) {
+      rendererRef.current.zoomOut();
+      zoomLevelUpdated();
+    }
+  };
+  const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    if (rendererRef.current) {
+      rendererRef.current.handleWheelZoom(event.nativeEvent);
+      zoomLevelUpdated();
+    }
+  };
 
   // ===== BLUEPRINT SELECTION =====
   const selectSubcategory = useCallback((subcat: Subcategory) => {
@@ -347,7 +380,7 @@ const App: React.FC = () => {
     if (interaction.type !== 'placing') {
       deselectSubcategory();
     }
-  }, [interaction.type]);
+  }, [interaction.type, deselectSubcategory]);
 
   // Some of our mouse events are applied to the document and the window. React does not have an easy way to do this.
   // As such, we need useEffects() to remove and re-apply these events whenever any of their state dependencies change.
@@ -496,34 +529,26 @@ const App: React.FC = () => {
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
+        onWheel={handleMouseWheel}
         onContextMenu={(event: React.MouseEvent<HTMLDivElement>) => {
           event.preventDefault(); //Prevent rightclick menu
         }}
       />
       <div id="sidebar-separator"></div>
       <Sidebar
-        onRotateClick={() => {
-          if (rendererRef.current) {
-            rendererRef.current.toggleGridRotation();
-          }
-        }}
+        onRotateClick={handleRotateGrid}
         onPanClick={handlePanClick}
         onEraserClick={handleEraserClick}
-        onZoomInClick={() => {
-          if (rendererRef.current) {
-            rendererRef.current.zoomIn();
-          }
-        }}
-        onZoomOutClick={() => {
-          if (rendererRef.current) {
-            rendererRef.current.zoomOut();
-          }
-        }}
+        onZoomInClick={handleZoomIn}
+        onZoomOutClick={handleZoomOut}
         onUndoClick={tryUndo}
         onRedoClick={tryRedo}
         onRotateBlueprintClick={selectNextBlueprintIndex}
         canUndo={canUndo}
         canRedo={canRedo}
+        canZoomIn={canZoomIn}
+        canZoomOut={canZoomOut}
+        isGridRotated={isGridRotated}
         canRotateBlueprint={
           (selectedSubcategory?.blueprints?.length ?? 0) > 1 // Evil hack that accounts for nullness
         }

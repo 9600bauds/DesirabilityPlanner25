@@ -17,6 +17,9 @@ interface SidebarProps {
   onRotateBlueprintClick: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  canZoomIn: boolean;
+  canZoomOut: boolean;
+  isGridRotated: boolean;
   canRotateBlueprint: boolean;
   selectSubcategory: (subcat: Subcategory) => void;
   selectedSubcategory: Subcategory | null;
@@ -34,6 +37,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onRotateBlueprintClick,
   canUndo,
   canRedo,
+  canZoomIn,
+  canZoomOut,
+  isGridRotated,
   canRotateBlueprint,
   selectSubcategory,
   selectedSubcategory,
@@ -65,8 +71,18 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
       <hr className="sidebar-horizontal-separator" />
       <div id="bar-controls" className="button-grid">
-        <ScalingButton id="zoomout" onClick={onZoomOutClick} title="Zoom Out" />
-        <ScalingButton id="zoomin" onClick={onZoomInClick} title="Zoom In" />
+        <ScalingButton
+          id="zoomout"
+          onClick={onZoomOutClick}
+          disabled={!canZoomOut}
+          title="Zoom Out"
+        />
+        <ScalingButton
+          id="zoomin"
+          onClick={onZoomInClick}
+          disabled={!canZoomIn}
+          title="Zoom In"
+        />
         <ScalingButton
           id="undo"
           onClick={onUndoClick}

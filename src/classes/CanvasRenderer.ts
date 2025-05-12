@@ -16,6 +16,9 @@ import {
   CELL_PX,
   MIN_LABEL_FONTSIZE_WITH_BREAKS,
   MIN_ZOOM_FOR_LABELS,
+  ZOOM_SENSITIVITY_FACTOR,
+  MAX_ZOOM,
+  MIN_ZOOM,
 } from '../utils/constants';
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, Coordinate } from '../utils/geometry';
@@ -45,7 +48,7 @@ class CanvasRenderer {
   private devicePixelRatio: number;
 
   // Transform state
-  private isRotated: boolean = false;
+  public isRotated: boolean = false;
   private zoomLevel: number = 1.0;
   private offsetX: number = 0;
   private offsetY: number = 0;
@@ -108,7 +111,7 @@ class CanvasRenderer {
     this.mainLayers.tiles = createCtx('tiles-main', 11);
 
     // Center view
-    this.centerViewAt([GRID_CENTER_PX, GRID_CENTER_PX]);
+    this.focusOnGridPoint([GRID_CENTER_PX, GRID_CENTER_PX]);
 
     // Go ahead and get us started here
     this.scheduleRerender();
@@ -272,40 +275,73 @@ class CanvasRenderer {
     this.isRotated = !this.isRotated;
 
     // Recenter view
-    this.centerViewAt(oldCenter.toCoordinate());
-
-    this.scheduleRerender();
+    this.focusOnGridPoint(oldCenter.toCoordinate());
   };
 
-  public centerViewAt = (point: Coordinate) => {
-    const center = this.viewCenter;
-
+  /**
+   * Focuses the view on a desired grid coordinate.
+   * @param gridPointCoord The point that you want the center to be focused on.
+   * @param targetCanvasPoint The point on the canvas (CSS pixels) that the focus point should occupy afterwards. Defaults to the center of the screen.
+   */
+  public focusOnGridPoint = (
+    gridPointCoord: Coordinate,
+    targetCanvasPoint: Coordinate = this.viewCenter
+  ): void => {
+    // If the grid is currently rotated, we need to rotate the target grid point
+    // so the offset calculation works correctly within the rotated coordinate system.
+    let adjustedGridPointCoord = gridPointCoord;
     if (this.isRotated) {
-      point = ROTATE_AROUND_ORIGIN(point);
+      adjustedGridPointCoord = ROTATE_AROUND_ORIGIN(gridPointCoord);
     }
 
-    this.offsetX = center[0] - point[0] * this.zoomLevel;
-    this.offsetY = center[1] - point[1] * this.zoomLevel;
+    // Calculate the offset needed to place the (potentially rotated) grid point
+    // at the target canvas point, considering the current zoom level.
+    this.offsetX =
+      targetCanvasPoint[0] - adjustedGridPointCoord[0] * this.zoomLevel;
+    this.offsetY =
+      targetCanvasPoint[1] - adjustedGridPointCoord[1] * this.zoomLevel;
 
-    this.scheduleRerender(); //This might not always need a full rerender if the distance moved is small enough but that's a very low priority optimization
+    this.scheduleRerender(); // Schedule a rerender as the view has changed.
   };
 
   public zoomIn = () => {
-    this.zoom(1.2);
+    // Zoom in towards the center of the view
+    this.zoom(1.2, this.viewCenter);
   };
 
   public zoomOut = () => {
-    this.zoom(1 / 1.2);
+    // Zoom out from the center of the view
+    this.zoom(1 / 1.2, this.viewCenter);
   };
 
-  private zoom = (factor: number) => {
-    const oldCenter = this.canvas2grid(this.viewCenter);
+  private zoom = (factor: number, targetCanvasPoint: Coordinate): void => {
+    const gridPointBeforeZoom = this.canvas2grid(targetCanvasPoint);
+
     this.zoomLevel *= factor;
+    this.zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, this.zoomLevel));
 
-    // Recenter view
-    this.centerViewAt(oldCenter.toCoordinate());
+    this.focusOnGridPoint(
+      gridPointBeforeZoom.toCoordinate(),
+      targetCanvasPoint
+    );
+  };
 
-    this.scheduleRerender(); //This might not always need a full rerender in some very specific cases but that's very tricky for such a small optimization
+  public handleWheelZoom = (event: WheelEvent): void => {
+    event.preventDefault();
+
+    if (event.deltaY === 0) return;
+    const zoomFactor = Math.pow(ZOOM_SENSITIVITY_FACTOR, -event.deltaY);
+
+    const mouseCanvasPos = getClientCoordinates(event);
+
+    this.zoom(zoomFactor, mouseCanvasPos);
+  };
+
+  public canZoomIn = () => {
+    return this.zoomLevel < MAX_ZOOM;
+  };
+  public canZoomOut = () => {
+    return this.zoomLevel > MIN_ZOOM;
   };
 
   // Size handling
