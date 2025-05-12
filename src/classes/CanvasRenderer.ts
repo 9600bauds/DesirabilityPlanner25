@@ -14,6 +14,8 @@ import {
   ROTATE_AROUND_ORIGIN,
   COUNTERROTATE_AROUND_ORIGIN,
   CELL_PX,
+  MIN_LABEL_FONTSIZE_WITH_BREAKS,
+  MIN_ZOOM_FOR_LABELS,
 } from '../utils/constants';
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, Coordinate } from '../utils/geometry';
@@ -25,7 +27,6 @@ import { InteractionEvent } from '../types/InteractionEvent';
 class CanvasRenderer {
   // Settings
   private transparentBuildings: boolean = false;
-  private readonly GRID_TEXT_THRESHOLD = 0.6; // Zoom threshold to draw
 
   // Rendering system
   private pendingRerender: number | null = null;
@@ -454,7 +455,7 @@ class CanvasRenderer {
     } else {
       this.hideLayer(this.previewLayers.tiles);
     }
-    if (modifiedArea && this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+    if (modifiedArea && this.zoomLevel > MIN_ZOOM_FOR_LABELS) {
       this.renderTileNumbers(
         this.previewLayers.tileNumbers,
         modifiedValues,
@@ -573,7 +574,7 @@ class CanvasRenderer {
 
     this.renderTiles(this.mainLayers.tiles, baseValues, viewport.tilesRect);
 
-    if (this.zoomLevel > this.GRID_TEXT_THRESHOLD) {
+    if (this.zoomLevel > MIN_ZOOM_FOR_LABELS) {
       this.renderTileNumbers(
         this.mainLayers.tileNumbers,
         baseValues,
@@ -826,9 +827,9 @@ class CanvasRenderer {
       const fontWithBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, true);
       //prettier-ignore
       const fontWithoutBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, false);
-      if (fontWithoutBreaks >= 8) {
+      if (fontWithoutBreaks >= MIN_LABEL_FONTSIZE_WITH_BREAKS) {
         fontSize = fontWithoutBreaks;
-      } else if (fontWithBreaks >= 6) {
+      } else if (fontWithBreaks >= MIN_LABEL_FONTSIZE_WITH_BREAKS) {
         fontSize = fontWithBreaks;
       } else {
         continue;

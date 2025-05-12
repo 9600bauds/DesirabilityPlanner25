@@ -45,7 +45,8 @@
   line-height: 1.2;
   word-break: auto;
   
-  -webkit-text-stroke: 3px white;
+  -webkit-text-stroke: clamp(1px, 0.15em, 3px) white;
+  text-rendering: optimizeLegibility;
   paint-order: stroke fill;
 }
 
