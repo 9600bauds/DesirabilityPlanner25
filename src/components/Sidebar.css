@@ -85,6 +85,7 @@
   max-height: 100%;
   object-fit: contain;
   display: block;
+  pointer-events: none; /* No clickdrag please */
   border-radius: 0.2rem;
 }
 /* Highlight when mousing over */
@@ -95,9 +96,9 @@
   box-shadow: inset 0 0 1.5em 0.1em var(--sidebar-bg), inset 0 0 1em 0.3em var(--sidebar-bg);
 }
 /* Hideous border when selected */
-.grid-button.selected .button-icon {
+.grid-button:active .button-icon, .grid-button.selected .button-icon {
   background-color: var(--selected-highlight);
-  box-shadow: inset 0 0 1.5em #000000, inset 0 0 0.75em #000000; /* Yes, this is hideous, but it's this hideous in the game too! */
+  box-shadow: inset 0 0 1.5em #000000, inset 0 0 0.75em #000000 !important; /* Yes, this is hideous, but it's this hideous in the game too! */
   /* Offset it a bit downwards */
   margin-top: 0.4em;
   margin-left: 0.15em;
