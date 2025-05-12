@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
+import './App.css';
 import Sidebar from './Sidebar';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
