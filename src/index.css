@@ -50,15 +50,16 @@
 }
 
 #sidebar-separator {
-  --separator-width: 10px;
-  --colored-band-main-height: 20px;
+  --colored-band-main-height: clamp(8px, 6%, 20px);
   --bevel-thickness: 1px;
   --white-separator-height: 3px;
   --black-separator-height: 1px;
 
   /* --- Element Styling --- */
   height: 100%;
-  width: var(--separator-width);
+  min-width: 4px;
+  max-width: 10px;
+  width: 1.5%;
   flex-shrink: 0; /* Don't shrink */
   flex-grow: 0;   /* Don't grow */
   border-right:  1px solid #000000;
