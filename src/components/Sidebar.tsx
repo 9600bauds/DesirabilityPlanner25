@@ -15,6 +15,7 @@ interface SidebarProps {
   onUndoClick: () => void;
   onRedoClick: () => void;
   onRotateBlueprintClick: () => void;
+  onToggleTransparencyClick: () => void;
   canUndo: boolean;
   canRedo: boolean;
   canZoomIn: boolean;
@@ -35,6 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onUndoClick,
   onRedoClick,
   onRotateBlueprintClick,
+  onToggleTransparencyClick,
   canUndo,
   canRedo,
   canZoomIn,
@@ -48,7 +50,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div id="sidebar-container">
       <div id="top-controls" className="button-grid">
-        <ScalingButton id="north" onClick={onRotateClick} title="Align North" />
+        <ScalingButton
+          id="grid-rotation"
+          /*iconPath={!isGridRotated ? '/grid-unrotated' : '/grid-rotated'}*/
+          onClick={onRotateClick}
+          title={`Align Grid ${isGridRotated ? '(North is currently UP)' : '(North is currently TOP-LEFT)'}`}
+        />
         <ScalingButton
           id="rotate"
           onClick={onRotateBlueprintClick}
@@ -67,6 +74,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           onClick={onEraserClick}
           title="Eraser Tool"
           isActive={currentInteractionType === 'erasing'}
+        />
+        <ScalingButton
+          id="transparency"
+          onClick={onToggleTransparencyClick}
+          title="Toggle Structure Transparency"
         />
       </div>
       <hr className="sidebar-horizontal-separator" />

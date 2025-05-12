@@ -363,6 +363,9 @@ class CanvasRenderer {
       this.mainLayers.buildings.canvas.style.opacity = '1';
     }
   };
+  public toggleBuildingTransparency = (): void => {
+    this.setBuildingTransparency(!this.transparentBuildings);
+  };
 
   // === RENDERING METHODS ===
 

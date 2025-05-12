@@ -413,25 +413,12 @@ const App: React.FC = () => {
         event.preventDefault();
         selectNextBlueprintIndex();
       }
-
-      // Building transparency
-      if (event.key === 'Control' && !event.repeat && rendererRef.current) {
-        rendererRef.current.setBuildingTransparency(true);
-      }
-    };
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'Control' && rendererRef.current) {
-        rendererRef.current.setBuildingTransparency(false);
-      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
     };
   }, [tryUndo, tryRedo, selectNextBlueprintIndex]);
 
@@ -520,6 +507,12 @@ const App: React.FC = () => {
     setInteractionType('erasing');
   }, [setInteractionType]);
 
+  const handleTransparencyToggle = () => {
+    if (rendererRef.current) {
+      rendererRef.current.toggleBuildingTransparency();
+    }
+  };
+
   // ===== RENDER =====
   return (
     <div id="app-container">
@@ -544,6 +537,7 @@ const App: React.FC = () => {
         onUndoClick={tryUndo}
         onRedoClick={tryRedo}
         onRotateBlueprintClick={selectNextBlueprintIndex}
+        onToggleTransparencyClick={handleTransparencyToggle}
         canUndo={canUndo}
         canRedo={canRedo}
         canZoomIn={canZoomIn}
