@@ -408,9 +408,14 @@ const App: React.FC = () => {
         return;
       }
 
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' || event.key === ' ') {
         //Switch to panning mode, same as rightclick
         setInteractionType('panning');
+      }
+
+      if (event.key === 'Delete' || event.key === 'e' || event.key === 'E') {
+        //Switch to eraser mode
+        setInteractionType('erasing');
       }
 
       // Blueprint rotation
