@@ -1,0 +1,104 @@
+:root {
+  --notification-bg: rgb(187, 131, 93);
+  --notification-text-color: rgb(255, 255, 255);
+  --notification-text-shadow: rgb(0, 0, 0);
+  --notification-highlight: rgb(204, 128, 80);
+  --notification-shadow: rgb(190, 95, 48);
+
+  --notification-font-size: clamp(1rem, 0.5vw + 0.8rem, 1.75rem);
+  --notification-line-height: 1.2;
+  --notification-bevel-total-width: 4px;
+  --notification-internal-padding-y: 0px;
+  --notification-internal-padding-x: 0.5em;
+
+  --cap-border-color: #311b11;
+  --cap-background-color: #fffbff;
+  --cap-shadow: #000000;
+
+  --cap-outer-width: 12px;
+  --cap-outer-height: 22px;
+  --cap-white-bar-thickness: 2px;
+  --cap-group-spacing: 0.25em;
+}
+
+.notification {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--notification-bg);
+  color: var(--notification-text-color);
+  font-family: "Delius", cursive;
+  font-style: normal;
+  font-weight: bold;
+  font-size: var(--notification-font-size);
+  line-height: var(--notification-line-height);
+
+  border-style: solid;
+  border-width: calc(var(--notification-bevel-total-width) / 2);
+  border-top-color: var(--notification-highlight);
+  border-left-color: var(--notification-highlight);
+  border-bottom-color: var(--notification-shadow);
+  border-right-color: var(--notification-shadow);
+
+  box-shadow:
+    inset calc(var(--notification-bevel-total-width) / 2) calc(var(--notification-bevel-total-width) / 2) 0 0 var(--notification-shadow),
+    inset calc(var(--notification-bevel-total-width) / -2) calc(var(--notification-bevel-total-width) / -2) 0 0 var(--notification-highlight);
+
+  padding-top: calc(var(--notification-internal-padding-y) + (var(--notification-bevel-total-width) / 2));
+  padding-bottom: calc(var(--notification-internal-padding-y) + (var(--notification-bevel-total-width) / 2));
+  padding-left: calc(var(--notification-internal-padding-x) + (var(--notification-bevel-total-width) / 2));
+  padding-right: calc(var(--notification-internal-padding-x) + (var(--notification-bevel-total-width) / 2));
+
+  box-sizing: border-box;
+
+  min-height: calc(
+    var(--cap-outer-height) +
+    (2 * var(--notification-internal-padding-y)) +
+    var(--notification-bevel-total-width)
+  );
+  min-width: 40%;
+  max-width: 100%;
+}
+
+.notification-text {
+  flex-grow: 1;
+  text-align: center;
+
+  padding-left: 1em;
+  padding-right: 1em;
+  text-shadow: -1px -1px 0 var(--notification-text-shadow);
+}
+.notification-text:only-child { /* If there are no bars... */
+  padding-left: 0.1em;
+  padding-right: 0.1em;
+}
+
+.notification-cap-container {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--cap-group-spacing);
+}
+
+.notification-cap {
+  width: var(--cap-outer-width);
+  height: var(--cap-outer-height);
+  border: 1px solid var(--cap-border-color);
+  background-color: var(--cap-background-color);
+  padding-top: var(--cap-white-bar-thickness);
+  padding-bottom: var(--cap-white-bar-thickness);
+  box-sizing: border-box;
+}
+
+.cap-filling {
+  height: 100%;
+  width: 100%;
+}
+.cap-filling.blue {
+  background-color: #255797;
+}
+.cap-filling.red {
+  background-color: #b03021;
+}
+
+.side-shadows {
+  box-shadow: -4px 0px 3px -3px var(--cap-shadow) inset, 4px 0px 3px -3px var(--cap-shadow) inset;
+}

@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import './App.css';
+import { toast, Toaster } from 'react-hot-toast';
 import Sidebar from './Sidebar';
+import ToastNotification from './ToastNotification';
 import Subcategory from '../interfaces/Subcategory';
 import CanvasRenderer from '../classes/CanvasRenderer';
 import Blueprint from '../types/Blueprint';
@@ -523,6 +525,20 @@ const App: React.FC = () => {
     }
   };
 
+  // ===== NOTIFICATIONS =====
+  const showToast = useCallback(
+    (message: string, hasCaps: boolean, duration?: number) => {
+      toast.custom(
+        (_t) => <ToastNotification message={message} hasCaps={hasCaps} />,
+        {
+          id: `${message.slice(0, 10)}-${Date.now()}`,
+          duration: duration,
+        }
+      );
+    },
+    []
+  );
+
   // ===== RENDER =====
   return (
     <div id="app-container">
@@ -536,7 +552,9 @@ const App: React.FC = () => {
         onContextMenu={(event: React.MouseEvent<HTMLDivElement>) => {
           event.preventDefault(); //Prevent rightclick menu
         }}
-      />
+      >
+        <Toaster position="top-center" />
+      </div>
       <div id="sidebar-separator"></div>
       <Sidebar
         onRotateClick={handleRotateGrid}
