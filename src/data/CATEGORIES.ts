@@ -38,7 +38,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   HOUSING_FANCY: {
     id: 'HOUSING_FANCY',
-    iconPath: '/categories/nicehouse2',
+    iconPath: '/categories/nicehouse',
     displayName: 'Fancy Housing',
     baseColor: 'rgb(84, 194, 51)',
     subCategories: new Map(),
@@ -80,7 +80,7 @@ export const ALL_CATEGORIES: Record<string, Category> = {
   },
   FOOD: {
     id: 'FOOD',
-    iconPath: '/categories/ibex2',
+    iconPath: '/categories/ibex',
     displayName: 'Food and Farming',
     baseColor: 'rgb(173, 65, 33)',
     subCategories: new Map(),
