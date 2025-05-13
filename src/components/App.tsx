@@ -408,6 +408,11 @@ const App: React.FC = () => {
         return;
       }
 
+      if (event.key === 'Escape') {
+        //Switch to panning mode, same as rightclick
+        setInteractionType('panning');
+      }
+
       // Blueprint rotation
       if ((event.key === 'r' || event.key === 'R') && !event.repeat) {
         event.preventDefault();
