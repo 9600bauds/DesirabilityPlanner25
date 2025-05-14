@@ -16,6 +16,7 @@ interface SidebarProps {
   onRedoClick: () => void;
   onRotateBlueprintClick: () => void;
   onToggleTransparencyClick: () => void;
+  onHelpClick: () => void;
   canUndo: boolean;
   canRedo: boolean;
   canZoomIn: boolean;
@@ -37,6 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onRedoClick,
   onRotateBlueprintClick,
   onToggleTransparencyClick,
+  onHelpClick,
   canUndo,
   canRedo,
   canZoomIn,
@@ -54,15 +56,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           id="grid-rotation"
           /*iconPath={!isGridRotated ? '/grid-unrotated' : '/grid-rotated'}*/
           onClick={onRotateClick}
-          title={`Align Grid ${isGridRotated ? '(North is currently UP)' : '(North is currently TOP-LEFT)'}`}
+          title={`Grid Perspective ${isGridRotated ? '(North is currently UP)' : '(North is currently TOP-LEFT)'}`}
         />
         <ScalingButton
           id="rotate"
           onClick={onRotateBlueprintClick}
           disabled={!canRotateBlueprint}
-          title="Rotate Blueprint (R) (also toggles between venue variants and 1x1/2x2 houses)"
+          title="Rotate Blueprint (R) (also switches between venue variants and 1x1/2x2 houses)"
         />
-        <ScalingButton id="help" title="Help (todo!)" />
+        <ScalingButton id="help" title="View Help" onClick={onHelpClick} />
         <ScalingButton
           id="pan"
           onClick={onPanClick}

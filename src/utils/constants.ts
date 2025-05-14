@@ -64,3 +64,5 @@ export const MIN_DESIRABILITY_COLOR = -10;
 export const MAX_DESIRABILITY_COLOR = 50;
 
 export const URL_STATE_INDEX = 'buildings';
+export const LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS =
+  'desirabilityPlanner_hasSeenInstructions';

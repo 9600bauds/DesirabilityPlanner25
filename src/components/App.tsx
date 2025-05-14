@@ -15,10 +15,16 @@ import {
 import GridStateManager from '../classes/GridStateManager';
 import { Rectangle, Tile, Coordinate } from '../utils/geometry';
 import { decodeData, encodeData } from '../utils/encoding';
-import { URL_STATE_INDEX } from '../utils/constants';
+import {
+  LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS,
+  URL_STATE_INDEX,
+} from '../utils/constants';
 import { useUrlState } from '../hooks/useUrlState';
 import { getClientCoordinates } from '../utils/events';
 import { InteractionEvent } from '../types/InteractionEvent';
+import HelpModal from './HelpModal';
+import SimpleInstructions from './InstructionsSimple';
+import FullInstructions from './InstructionsFull';
 
 const App: React.FC = () => {
   // ===== INTERACTION STATE =====
@@ -36,6 +42,7 @@ const App: React.FC = () => {
   const [canZoomIn, setCanZoomIn] = useState(true);
   const [canZoomOut, setCanZoomOut] = useState(true);
   const [isGridRotated, setIsGridRotated] = useState(false);
+  const [modalPage, setModalPage] = useState<null | 'simple' | 'full'>(null);
 
   // ===== REFS =====
   const canvasContainer = useRef<HTMLDivElement>(null);
@@ -322,6 +329,14 @@ const App: React.FC = () => {
 
   // ===== INITIALIZATION EFFECTS =====
 
+  // Show initial instructions if it's the user's first time seeing the page
+  useEffect(() => {
+    const hasSeen = localStorage.getItem(LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS);
+    if (!hasSeen) {
+      setModalPage('simple');
+    }
+  }, []);
+
   // Initialize from URL
   useEffect(() => {
     const compressedState = getUrlState(URL_STATE_INDEX);
@@ -431,7 +446,8 @@ const App: React.FC = () => {
     }
 
     return () => {
-      // Responsible cleanup!
+      // Responsible cleanup! This is completely unnecessary since the App component
+      // will never be unloaded short of closing the page. But it's good practice.
       clearTimeout(timeoutId);
       if (eggElem && egg1) {
         eggElem.removeEventListener('click', egg1);
@@ -443,6 +459,8 @@ const App: React.FC = () => {
   // As such, we need useEffects() to remove and re-apply these events whenever any of their state dependencies change.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (modalPage) return; // Do not apply keybinds while modal is open, to effectively disable them
+
       // Undo/Redo keyboard shortcuts
       if (
         event.ctrlKey &&
@@ -487,7 +505,8 @@ const App: React.FC = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [tryUndo, tryRedo, selectNextBlueprintIndex]);
+    // modalPage is in the dependencies so we can effectively disable/re-enable shortcuts when its state updates
+  }, [tryUndo, tryRedo, selectNextBlueprintIndex, modalPage]);
 
   // ===== EVENT HANDLERS =====
 
@@ -523,14 +542,23 @@ const App: React.FC = () => {
   }, [updateInteraction]);
   useEffect(() => {
     const handleTouchMove = (event: TouchEvent) => {
-      event.preventDefault();
+      if (isInteractionActive(interaction)) {
+        // Only prevent default if an app interaction is active, otherwise, go ahead and let the rest of the page use the interaction
+        event.preventDefault();
+      }
+      // Always update the application's interaction state for hover effects, etc.
       updateInteraction(event);
     };
 
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    return () => window.removeEventListener('touchmove', handleTouchMove);
-  }, [updateInteraction, interaction]);
+    // { passive: false } is important because we are conditionally calling preventDefault()
+    window.addEventListener('touchmove', handleTouchMove, {
+      passive: false,
+    });
 
+    return () => {
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [interaction, updateInteraction, modalPage]);
   const handleMouseLeave = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       updateInteraction(event.nativeEvent);
@@ -597,6 +625,15 @@ const App: React.FC = () => {
     }
   };
 
+  const handleHelpClick = useCallback(() => {
+    setModalPage('full'); // Always show full instructions on manual click
+  }, []);
+
+  const closeHelpModal = useCallback(() => {
+    setModalPage(null);
+    localStorage.setItem(LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS, 'true');
+  }, []);
+
   // ===== NOTIFICATIONS =====
   const showToast = useCallback(
     (
@@ -653,18 +690,26 @@ const App: React.FC = () => {
         onRedoClick={tryRedo}
         onRotateBlueprintClick={selectNextBlueprintIndex}
         onToggleTransparencyClick={handleTransparencyToggle}
+        onHelpClick={handleHelpClick}
         canUndo={canUndo}
         canRedo={canRedo}
         canZoomIn={canZoomIn}
         canZoomOut={canZoomOut}
         isGridRotated={isGridRotated}
         canRotateBlueprint={
-          (selectedSubcategory?.blueprints?.length ?? 0) > 1 // Evil hack that accounts for nullness
+          // Evil hack that accounts for nullness.
+          // Normally we'd want to have a proper flag for this, but selectedSubcategory is already a state, so this is OK.
+          (selectedSubcategory?.blueprints?.length ?? 0) > 1
         }
         selectSubcategory={selectSubcategory}
         selectedSubcategory={selectedSubcategory}
         currentInteractionType={interaction.type}
       />
+      <HelpModal isOpen={modalPage !== null} onClose={closeHelpModal}>
+        {/* Wacky conditional rendering */}
+        {modalPage === 'simple' && <SimpleInstructions />}
+        {modalPage === 'full' && <FullInstructions />}
+      </HelpModal>
     </div>
   );
 };
