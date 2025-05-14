@@ -59,6 +59,7 @@
   --black-separator-height: 1px;
 
   /* --- Element Styling --- */
+  position: relative;
   height: 100%;
   min-width: 4px;
   max-width: 10px;
@@ -151,4 +152,17 @@
     var(--c4-sh)            calc(3 * var(--single-unit-height) + var(--unit-s4-color-sh-start)),
     var(--c4-sh)            calc(3 * var(--single-unit-height) + var(--unit-s4-color-sh-end))
   );
+}
+
+#easteregg {
+  position: absolute;
+  left: 50%;
+  top: calc(6 * var(--single-unit-height) + var(--unit-s3-white-bottom-end));
+  height: calc(var(--colored-band-main-height) + var(--bevel-thickness) * 2);
+  width: 1px;
+
+  cursor: pointer; /* Show the cursor changing, for fun */
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
