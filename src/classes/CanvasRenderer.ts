@@ -29,7 +29,7 @@ import { InteractionEvent } from '../types/InteractionEvent';
 
 class CanvasRenderer {
   // Settings
-  private transparentBuildings: boolean = false;
+  public transparentBuildings: boolean = false;
 
   // Rendering system
   private pendingRerender: number | null = null;

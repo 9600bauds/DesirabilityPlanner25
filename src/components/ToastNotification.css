@@ -62,6 +62,8 @@
 .notification-text {
   flex-grow: 1;
   text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 
   padding-left: 1em;
   padding-right: 1em;
@@ -76,6 +78,11 @@
   display: flex;
   flex-shrink: 0;
   gap: var(--cap-group-spacing);
+}
+@container canvas-container (max-width: 400px) {
+  .notification-cap-container {
+    display: none;
+  }
 }
 
 .notification-cap {

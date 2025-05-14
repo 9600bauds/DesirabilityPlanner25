@@ -6,6 +6,8 @@
 }
 
 #canvas-container {
+  container-name: canvas-container;
+  container-type: inline-size;
   contain: content;
   position: relative;
   background-color: white;

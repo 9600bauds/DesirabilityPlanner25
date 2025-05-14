@@ -105,7 +105,23 @@ const App: React.FC = () => {
   const handleRotateGrid = () => {
     if (rendererRef.current) {
       rendererRef.current.toggleGridRotation();
-      setIsGridRotated(rendererRef.current.isRotated);
+      const newRotationState = rendererRef.current.isRotated;
+      setIsGridRotated(newRotationState);
+      if (newRotationState === true) {
+        showToast(
+          'North is now UP (matches what you see in-game)',
+          true,
+          6000,
+          'rotation-notification'
+        );
+      } else {
+        showToast(
+          'North is now TOP LEFT!',
+          true,
+          5000,
+          'rotation-notification'
+        );
+      }
     }
   };
 
@@ -522,16 +538,33 @@ const App: React.FC = () => {
   const handleTransparencyToggle = () => {
     if (rendererRef.current) {
       rendererRef.current.toggleBuildingTransparency();
+      const newTransparencyState = rendererRef.current.transparentBuildings;
+      const snark = gridManagerRef.current.getBuildings().size <= 0;
+      if (newTransparencyState === true) {
+        showToast(
+          `Building transparency enabled.${snark ? '\n(You have no buildings placed, so you might not notice a difference.)' : ''}`,
+          true,
+          snark ? 7000 : 3000,
+          'rotation-notification'
+        );
+      } else {
+        showToast(
+          'Building transparency disabled.',
+          true,
+          3000,
+          'rotation-notification'
+        );
+      }
     }
   };
 
   // ===== NOTIFICATIONS =====
   const showToast = useCallback(
-    (message: string, hasCaps: boolean, duration?: number) => {
+    (message: string, hasCaps: boolean, duration?: number, id?: string) => {
       toast.custom(
         (_t) => <ToastNotification message={message} hasCaps={hasCaps} />,
         {
-          id: `${message.slice(0, 10)}-${Date.now()}`,
+          id: id ?? `${message.slice(0, 10)}-${Date.now()}`,
           duration: duration,
         }
       );

@@ -2,7 +2,7 @@ import './ToastNotification.css';
 
 interface ToastProps {
   message: string;
-  hasCaps?: boolean;
+  hasCaps: boolean;
 }
 
 const NotificationCap = ({ color }: { color: string }) => {
@@ -13,10 +13,7 @@ const NotificationCap = ({ color }: { color: string }) => {
   );
 };
 
-const ToastNotification: React.FC<ToastProps> = ({
-  message,
-  hasCaps = true,
-}) => {
+const ToastNotification: React.FC<ToastProps> = ({ message, hasCaps }) => {
   return (
     <div className="notification">
       {hasCaps && (
