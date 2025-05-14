@@ -410,7 +410,12 @@ const App: React.FC = () => {
       );
     };
     const egg2 = () => {
-      showToast(`Build Granaries to store the upcoming harvest`, true, 5000);
+      showToast(
+        `Build Granaries to store the upcoming harvest`,
+        true,
+        3000,
+        'granaries'
+      );
       repeat();
     };
 
@@ -614,18 +619,26 @@ const App: React.FC = () => {
   // ===== RENDER =====
   return (
     <div id="app-container">
-      <div
-        ref={canvasContainer}
-        id="canvas-container"
-        onMouseDown={handleMouseDown}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onWheel={handleMouseWheel}
-        onContextMenu={(event: React.MouseEvent<HTMLDivElement>) => {
-          event.preventDefault(); //Prevent rightclick menu
-        }}
-      >
-        <Toaster position="top-center" />
+      <div id="content-container">
+        <div id="toast-container">
+          <Toaster
+            position="top-center"
+            containerStyle={{
+              position: 'absolute',
+            }}
+          />
+        </div>
+        <div
+          ref={canvasContainer}
+          id="canvas-container"
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onTouchStart={handleTouchStart}
+          onWheel={handleMouseWheel}
+          onContextMenu={(event: React.MouseEvent<HTMLDivElement>) => {
+            event.preventDefault(); //Prevent rightclick menu
+          }}
+        ></div>
       </div>
       <div id="sidebar-separator">
         <div id="easteregg" tabIndex={-1} aria-hidden="true" />

@@ -15,6 +15,7 @@
   box-shadow: none; /* Optional: subtle drop shadow for the whole menu */
   scrollbar-color: var(--menu-shadow) var(--menu-highlight);
   scrollbar-width: thin;
+  z-index: 10000; /* Try to be on top of notifications (ludicrous number I know) */
 }
 
 .szh-menu__item {

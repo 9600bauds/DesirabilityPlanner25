@@ -5,15 +5,25 @@
   overflow: hidden; /* Prevent scrollbars on the app container itself */
 }
 
-#canvas-container {
+#content-container {
   container-name: canvas-container;
   container-type: inline-size;
-  contain: content;
   position: relative;
-  background-color: white;
   flex-grow: 1; /* Take up remaining space */
   flex-shrink: 1; /* Allow shrinking */
   flex-basis: 0%; /* Start from 0 and grow */
+}
+
+#canvas-container {
+  position: absolute; top: 0; left: 0; height: 100%; width: 100%; /* Stack this and the toast container on top of eachother */
+  contain: content; /* Allegedly for performance, though I'm no longer sure it does anything at this point */
+  background-color: white;
+}
+
+#toast-container {
+  position: absolute; top: 0; left: 0; height: 100%; width: 100%; /* Stack this and the canvas container on top of eachother */
+  pointer-events: none; /* Don't steal clicks from the canvas */
+  z-index: 200; /* Always on top of the canvas */
 }
 
 .textLayer {
