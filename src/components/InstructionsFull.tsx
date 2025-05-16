@@ -21,7 +21,7 @@ const FullInstructions: React.FC = () => {
           altText="Pan Mode Icon"
         />
         <p>
-          To move around, click <b>Pan Mode</b> at the top (shortcut: <b>Spacebar</b>), then click-drag on the grid.
+          To move around, click <b>Pan Mode</b> at the top (shortcuts: <b>Spacebar, Right Click</b>), then click-drag on the grid.
         </p>
       </div>
       <div className="instruction-item">
@@ -30,9 +30,16 @@ const FullInstructions: React.FC = () => {
           altText="Eraser Mode Icon"
         />
         <p>
-          To delete buildings, click <b>Eraser Mode</b> at the top (shortcut: <b>E</b>), then click-drag on the grid.
+          To delete buildings, click <b>Eraser Mode</b> at the top (shortcuts: <b>E, Del</b>), then click-drag on the grid.
         </p>
       </div>
+
+      <h3>Saving & Sharing Your Plan</h3>
+      <p>
+        Your current city plan is automatically encoded and saved in the URL of your browser.<br/>
+        To save your plan, simply bookmark the current page.<br/>
+        To share it, copy the full URL from your browser's address bar and send it to others.
+      </p>
 
       <h3>Perspective</h3>
       <div className="instruction-item">
@@ -81,13 +88,6 @@ const FullInstructions: React.FC = () => {
           </ul>
         </p>
       </div>
-
-      <h3>Saving & Sharing Your Plan</h3>
-      <p>
-        Your current city plan is automatically encoded and saved in the URL of your browser.<br/>
-        To save your plan, simply bookmark the current page.<br/>
-        To share it, copy the full URL from your browser's address bar and send it to others.
-      </p>
     </>
   );
 };

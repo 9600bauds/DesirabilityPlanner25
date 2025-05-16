@@ -68,13 +68,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         <ScalingButton
           id="pan"
           onClick={onPanClick}
-          title="Pan Tool (Space)"
+          title="Pan Tool (Spacebar, Right Click)"
           isActive={currentInteractionType === 'panning'}
         />
         <ScalingButton
           id="eraser"
           onClick={onEraserClick}
-          title="Eraser Tool (E)"
+          title="Eraser Tool (E, Del)"
           isActive={currentInteractionType === 'erasing'}
         />
         <ScalingButton
