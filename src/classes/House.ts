@@ -26,20 +26,23 @@ class House extends Building {
   public getLabel(tileValues: Int16Array) {
     const max = this.maxDesirabilityFromGrid(tileValues);
 
-    if (this.desirabilityToDevolve && max <= this.desirabilityToDevolve) {
+    if (
+      this.desirabilityToDevolve !== undefined &&
+      max <= this.desirabilityToDevolve
+    ) {
       return (
         this.baseLabel! +
         `<br>${max}/${this.desirabilityToDevolve + 1}&nbsp;to<br>not&nbsp;devolve`
       );
     } else if (
-      this.desirabilityToBeStable &&
+      this.desirabilityToBeStable !== undefined &&
       max < this.desirabilityToBeStable
     ) {
       return (
         this.baseLabel! +
         `<br>${max}/${this.desirabilityToBeStable}&nbsp;to<br>be&nbsp;stable`
       );
-    } else if (this.desirabilityToEvolve) {
+    } else if (this.desirabilityToEvolve !== undefined) {
       return (
         this.baseLabel! +
         `<br>${max}/${this.desirabilityToEvolve}&nbsp;to<br>evolve`
