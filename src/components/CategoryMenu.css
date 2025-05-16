@@ -12,7 +12,7 @@
 .szh-menu {
   background-color: transparent;
   border: none; 
-  box-shadow: none; /* Optional: subtle drop shadow for the whole menu */
+  box-shadow: none; /* Subtle drop shadow for the whole menu */
   scrollbar-color: var(--menu-shadow) var(--menu-highlight);
   scrollbar-width: thin;
   z-index: 10000; /* Try to be on top of notifications (ludicrous number I know) */
@@ -20,17 +20,23 @@
 
 .szh-menu__item {
   box-sizing: border-box;
+  padding: 0.25rem 1.5rem; /* Smaller vertical padding than default */
+
   background-color: var(--menu-bg);
   color: var(--menu-text-color);
+
   font-family: "Delius", cursive;
   font-style: normal;
   font-weight: bold;
+  white-space: nowrap; /* No linebreaks. Ever. */ 
+
   border-style: solid;
   border-width: var(--menu-border-width);
   border-top-color: var(--menu-highlight);
   border-left-color: var(--menu-highlight);
   border-bottom-color: var(--menu-shadow);
   border-right-color: var(--menu-shadow);
+
   transition:
     background-color 0.1s ease-in-out,
     border-color 0.1s ease-in-out;
