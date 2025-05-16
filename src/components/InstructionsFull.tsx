@@ -61,6 +61,27 @@ const FullInstructions: React.FC = () => {
         </p>
       </div>
 
+      <h3>Housing</h3>
+      <div className="instruction-item">
+        <InstructionIcon
+          iconName="categories/basichouse"
+          altText="Basic house"
+          classes="large"
+        />
+        <p>
+          Here's how to read the desirability tooltips on houses:<br/>
+          <ul>
+            <li>"##/## to <b>not devolve</b>:" This house will immediately devolve, as the desirability is dragging it down.</li>
+            <li>
+              "##/## to <b>be stable</b>:" This house is unstable. It will not devolve from desirability alone, but if it devolves from other causes (e.g. temporary lack of food), it will not evolve back to this level.<br/>
+              The only way for this type of house to exist is for the desirability to have been higher in the past, and recently fallen.<br/>
+              Example: A 2x2 needs 60 desirability to evolve into a 3x3. The desirability may then drop all the way down to 53 without it devolving. But if a 2 second lack of food causes it to shrink, it will need 60 desirability to become a 3x3 again.<br/>
+            </li>
+            <li>"##/## to <b>evolve</b>:" This house is stable, but needs more desirability to evolve (assuming all other needs are met).</li>
+          </ul>
+        </p>
+      </div>
+
       <h3>Saving & Sharing Your Plan</h3>
       <p>
         Your current city plan is automatically encoded and saved in the URL of your browser.<br/>
