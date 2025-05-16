@@ -1,6 +1,16 @@
 import Blueprint from '../types/Blueprint';
 import { Tile } from '../utils/geometry';
 
+// We will repeat this one a lot for all the variations, so I'm defining it here to reduce copypaste
+const pavilion_base = {
+  label: 'Pavilion',
+  height: 4,
+  width: 4,
+  cost: [100, 400, 500, 600, 750],
+  employeesRequired: 20,
+  category: 'FUN',
+};
+
 export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   // Category: ROAD
   Road: {
@@ -167,6 +177,57 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     employeesRequired: 30,
     desireBox: { baseDesirability: -6, stepDist: 1, stepVal: 2, maxRange: 3 },
     category: 'FUN',
+  },
+  'Juggling Stage': {
+    id: 50,
+    hidden: true,
+    height: 1,
+    width: 1,
+    desireBox: { baseDesirability: 2, stepDist: 1, stepVal: -1, maxRange: 2 },
+    category: 'FUN',
+    fillColor: 'rgb(243, 192, 237)',
+  },
+  'Music Stage': {
+    id: 51,
+    hidden: true,
+    height: 1,
+    width: 1,
+    desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
+    category: 'FUN',
+    fillColor: 'rgb(239, 243, 192)',
+  },
+  'Dance Stage': {
+    id: 52,
+    hidden: true,
+    height: 2,
+    width: 2,
+    desireBox: { baseDesirability: 6, stepDist: 1, stepVal: -1, maxRange: 6 },
+    category: 'FUN',
+    fillColor: 'rgb(192, 243, 233)',
+  },
+  Pavilion_1: {
+    ...pavilion_base,
+    id: 60,
+    children: [
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_2: {
+    ...pavilion_base,
+    id: 61,
+    children: [
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 3) },
+    ],
   },
 
   // Category: GOVT
