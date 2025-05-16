@@ -10,6 +10,22 @@ const pavilion_base = {
   employeesRequired: 20,
   category: 'FUN',
 };
+const bandstand_base = {
+  label: 'Bandstand',
+  height: 3,
+  width: 3,
+  cost: [30, 130, 150, 180, 225],
+  employeesRequired: 12,
+  category: 'FUN',
+};
+const booth_base = {
+  label: 'Booth',
+  height: 2,
+  width: 2,
+  cost: [10, 40, 50, 60, 75],
+  employeesRequired: 8,
+  category: 'FUN',
+};
 
 export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   // Category: ROAD
@@ -205,11 +221,128 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     category: 'FUN',
     fillColor: 'rgb(192, 243, 233)',
   },
-  Pavilion_1: {
-    ...pavilion_base,
+
+  Booth_1: {
+    // ▟
+    id: 55,
+    ...booth_base,
+    children: [
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+    ],
+  },
+  Booth_2: {
+    // ▙
+    id: 56,
+    ...booth_base,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+    ],
+  },
+  Booth_3: {
+    // ▜
+    id: 57,
+    ...booth_base,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+    ],
+  },
+  Booth_4: {
+    // ▛
+    id: 58,
+    ...booth_base,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(1, 1) },
+    ],
+  },
+  Bandstand_1: {
+    // ⊣
     id: 60,
+    ...bandstand_base,
+    children: [
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+    ],
+  },
+  Bandstand_2: {
+    // ⊥
+    id: 61,
+    ...bandstand_base,
+    children: [
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+    ],
+  },
+  Bandstand_3: {
+    // ⊢
+    id: 62,
+    ...bandstand_base,
+    children: [
+      { childKey: 'Music Stage', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+    ],
+  },
+  Bandstand_4: {
+    // ⊤
+    id: 63,
+    ...bandstand_base,
+    children: [
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+    ],
+  },
+  Pavilion_1: {
+    //⠤⡧
+    ...pavilion_base,
+    id: 70,
     children: [
       { childKey: 'Dance Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 3) },
       { childKey: 'Music Stage', relativeOrigin: new Tile(3, 0) },
       { childKey: 'Music Stage', relativeOrigin: new Tile(3, 1) },
       { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
@@ -218,15 +351,203 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     ],
   },
   Pavilion_2: {
+    //⢼⠤
     ...pavilion_base,
-    id: 61,
+    id: 71,
     children: [
-      { childKey: 'Dance Stage', relativeOrigin: new Tile(2, 0) },
       { childKey: 'Music Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(2, 0) },
       { childKey: 'Music Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 2) },
       { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 3) },
       { childKey: 'Garden', relativeOrigin: new Tile(2, 3) },
       { childKey: 'Garden', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_3: {
+    //⠒⡗
+    ...pavilion_base,
+    id: 72,
+    children: [
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_4: {
+    //⢺⠒
+    ...pavilion_base,
+    id: 73,
+    children: [
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 3) },
+    ],
+  },
+  Pavilion_5: {
+    //⣀⣇
+    ...pavilion_base,
+    id: 74,
+    children: [
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_6: {
+    //⣸⣀
+    ...pavilion_base,
+    id: 75,
+    children: [
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_7: {
+    //⠉⡏
+    ...pavilion_base,
+    id: 76,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_8: {
+    //⢹⠉
+    ...pavilion_base,
+    id: 77,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_9: {
+    //⡧⠤
+    ...pavilion_base,
+    id: 78,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_10: {
+    //⡗⠒
+    ...pavilion_base,
+    id: 79,
+    children: [
+      { childKey: 'Road', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 0) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(3, 3) },
+    ],
+  },
+  Pavilion_11: {
+    //⠤⢼
+    ...pavilion_base,
+    id: 80,
+    children: [
+      { childKey: 'Dance Stage', relativeOrigin: new Tile(0, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(2, 0) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 0) },
+      { childKey: 'Music Stage', relativeOrigin: new Tile(2, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 1) },
+      { childKey: 'Road', relativeOrigin: new Tile(0, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(1, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(2, 2) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 2) },
+      { childKey: 'Juggling Stage', relativeOrigin: new Tile(0, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(1, 3) },
+      { childKey: 'Garden', relativeOrigin: new Tile(2, 3) },
+      { childKey: 'Road', relativeOrigin: new Tile(3, 3) },
     ],
   },
 
@@ -1380,32 +1701,3 @@ validateBlueprintIds(ALL_BLUEPRINTS);
 export const BLUEPRINTS_BY_ID = new Map(
   Object.values(ALL_BLUEPRINTS).map((blueprint) => [blueprint.id, blueprint])
 );
-
-/*
-'Bandstand': {
-label: 'Bandstand',
-      height: 3,
-      width: 3,
-      cost: [30, 130, 150, 180, 225],
-      employeesRequired: 12,
-      desireBoxes: [
-        { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x },
-      ],
-    },
-'Booth': {
-label: 'Booth',
-    height: 2,
-    width: 2,
-    cost: [10, 40, 50, 60, 75],
-    employeesRequired: 8,
-desireBox: { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x }
-  },
-'Pavilion': {
-label: 'Pavilion',
-    height: 4,
-    width: 4,
-    cost: [100, 400, 500, 600, 750],
-    employeesRequired: 20,
-desireBox: { baseDesirability: x, stepDist: x, stepVal: x, maxRange: x }
-  },
-  */
