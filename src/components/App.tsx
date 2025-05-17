@@ -436,7 +436,11 @@ const App: React.FC = () => {
 
     let timeoutId: number;
     function repeat() {
-      timeoutId = setTimeout(egg2, Math.random() * 1000 * 60 * 5); // every 5 mins on average
+      const averageTime = 1000 * 60 * 5; // every 5 mins on average
+      timeoutId = setTimeout(
+        egg2,
+        Math.random() * averageTime + averageTime / 2
+      );
     }
     repeat();
 

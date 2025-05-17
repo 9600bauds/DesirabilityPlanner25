@@ -662,6 +662,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Police Station': {
     id: 101,
     label: 'Po&#8203;lice',
+    fillColor: colors.walker_basic,
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],

@@ -166,7 +166,7 @@
 
 #easteregg {
   position: absolute;
-  top: calc(6 * var(--single-unit-height) + var(--unit-s3-white-bottom-end));
+  top: calc(2 * var(--single-unit-height) + var(--unit-s3-white-bottom-end));
   height: calc(var(--colored-band-main-height) + var(--bevel-thickness) * 2);
   width: 1px;
 
