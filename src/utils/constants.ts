@@ -9,8 +9,8 @@ export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 8.0;
 export const ZOOM_SENSITIVITY_FACTOR = 1.001;
 export const MIN_ZOOM_FOR_LABELS = 0.3;
-export const MIN_LABEL_FONTSIZE_WITHOUT_BREAKS = 8;
-export const MIN_LABEL_FONTSIZE_WITH_BREAKS = 5;
+export const MIN_LABEL_FONTSIZE_WITHOUT_BREAKS = 12;
+export const MIN_LABEL_FONTSIZE_WITH_BREAKS = 6;
 
 // Convert x,y coordinates to a grid index
 export function COORD_TO_UINT16([x, y]: Coordinate): number {

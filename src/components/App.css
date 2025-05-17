@@ -57,7 +57,7 @@
   line-height: 1.2;
   word-break: auto;
   
-  -webkit-text-stroke: clamp(1px, 0.15em, 3px) white;
+  -webkit-text-stroke: clamp(3px, 0.1em, 10px) white;
   text-rendering: optimizeLegibility;
   paint-order: stroke fill;
 }
@@ -166,7 +166,6 @@
 
 #easteregg {
   position: absolute;
-  left: 50%;
   top: calc(6 * var(--single-unit-height) + var(--unit-s3-white-bottom-end));
   height: calc(var(--colored-band-main-height) + var(--bevel-thickness) * 2);
   width: 1px;

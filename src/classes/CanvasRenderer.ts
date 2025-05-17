@@ -19,6 +19,7 @@ import {
   ZOOM_SENSITIVITY_FACTOR,
   MAX_ZOOM,
   MIN_ZOOM,
+  MIN_LABEL_FONTSIZE_WITHOUT_BREAKS,
 } from '../utils/constants';
 import { smallestFontSizeInBounds } from '../utils/fonts';
 import { Tile, Rectangle, Coordinate } from '../utils/geometry';
@@ -866,7 +867,7 @@ class CanvasRenderer {
       const fontWithBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, true);
       //prettier-ignore
       const fontWithoutBreaks = smallestFontSizeInBounds(innerLabel, labelWidth, labelHeight, false);
-      if (fontWithoutBreaks >= MIN_LABEL_FONTSIZE_WITH_BREAKS) {
+      if (fontWithoutBreaks >= MIN_LABEL_FONTSIZE_WITHOUT_BREAKS) {
         fontSize = fontWithoutBreaks;
       } else if (fontWithBreaks >= MIN_LABEL_FONTSIZE_WITH_BREAKS) {
         fontSize = fontWithBreaks;
