@@ -1,6 +1,7 @@
 import { Category } from '../interfaces/Category';
 import Subcategory from '../interfaces/Subcategory';
 import { ALL_BLUEPRINTS } from './BLUEPRINTS';
+import colors from '../utils/colors';
 
 export function populateCategories() {
   for (const categoryKey in ALL_CATEGORIES) {
@@ -33,84 +34,84 @@ export const ALL_CATEGORIES: Record<string, Category> = {
     id: 'HOUSING_BASIC',
     iconPath: '/categories/basichouse',
     displayName: 'Basic Housing',
-    baseColor: 'rgb(84, 194, 51)',
+    baseColor: colors.housing,
     subCategories: new Map(),
   },
   HOUSING_FANCY: {
     id: 'HOUSING_FANCY',
     iconPath: '/categories/nicehouse',
     displayName: 'Fancy Housing',
-    baseColor: 'rgb(84, 194, 51)',
+    baseColor: colors.housing,
     subCategories: new Map(),
   },
   BEAUTY: {
     id: 'BEAUTY',
     iconPath: '/categories/beauty',
     displayName: 'Beautification',
-    baseColor: 'rgb(225, 215, 0)',
+    baseColor: colors.beauty_inert,
     subCategories: new Map(),
   },
   ROAD: {
     id: 'ROAD',
     iconPath: '/categories/road',
     displayName: 'Road',
-    baseColor: 'rgb(255, 194, 144)',
+    baseColor: colors.road,
     subCategories: new Map(),
   },
   GOVT: {
     id: 'GOVT',
     iconPath: '/categories/govt',
     displayName: 'Municipal Buildings',
-    baseColor: 'rgb(209, 209, 209)',
+    baseColor: colors.walker_essential,
     subCategories: new Map(),
   },
   FUN: {
     id: 'FUN',
     iconPath: '/categories/fun',
     displayName: 'Entertainment',
-    baseColor: 'rgb(224, 142, 187)',
+    baseColor: colors.walker_midtier,
     subCategories: new Map(),
   },
   HEALTH: {
     id: 'HEALTH',
     iconPath: '/categories/health',
     displayName: 'Health and Sanitation',
-    baseColor: 'rgb(32, 68, 146)',
+    baseColor: colors.walker_basic,
     subCategories: new Map(),
   },
   FOOD: {
     id: 'FOOD',
     iconPath: '/categories/ibex',
     displayName: 'Food and Farming',
-    baseColor: 'rgb(173, 65, 33)',
+    baseColor: colors.storageBase,
     subCategories: new Map(),
   },
   STORAGE: {
     id: 'STORAGE',
     iconPath: '/categories/vase',
     displayName: 'Storage and Distribution',
-    baseColor: 'rgb(245, 226, 180)',
+    baseColor: colors.storageBase,
     subCategories: new Map(),
   },
   INDUSTRY: {
     id: 'INDUSTRY',
     iconPath: '/categories/industry',
     displayName: 'Industrial Buildings',
-    baseColor: 'rgb(189, 97, 57)',
+    baseColor: colors.industryBase,
     subCategories: new Map(),
   },
   RELIGION_EDUCATION: {
     id: 'RELIGION_EDUCATION',
     iconPath: '/categories/relication',
     displayName: 'Religion & Education',
-    baseColor: 'rgb(2, 92, 14)',
+    baseColor: colors.walker_fancy,
     subCategories: new Map(),
   },
   MILITARY: {
     id: 'MILITARY',
     iconPath: '/categories/military',
     displayName: 'Military Structures',
-    baseColor: 'rgb(126, 13, 13)',
+    baseColor: colors.industryBase,
     subCategories: new Map(),
   },
 };

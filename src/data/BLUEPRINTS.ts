@@ -1,4 +1,5 @@
 import Blueprint from '../types/Blueprint';
+import colors from '../utils/colors';
 import { Tile } from '../utils/geometry';
 
 // We will repeat this one a lot for all the variations, so I'm defining it here to reduce copypaste
@@ -52,7 +53,8 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   },
   Plaza: {
     id: 12,
-    label: 'Pla&#8203;za',
+    label: 'Plaza',
+    fillColor: colors.beauty_needsroad,
     height: 1,
     width: 1,
     cost: [3, 12, 15, 18, 22],
@@ -177,6 +179,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Senet House': {
     id: 44,
     label: 'Senet House',
+    fillColor: colors.walker_fancy,
     height: 4,
     width: 4,
     cost: [300, 1200, 1500, 1800, 2250],
@@ -201,7 +204,6 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     width: 1,
     desireBox: { baseDesirability: 2, stepDist: 1, stepVal: -1, maxRange: 2 },
     category: 'FUN',
-    fillColor: 'rgb(243, 192, 237)',
   },
   'Music Stage': {
     id: 51,
@@ -210,7 +212,6 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     width: 1,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
     category: 'FUN',
-    fillColor: 'rgb(239, 243, 192)',
   },
   'Dance Stage': {
     id: 52,
@@ -219,7 +220,6 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     width: 2,
     desireBox: { baseDesirability: 6, stepDist: 1, stepVal: -1, maxRange: 6 },
     category: 'FUN',
-    fillColor: 'rgb(192, 243, 233)',
   },
 
   Booth_1: {
@@ -565,6 +565,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Courthouse: {
     id: 92,
     label: 'Court&#8203;house',
+    fillColor: colors.walker_midtier,
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
@@ -584,7 +585,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   },
   Firehouse: {
     id: 94,
-    label: 'Fire&#8203;house',
+    label: 'Fire House',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -595,6 +596,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Mansion, Dynasty': {
     id: 95,
     label: 'Dynas&#8203;ty Man&#8203;sion',
+    fillColor: colors.beauty_needsroad,
     height: 5,
     width: 5,
     cost: [140, 560, 700, 840, 1050],
@@ -605,6 +607,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Mansion, Family': {
     id: 96,
     label: 'Fami&#8203;ly Man&#8203;sion',
+    fillColor: colors.beauty_needsroad,
     height: 4,
     width: 4,
     cost: [80, 320, 400, 480, 600],
@@ -615,6 +618,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Mansion, Personal': {
     id: 97,
     label: 'Perso&#8203;nal Man&#8203;sion',
+    fillColor: colors.beauty_needsroad,
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
@@ -625,6 +629,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Palace, City': {
     id: 98,
     label: 'City Palace',
+    fillColor: colors.beauty_needsroad,
     height: 6,
     width: 6,
     cost: [240, 950, 1200, 1440, 1800],
@@ -635,6 +640,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Palace, Town': {
     id: 99,
     label: 'Town Palace',
+    fillColor: colors.beauty_needsroad,
     height: 5,
     width: 5,
     cost: [200, 800, 1000, 1200, 1500],
@@ -645,6 +651,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Palace, Village': {
     id: 100,
     label: 'Village Palace',
+    fillColor: colors.beauty_needsroad,
     height: 4,
     width: 4,
     cost: [180, 720, 900, 1080, 1350],
@@ -654,7 +661,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   },
   'Police Station': {
     id: 101,
-    label: 'Po&#8203;lice Sta&#8203;tion',
+    label: 'Po&#8203;lice',
     height: 1,
     width: 1,
     cost: [6, 24, 30, 36, 45],
@@ -674,6 +681,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Tax Collector': {
     id: 103,
     label: 'Tax Co&#8203;llector',
+    fillColor: colors.walker_midtier,
     height: 2,
     width: 2,
     cost: [15, 60, 75, 90, 112],
@@ -696,6 +704,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Dentist: {
     id: 112,
     label: 'Den&#8203;tist',
+    fillColor: colors.walker_midtier,
     height: 1,
     width: 1,
     cost: [10, 40, 50, 60, 75],
@@ -706,6 +715,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Mortuary: {
     id: 113,
     label: 'Mor&#8203;tuary',
+    fillColor: colors.walker_fancy,
     height: 2,
     width: 2,
     cost: [20, 80, 100, 120, 150],
@@ -716,6 +726,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Physician: {
     id: 114,
     label: 'Physi&#8203;cian',
+    fillColor: colors.walker_basic,
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -726,6 +737,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Water Supply': {
     id: 115,
     label: 'Water Supply',
+    fillColor: colors.walker_basic,
     height: 2,
     width: 2,
     cost: [10, 40, 50, 60, 75],
@@ -1550,6 +1562,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Shrine: {
     id: 222,
     label: 'Shrine',
+    fillColor: colors.beauty_needsroad,
     height: 1,
     width: 1,
     cost: [20, 80, 100, 120, 150],
@@ -1560,6 +1573,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Temple: {
     id: 223,
     label: 'Temple',
+    fillColor: colors.walker_basic,
     height: 3,
     width: 3,
     cost: [30, 120, 150, 180, 225],
@@ -1607,6 +1621,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Library: {
     id: 227,
     label: 'Library',
+    fillColor: colors.walker_fancy,
     height: 3,
     width: 3,
     cost: [90, 360, 450, 540, 675],
@@ -1617,6 +1632,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   'Scribe School': {
     id: 228,
     label: 'Scribe School',
+    fillColor: colors.walker_fancy,
     height: 2,
     width: 2,
     cost: [30, 120, 150, 180, 225],
@@ -1629,6 +1645,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
   Bazaar: {
     id: 241,
     label: 'Bazaar',
+    fillColor: colors.walker_basic,
     height: 2,
     width: 2,
     cost: [8, 32, 40, 48, 60],

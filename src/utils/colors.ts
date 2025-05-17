@@ -60,27 +60,27 @@ export function desirabilityColor(value: number): string {
   return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 }
 
-const backgroundWhite = 'rgba(255,255,255,1)';
-const outlineWhite = 'rgba(255,255,255,1)';
-const redVeryLowTransparency = 'rgba(255, 0, 0, 0.1)';
-const redLowTransparency = 'rgba(255, 0, 0, 0.2)';
-const redMidTransparency = 'rgba(255, 0, 0, 0.4)';
-const redHighTransparency = 'rgba(255, 0, 0, 1)';
-const greenLowTransparency = 'rgba(0, 255, 0, 0.2)';
-const greenMidTransparency = 'rgba(0, 255, 0, 0.4)';
-const weakOutlineBlack = 'rgba(0,0,0,0.2)';
-const strongOutlineBlack = 'rgba(0,0,0,0.8)';
-const pureBlack = 'rgba(0,0,0,1)';
 export default {
-  backgroundWhite,
-  outlineWhite,
-  redVeryLowTransparency,
-  redLowTransparency,
-  redMidTransparency,
-  redHighTransparency,
-  greenLowTransparency,
-  greenMidTransparency,
-  weakOutlineBlack,
-  strongOutlineBlack,
-  pureBlack,
+  backgroundWhite: 'rgba(255,255,255,1)',
+  outlineWhite: 'rgba(255,255,255,1)',
+  redVeryLowTransparency: 'rgba(255, 0, 0, 0.1)',
+  redLowTransparency: 'rgba(255, 0, 0, 0.2)',
+  redMidTransparency: 'rgba(255, 0, 0, 0.4)',
+  redHighTransparency: 'rgba(255, 0, 0, 1)',
+  greenLowTransparency: 'rgba(0, 255, 0, 0.2)',
+  greenMidTransparency: 'rgba(0, 255, 0, 0.4)',
+  weakOutlineBlack: 'rgba(0,0,0,0.2)',
+  strongOutlineBlack: 'rgba(0,0,0,0.8)',
+  pureBlack: 'rgba(0,0,0,1)',
+
+  road: 'rgb(153, 102, 51)',
+  housing: 'rgb(231, 130, 132)',
+  beauty_inert: 'rgb(102, 204, 0)',
+  beauty_needsroad: 'rgb(166, 218, 149)',
+  walker_essential: 'rgb(65, 69, 89)',
+  walker_basic: 'rgb(198, 208, 245)',
+  walker_midtier: 'rgb(129, 200, 190)',
+  walker_fancy: 'rgb(202, 158, 230)',
+  storageBase: 'rgb(204, 178, 127)',
+  industryBase: 'rgb(255, 128, 0)',
 };
