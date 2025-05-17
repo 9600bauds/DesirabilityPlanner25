@@ -55,6 +55,7 @@
   text-align: center;
 
   line-height: 1.2;
+  padding: 3px;
   word-break: auto;
   
   -webkit-text-stroke: clamp(3px, 0.1em, 10px) white;

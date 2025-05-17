@@ -130,54 +130,23 @@ class CanvasRenderer {
     this.previewLayers = {};
   };
 
+  /**
+   * @param newContext Partial RenderContext, updates only the properties that were provided
+   */
   public updateRenderContext(newContext: Partial<RenderContext>): void {
-    // Update only the properties that were provided
     this.renderContext = {
       ...this.renderContext,
       ...newContext,
     };
   }
 
-  // === COORDINATE TRANSFORMATIONS ===
+  // === MOUSE HANDLING ===
 
   /**
-   * Convert a screen coordinate to a grid tile
+   * @param event Mouse event, touch event, or similar. NOT a React event.
+   * @returns True if the mouse is on top of the canvas, false if it's on top of another element or out of bounds
    */
-  public getMouseCoords = (
-    event: InteractionEvent,
-    allowOutsideViewport = false
-  ): Tile | null => {
-    const point = getClientCoordinates(event);
-    if (!allowOutsideViewport && !this.isEventInsideViewport(event)) {
-      return null; //This is outside our viewport!
-    }
-
-    const gridPt = this.canvas2grid(point);
-    // Convert to tile coordinates
-    const tileX = Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPt.x)));
-    const tileY = Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPt.y)));
-
-    return new Tile(tileX, tileY);
-  };
-
-  private grid2canvas = (tile: Tile, rotate = this.isRotated): Coordinate => {
-    let point = tile.toCoordinate();
-    if (rotate) point = ROTATE_AROUND_ORIGIN(point);
-    return [
-      COORD_TO_PX(point[0]) * this.zoomLevel + this.offsetX,
-      COORD_TO_PX(point[1]) * this.zoomLevel + this.offsetY,
-    ];
-  };
-
-  private canvas2grid = (coord: Coordinate, rotate = this.isRotated): Tile => {
-    const x = (coord[0] - this.offsetX) / this.zoomLevel;
-    const y = (coord[1] - this.offsetY) / this.zoomLevel;
-    let point: Coordinate = [x, y];
-    if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
-    return Tile.fromCoordinate(point);
-  };
-
-  public isEventInsideViewport = (event: InteractionEvent) => {
+  public isMouseInsideCanvas = (event: InteractionEvent) => {
     const target = event.target;
     if (!(target instanceof Node)) {
       // This case should ideally not happen with standard DOM events
@@ -190,8 +159,64 @@ class CanvasRenderer {
     );
   };
 
-  // Get the range of tiles currently visible in the viewport
-  public getViewport = (): { coordsRect: Rectangle; tilesRect: Rectangle } => {
+  /**
+   * @param event Mouse event, touch event, or similar. NOT a React event.
+   * @param allowOutsideViewport If false, will return null when the mouse is outside the canvas (i.e. is on top of a menu, the sidebar, or has left the window entirely)
+   * @returns The Tile currently underneath the mouse, or null if no such tile exists (out of bounds).
+   */
+  public getMouseCoords = (
+    event: InteractionEvent,
+    allowOutsideViewport = false
+  ): Tile | null => {
+    const point = getClientCoordinates(event);
+    if (!allowOutsideViewport && !this.isMouseInsideCanvas(event)) {
+      return null; //This is outside our viewport!
+    }
+
+    const gridPt = this.screen2tile(point);
+    // Convert to tile coordinates
+    const tileX = Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPt.x)));
+    const tileY = Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPt.y)));
+
+    return new Tile(tileX, tileY);
+  };
+
+  // === COORDINATE TRANSFORMATIONS ===
+
+  /**
+   * @param tile A tile (point corresponding a visible square in the grid)
+   * @param rotate Whether to apply rotation or not, defaults to matching the current rotation state
+   * @returns The X Y coordinates of where in the screen the top-left corner of that tile would be. It is not guaranteed to be inside the screen (can be a negative or very large number.)
+   */
+  private tile2screen = (tile: Tile, rotate = this.isRotated): Coordinate => {
+    let point = tile.toCoordinate();
+    if (rotate) point = ROTATE_AROUND_ORIGIN(point);
+    return [
+      COORD_TO_PX(point[0]) * this.zoomLevel + this.offsetX,
+      COORD_TO_PX(point[1]) * this.zoomLevel + this.offsetY,
+    ];
+  };
+
+  /**
+   * @param coord A set of X Y coordinates corresponding to a point in the visible screen.
+   * @param rotate Whether to apply rotation or not, defaults to matching the current rotation state
+   * @returns A tile (point corresponding a visible square in the grid). It is not guaranteed to be a tile within bounds of the grid's limits (e.g. can be negative).
+   */
+  private screen2tile = (coord: Coordinate, rotate = this.isRotated): Tile => {
+    const x = (coord[0] - this.offsetX) / this.zoomLevel;
+    const y = (coord[1] - this.offsetY) / this.zoomLevel;
+    let point: Coordinate = [x, y];
+    if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
+    return Tile.fromCoordinate(point);
+  };
+
+  /**
+   * Gets the smallest axis-aligned rectangle that contains all grid tiles in view.
+   */
+  public getRectInView = (): {
+    coordsRect: Rectangle;
+    tilesRect: Rectangle;
+  } => {
     // Currently, this function uses a very simple and slightly wasteful algorithm.
     // In order to handle grid rotation, we need to get the axis-aligned bounding box of all four corners of the viewport.
     // This means that when the grid is rotated, up to 50% of the tiles we render are wasted effort since they're offscreen!
@@ -199,8 +224,8 @@ class CanvasRenderer {
     // However, fixing that is tricky without messing with the SIMD optimization. And there are much more significant optimizations we should do, first.
     let minX: number, minY: number, maxX: number, maxY: number;
     if (!this.isRotated) {
-      const topLeft = this.canvas2grid([0, 0]);
-      const bottomRight = this.canvas2grid([
+      const topLeft = this.screen2tile([0, 0]);
+      const bottomRight = this.screen2tile([
         this.clientWidth,
         this.clientHeight,
       ]);
@@ -212,10 +237,10 @@ class CanvasRenderer {
     } else {
       // For a rotated grid, we need the 4 corners
       const corners = [
-        this.canvas2grid([0, 0]), // top-left
-        this.canvas2grid([this.clientWidth, 0]), // top-right
-        this.canvas2grid([0, this.clientHeight]), // bottom-left
-        this.canvas2grid([this.clientWidth, this.clientHeight]), // bottom-right
+        this.screen2tile([0, 0]), // top-left
+        this.screen2tile([this.clientWidth, 0]), // top-right
+        this.screen2tile([0, this.clientHeight]), // bottom-left
+        this.screen2tile([this.clientWidth, this.clientHeight]), // bottom-right
       ];
       minX = Math.min(...corners.map((p) => p.x));
       minY = Math.min(...corners.map((p) => p.y));
@@ -271,7 +296,7 @@ class CanvasRenderer {
   }
 
   public toggleGridRotation = (): void => {
-    const oldCenter = this.canvas2grid(this.viewCenter);
+    const oldCenter = this.screen2tile(this.viewCenter);
 
     this.isRotated = !this.isRotated;
 
@@ -281,42 +306,37 @@ class CanvasRenderer {
 
   /**
    * Focuses the view on a desired grid coordinate.
-   * @param gridPointCoord The point that you want the center to be focused on.
+   * @param gridPointCoord The point that you want to be focused on.
    * @param targetCanvasPoint The point on the canvas (CSS pixels) that the focus point should occupy afterwards. Defaults to the center of the screen.
    */
   public focusOnGridPoint = (
     gridPointCoord: Coordinate,
     targetCanvasPoint: Coordinate = this.viewCenter
   ): void => {
-    // If the grid is currently rotated, we need to rotate the target grid point
-    // so the offset calculation works correctly within the rotated coordinate system.
-    let adjustedGridPointCoord = gridPointCoord;
     if (this.isRotated) {
-      adjustedGridPointCoord = ROTATE_AROUND_ORIGIN(gridPointCoord);
+      gridPointCoord = ROTATE_AROUND_ORIGIN(gridPointCoord);
     }
+    this.offsetX = targetCanvasPoint[0] - gridPointCoord[0] * this.zoomLevel;
+    this.offsetY = targetCanvasPoint[1] - gridPointCoord[1] * this.zoomLevel;
 
-    // Calculate the offset needed to place the (potentially rotated) grid point
-    // at the target canvas point, considering the current zoom level.
-    this.offsetX =
-      targetCanvasPoint[0] - adjustedGridPointCoord[0] * this.zoomLevel;
-    this.offsetY =
-      targetCanvasPoint[1] - adjustedGridPointCoord[1] * this.zoomLevel;
-
-    this.scheduleRerender(); // Schedule a rerender as the view has changed.
+    this.scheduleRerender(); // Schedule a rerender as the view has changed
   };
 
+  /**
+   * Zoom in towards the center of the view
+   */
   public zoomIn = () => {
-    // Zoom in towards the center of the view
     this.zoom(1.2, this.viewCenter);
   };
-
+  /**
+   * Zoom out from the center of the view
+   */
   public zoomOut = () => {
-    // Zoom out from the center of the view
     this.zoom(1 / 1.2, this.viewCenter);
   };
 
   private zoom = (factor: number, targetCanvasPoint: Coordinate): void => {
-    const gridPointBeforeZoom = this.canvas2grid(targetCanvasPoint);
+    const gridPointBeforeZoom = this.screen2tile(targetCanvasPoint);
 
     this.zoomLevel *= factor;
     this.zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, this.zoomLevel));
@@ -390,6 +410,9 @@ class CanvasRenderer {
     }
   };
 
+  /**
+   * Clear this canvas context in an optimized way.
+   */
   private fastClearCtx = (
     ctx: CanvasRenderingContext2D,
     rotate = this.isRotated
@@ -432,7 +455,7 @@ class CanvasRenderer {
     // Get current interaction state from render context
     const interactionState = this.renderContext.getInteractionState();
 
-    const viewport = this.getViewport();
+    const viewport = this.getRectInView();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
       return;
     }
@@ -604,7 +627,7 @@ class CanvasRenderer {
 
     this.hideLayers(this.previewLayers);
 
-    const viewport = this.getViewport();
+    const viewport = this.getRectInView();
     if (viewport.tilesRect.height < 1 || viewport.tilesRect.width < 1) {
       return; //We are fully offscreen! //todo: prevent this from happening to begin with!
     }
@@ -728,7 +751,7 @@ class CanvasRenderer {
     tileValues: Int16Array,
     bounds: Rectangle
   ) => {
-    this.fastClearCtx(ctx, false); //We intentionally do not rotate!;
+    this.fastClearCtx(ctx, false); //We intentionally do not rotate!
     // Set text style
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
@@ -847,7 +870,7 @@ class CanvasRenderer {
 
       let labelOrigin;
       if (!this.isRotated) {
-        labelOrigin = this.grid2canvas(building.origin);
+        labelOrigin = this.tile2screen(building.origin);
       } else {
         // Because I couldn't figure out rotation, we do this thing where we position ourselves on the center of the building, rotate, and then go back.
         // We also make ourselves a bit wider and a bit shorter because it looks better with rotated buildings.
@@ -857,7 +880,7 @@ class CanvasRenderer {
           building.origin.x + building.width / 2,
           building.origin.y + building.height / 2
         );
-        labelOrigin = this.grid2canvas(buildingCenter);
+        labelOrigin = this.tile2screen(buildingCenter);
         labelOrigin[0] -= labelWidth / 2;
         labelOrigin[1] -= labelHeight / 2;
       }
@@ -884,7 +907,6 @@ class CanvasRenderer {
             top: ${labelOrigin[1]}px;
             width: ${labelWidth}px;
             height: ${labelHeight}px;
-            padding: 3px;
             font-size: ${fontSize}px;
           "
         >
