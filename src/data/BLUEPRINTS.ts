@@ -744,7 +744,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     cost: [10, 40, 50, 60, 75],
     employeesRequired: 5,
     desireBox: { baseDesirability: 4, stepDist: 1, stepVal: -1, maxRange: 4 },
-    desirabilityToEvolve: 40,
+    // Evolves when the NORTHERNMOST tile gets 30 desirability??
     category: 'HEALTH',
   },
   Well: {
@@ -1653,7 +1653,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     cost: [8, 32, 40, 48, 60],
     employeesRequired: 5,
     desireBox: { baseDesirability: -2, stepDist: 1, stepVal: 1, maxRange: 6 },
-    desirabilityToEvolve: 40,
+    // Evolves when the NORTHERNMOST tile gets 31 desirability??
     category: 'STORAGE',
   },
   Dock: {
