@@ -1079,7 +1079,7 @@ export const ALL_BLUEPRINTS: Record<string, Blueprint> = {
     desireBox: {
       baseDesirability: 1,
       stepDist: 2,
-      stepVal: 0,
+      stepVal: -1,
       maxRange: 2,
     },
     desirabilityToBeStable: 50,
