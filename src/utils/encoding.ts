@@ -5,7 +5,7 @@ const uint8ToBinary = (uint8: Uint8Array): string => {
   }
   return result;
 };
-const binaryToUint8 = (binary: string): Uint8Array => {
+const binaryToUint8 = (binary: string): Uint8Array<ArrayBuffer> => {
   const result = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
     result[i] = binary.charCodeAt(i);
@@ -37,7 +37,7 @@ export function encodeData(data: Uint8Array): string {
   }
 }
 
-export function decodeData(str: string): Uint8Array {
+export function decodeData(str: string): Uint8Array<ArrayBuffer> {
   try {
     const binary = urlToBase64(str);
     const bytes = binaryToUint8(binary);
