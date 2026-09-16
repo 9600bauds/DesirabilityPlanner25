@@ -30,7 +30,6 @@ export function encodeData(data: Uint8Array): string {
   try {
     return base64ToUrl(uint8ToBinary(data));
   } catch (error) {
-    console.error('Error encoding data:', error);
     throw new Error(
       `Encoding failed: ${error instanceof Error ? error.message : String(error)}`
     );
@@ -43,7 +42,6 @@ export function decodeData(str: string): Uint8Array<ArrayBuffer> {
     const bytes = binaryToUint8(binary);
     return bytes;
   } catch (error) {
-    console.error('Error decoding data:', error);
     throw new Error(
       `Decoding failed: ${error instanceof Error ? error.message : String(error)}`
     );
