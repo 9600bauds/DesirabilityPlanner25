@@ -3,6 +3,7 @@ import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 import Building from './Building';
 import { BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
+import { COORD_TO_UINT16 } from '../utils/constants';
 
 export interface BlueprintPlacement {
   position: Tile;
@@ -26,6 +27,10 @@ class GridStateManager {
 
   public getBaseValues = (): Int16Array => {
     return this.activeGridState.getDesirabilityGrid();
+  };
+
+  public valueAt = (x: number, y: number) => {
+    return this.getBaseValues()[COORD_TO_UINT16([x, y])];
   };
 
   public getBuildings = (): Set<Building> => {
