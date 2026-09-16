@@ -17,7 +17,7 @@ import { Rectangle, Tile, Coordinate } from '../utils/geometry';
 import { decodeData, encodeData } from '../utils/encoding';
 import {
   LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS,
-  URL_STATE_INDEX,
+  URL_LEGACY_QUERY_INDEX,
 } from '../utils/constants';
 import { useUrlState } from '../hooks/useUrlState';
 import { getClientCoordinates } from '../utils/events';
@@ -50,17 +50,13 @@ const App: React.FC = () => {
   const gridManagerRef = useRef<GridStateManager>(new GridStateManager());
 
   // ===== URL MANAGEMENT =====
-  const { setUrlState, getUrlState } = useUrlState();
+  const { getFragmentState, setFragmentState, getQueryState, clearQueryState } =
+    useUrlState();
 
   const updateUrl = useCallback(() => {
-    const compressed = gridManagerRef.current.getUInt8Array();
-    if (compressed.length <= 0) {
-      setUrlState(URL_STATE_INDEX, null);
-    } else {
-      const encoded = encodeData(compressed);
-      setUrlState(URL_STATE_INDEX, encoded);
-    }
-  }, [setUrlState]);
+    const grid = gridManagerRef.current.getUInt8Array();
+    setFragmentState(grid.length > 0 ? encodeData(grid) : null);
+  }, [setFragmentState]);
 
   // ===== GRID STATE MANAGEMENT =====
   const gridStateUpdated = useCallback(() => {
@@ -339,26 +335,21 @@ const App: React.FC = () => {
 
   // Initialize from URL
   useEffect(() => {
-    const compressedState = getUrlState(URL_STATE_INDEX);
-    if (!compressedState) return;
+    // Old link handling
+    const legacy = getQueryState(URL_LEGACY_QUERY_INDEX);
+    if (legacy) clearQueryState(URL_LEGACY_QUERY_INDEX);
+
+    const saved = legacy ?? getFragmentState();
+    if (!saved) return;
 
     try {
-      const decoded = decodeData(compressedState);
-      if (!decoded.length) {
-        setUrlState(URL_STATE_INDEX, null);
-        return;
-      }
-      gridManagerRef.current.loadUInt8Array(decoded);
-
-      // Update undo/redo state directly
-      setCanUndo(gridManagerRef.current.canUndo());
-      setCanRedo(gridManagerRef.current.canRedo());
-
-      updateUrl();
+      gridManagerRef.current.loadUInt8Array(decodeData(saved));
+      // Explicitly rewrite the URL in case it was a legacy URL
+      gridStateUpdated();
     } catch (error) {
       console.error('Could not decode saved URL:', error);
     }
-  }, [getUrlState, setUrlState, updateUrl]);
+  }, [getFragmentState, getQueryState, clearQueryState, gridStateUpdated]);
 
   // Initialize renderer once, don't recreate based on blueprint changes
   useEffect(() => {
