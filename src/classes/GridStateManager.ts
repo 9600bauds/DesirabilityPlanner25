@@ -170,7 +170,7 @@ class GridStateManager {
     const arr = new Uint8Array(buildings.size * 3);
     let currIndex = 0;
     for (const building of buildings) {
-      arr[currIndex++] = building.bpID;
+      arr[currIndex++] = building.blueprint.id;
       arr[currIndex++] = building.origin.x;
       arr[currIndex++] = building.origin.y;
     }

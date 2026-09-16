@@ -1,7 +1,7 @@
 import Blueprint from '../types/Blueprint';
 import { Tile, Rectangle, getOutlinePath } from '../utils/geometry';
 import * as Collections from 'typescript-collections';
-import DesireBox from './desireBox';
+import DesireBox from './DesireBox';
 import BuildingGraphic, { fillPath } from '../interfaces/BuildingGraphic';
 import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
 import { COORD_TO_PX, GRID_MAX_X, GRID_MAX_Y } from '../utils/constants';
@@ -9,7 +9,7 @@ import { ALL_CATEGORIES } from '../data/CATEGORIES';
 import colors from '../utils/colors';
 
 class Building {
-  bpID: number;
+  blueprint: Blueprint;
   id: string;
   origin: Tile;
   width: number;
@@ -23,7 +23,16 @@ class Building {
   employeesRequired: number = 0;
 
   baseLabel?: string;
-  graphic?: BuildingGraphic;
+
+  private cachedGraphic?: BuildingGraphic;
+  private graphicIsCached = false;
+  public get graphic(): BuildingGraphic | undefined {
+    if (!this.graphicIsCached) {
+      this.cachedGraphic = this.buildGraphic(this.blueprint);
+      this.graphicIsCached = true;
+    }
+    return this.cachedGraphic;
+  }
 
   constructor(origin: Tile, blueprint: Blueprint) {
     if (
@@ -37,7 +46,7 @@ class Building {
       );
     }
 
-    this.bpID = blueprint.id;
+    this.blueprint = blueprint;
     this.id = `${blueprint.id};${origin.x};${origin.y}`;
     this.origin = origin;
     this.height = blueprint.height;
@@ -56,8 +65,6 @@ class Building {
 
     this.tilesOccupied = new Collections.Set<Tile>();
     this.recursiveAddToTilesOccupied(blueprint, this.origin);
-
-    this.graphic = this.buildGraphic(blueprint);
   }
 
   private recursiveAddToTilesOccupied = (data: Blueprint, origin: Tile) => {
