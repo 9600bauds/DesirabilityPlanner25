@@ -1,7 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import GridStateManager from '../classes/GridStateManager';
 import { LinkSource, readCityLink, writeCityLink } from './cityLink';
-import { LEGACY_README_LINK, URL_LEGACY_QUERY_INDEX } from '../utils/constants';
+import {
+  URL_LEGACY_QUERY_INDEX,
+  LEGACY_README_LINK,
+  README_FRAGMENT_LINK,
+} from '../utils/constants';
 
 describe('readCityLink', () => {
   let manager: GridStateManager;
@@ -17,6 +21,26 @@ describe('readCityLink', () => {
   beforeEach(() => {
     manager = new GridStateManager();
     cleared = [];
+  });
+
+  it('a legacy link loads its city', () => {
+    const loaded = readCityLink(
+      manager,
+      url({ getQueryState: () => LEGACY_README_LINK })
+    );
+
+    expect(loaded).toBe(true);
+    expect(manager.getBuildings().size).toBe(99);
+  });
+
+  it('a fragment link loads its city', () => {
+    const loaded = readCityLink(
+      manager,
+      url({ getFragmentState: () => README_FRAGMENT_LINK })
+    );
+
+    expect(loaded).toBe(true);
+    expect(manager.getBuildings().size).toBe(99);
   });
 
   it('a legacy link is swept off the URL once it has been read', () => {
@@ -50,13 +74,10 @@ describe('readCityLink', () => {
       expect(writeCityLink(manager)).toBe(null);
     });
 
-    it('the README city writes back the link it arrived in', () => {
-      readCityLink(
-        manager,
-        url({ getFragmentState: () => LEGACY_README_LINK })
-      );
+    it('a legacy city is written back compressed', () => {
+      readCityLink(manager, url({ getQueryState: () => LEGACY_README_LINK }));
 
-      expect(writeCityLink(manager)).toBe(LEGACY_README_LINK);
+      expect(writeCityLink(manager)).toBe(README_FRAGMENT_LINK);
     });
   });
 });
