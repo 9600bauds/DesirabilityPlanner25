@@ -174,10 +174,10 @@ class CanvasRenderer {
       return null; //This is outside our viewport!
     }
 
-    const gridPt = this.screen2tile(point);
+    const gridPoint = this.screen2gridPoint(point);
     // Convert to tile coordinates
-    const tileX = Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPt.x)));
-    const tileY = Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPt.y)));
+    const tileX = Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPoint[0])));
+    const tileY = Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPoint[1])));
 
     return new Tile(tileX, tileY);
   };
@@ -201,14 +201,16 @@ class CanvasRenderer {
   /**
    * @param coord A set of X Y coordinates corresponding to a point in the visible screen.
    * @param rotate Whether to apply rotation or not, defaults to matching the current rotation state
-   * @returns A tile (point corresponding a visible square in the grid). It is not guaranteed to be a tile within bounds of the grid's limits (e.g. can be negative).
+   * @returns The X Y grid pixel under that point. It is not guaranteed to be inside the grid's limits (e.g. can be negative).
    */
-  private screen2tile = (coord: Coordinate, rotate = this.isRotated): Tile => {
+  private screen2gridPoint = (
+    coord: Coordinate,
+    rotate = this.isRotated
+  ): Coordinate => {
     const x = (coord[0] - this.offsetX) / this.zoomLevel;
     const y = (coord[1] - this.offsetY) / this.zoomLevel;
-    let point: Coordinate = [x, y];
-    if (rotate) point = COUNTERROTATE_AROUND_ORIGIN(point);
-    return Tile.fromCoordinate(point);
+    const point: Coordinate = [x, y];
+    return rotate ? COUNTERROTATE_AROUND_ORIGIN(point) : point;
   };
 
   /**
@@ -225,28 +227,28 @@ class CanvasRenderer {
     // However, fixing that is tricky without messing with the SIMD optimization. And there are much more significant optimizations we should do, first.
     let minX: number, minY: number, maxX: number, maxY: number;
     if (!this.isRotated) {
-      const topLeft = this.screen2tile([0, 0]);
-      const bottomRight = this.screen2tile([
+      const topLeft = this.screen2gridPoint([0, 0]);
+      const bottomRight = this.screen2gridPoint([
         this.clientWidth,
         this.clientHeight,
       ]);
 
-      minX = topLeft.x;
-      minY = topLeft.y;
-      maxX = bottomRight.x;
-      maxY = bottomRight.y;
+      minX = topLeft[0];
+      minY = topLeft[1];
+      maxX = bottomRight[0];
+      maxY = bottomRight[1];
     } else {
       // For a rotated grid, we need the 4 corners
       const corners = [
-        this.screen2tile([0, 0]), // top-left
-        this.screen2tile([this.clientWidth, 0]), // top-right
-        this.screen2tile([0, this.clientHeight]), // bottom-left
-        this.screen2tile([this.clientWidth, this.clientHeight]), // bottom-right
+        this.screen2gridPoint([0, 0]), // top-left
+        this.screen2gridPoint([this.clientWidth, 0]), // top-right
+        this.screen2gridPoint([0, this.clientHeight]), // bottom-left
+        this.screen2gridPoint([this.clientWidth, this.clientHeight]), // bottom-right
       ];
-      minX = Math.min(...corners.map((p) => p.x));
-      minY = Math.min(...corners.map((p) => p.y));
-      maxX = Math.max(...corners.map((p) => p.x));
-      maxY = Math.max(...corners.map((p) => p.y));
+      minX = Math.min(...corners.map((p) => p[0]));
+      minY = Math.min(...corners.map((p) => p[1]));
+      maxX = Math.max(...corners.map((p) => p[0]));
+      maxY = Math.max(...corners.map((p) => p[1]));
     }
 
     const coordStartX = Math.max(0, minX);
@@ -297,12 +299,12 @@ class CanvasRenderer {
   }
 
   public toggleGridRotation = (): void => {
-    const oldCenter = this.screen2tile(this.viewCenter);
+    const oldCenter = this.screen2gridPoint(this.viewCenter);
 
     this.isRotated = !this.isRotated;
 
     // Recenter view
-    this.focusOnGridPoint(oldCenter.toCoordinate());
+    this.focusOnGridPoint(oldCenter);
   };
 
   /**
@@ -324,11 +326,11 @@ class CanvasRenderer {
   };
 
   public getViewState = (): ViewState => {
-    const gridPoint = this.screen2tile(this.viewCenter);
+    const gridPoint = this.screen2gridPoint(this.viewCenter);
     return {
       center: new Tile(
-        Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPoint.x))),
-        Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPoint.y)))
+        Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPoint[0]))),
+        Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPoint[1])))
       ),
       zoom: this.zoomLevel,
       rotated: this.isRotated,
@@ -360,15 +362,12 @@ class CanvasRenderer {
   };
 
   private zoom = (factor: number, targetCanvasPoint: Coordinate): void => {
-    const gridPointBeforeZoom = this.screen2tile(targetCanvasPoint);
+    const gridPointBeforeZoom = this.screen2gridPoint(targetCanvasPoint);
 
     this.zoomLevel *= factor;
     this.zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, this.zoomLevel));
 
-    this.focusOnGridPoint(
-      gridPointBeforeZoom.toCoordinate(),
-      targetCanvasPoint
-    );
+    this.focusOnGridPoint(gridPointBeforeZoom, targetCanvasPoint);
   };
 
   public handleWheelZoom = (event: WheelEvent): void => {
