@@ -20,11 +20,11 @@ export function useCityUrl(
   const viewStateFromUrl = useRef<ViewState | null>(null);
 
   // Held in a ref so a fresh callback each render cannot re-run the load below
-  const currentViewport = useRef(getViewState);
-  currentViewport.current = getViewState;
+  const currentViewState = useRef(getViewState);
+  currentViewState.current = getViewState;
 
   const saveToUrl = useCallback(() => {
-    setFragmentState(writeCityLink(manager, currentViewport.current()));
+    setFragmentState(writeCityLink(manager, currentViewState.current()));
   }, [manager, setFragmentState]);
 
   useEffect(() => {

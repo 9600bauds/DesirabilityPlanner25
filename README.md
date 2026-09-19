@@ -8,7 +8,7 @@ This planner allows you to experiment with different layouts and understand thei
 
 **Screenshot:**
 ![Screenshot of Desirability Planner](/public/screenshot.png)  
-_[Click here to try out the city plan in the screenshot!](https://9600bauds.github.io/DesirabilityPlanner25/?#𓍏𓍏𓀙𓍋𓊹𓁦𓀕𓀯𓃱𓃻𓋸𓁠𓀅𓌞𓌠𓁏𓅲𓀔𓀸𓀊𓀤𓁃𓄤𓀕𓀊𓋈𓀠𓀃𓁛𓌠𓁓𓁓𓋌𓁨𓁁𓄤𓀳𓁝𓁑𓌰𓀵𓀟𓀟𓀟𓆴𓀟𓀤𓇟𓇉𓃴𓀨𓅊𓄾𓇅𓎃𓃦𓁦𓏎𓄥𓎛𓍙𓃦𓀸𓁔𓀤𓁏𓆼𓇌𓅲𓁂𓃻𓍙𓀲𓃩𓇉𓆳𓂀𓃲𓁈𓂀𓂀𓁏𓄃𓁰𓃰𓃠𓉰𓂀𓀜𓊿𓁙𓁬𓍋𓇕𓊤)_
+_[Click here to try out the city plan in the screenshot!](https://9600bauds.github.io/DesirabilityPlanner25/#𓍏𓍏𓀙𓍋𓊹𓁦𓀕𓀯𓃱𓃻𓋸𓁠𓀅𓌞𓌠𓁏𓅲𓀔𓀸𓀊𓀤𓁃𓄤𓀕𓀊𓋈𓀠𓀃𓁛𓌠𓁓𓁓𓋌𓁨𓁁𓄤𓀳𓁝𓁑𓌰𓀵𓀟𓀟𓀟𓆴𓀟𓀤𓇟𓇉𓃴𓀨𓅊𓄾𓇅𓎃𓃦𓁦𓏎𓄥𓎛𓍙𓃦𓀸𓁔𓀤𓁏𓆼𓇌𓅲𓁂𓃻𓍙𓀲𓃩𓇉𓆳𓂀𓃲𓁈𓂀𓂀𓁏𓄃𓁰𓃰𓃠𓉰𓂀𓀜𓊿𓁙𓁬𓍋𓇕𓊤)_
 
 ## Tools Used
 
