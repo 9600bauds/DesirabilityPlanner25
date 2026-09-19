@@ -1,15 +1,18 @@
 import { deflateSync, inflateSync } from 'fflate';
+import { BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
 
 /*
  * Coordinates are never stored. What goes in is the bounding box of the city,
- * then one bit per tile of that box marking which tiles a building starts on,
- * then one bpID per set bit in reading order.
+ * the bpIDs in reading order, then one bit per tile of that box saying whether
+ * a building starts there.
+ *
+ * Only tiles that could still hold an origin get a bit. Once a building is
+ * placed, the rest of its footprint is skipped, because nothing may overlap it.
  */
 
 const URL_GRID_SIZE = 256;
 
 const BITS_PER_BYTE = 8;
-const BBOX_BYTES = 4;
 
 class BitWriter {
   private bytes: number[] = [];
@@ -76,6 +79,23 @@ class BitReader {
   }
 }
 
+const BBOX_BYTES = 4;
+const COUNT_BYTES = 2;
+const HEADER_BYTES = BBOX_BYTES + COUNT_BYTES;
+
+/*
+ * Buildings always fill their own width x height rectangle (children only ever
+ * add tiles on top), so skipping that rectangle can never skip a tile that some
+ * other building starts on.
+ */
+const sizeOf = (id: number) => {
+  const blueprint = BLUEPRINTS_BY_ID.get(id);
+  if (!blueprint) {
+    throw new Error(`Malformed data: no blueprint with id ${id}`);
+  }
+  return { width: blueprint.width, height: blueprint.height };
+};
+
 export function compressCity(triples: Uint8Array): Uint8Array {
   if (triples.length % 3 !== 0) {
     throw new Error(
@@ -102,37 +122,56 @@ export function compressCity(triples: Uint8Array): Uint8Array {
   const width = maxX - minX + 1;
   const height = maxY - minY + 1;
 
-  // The bitmap comes out in reading order, so the IDs have to as well or they
-  // get handed to the wrong buildings
-  const order = Array.from({ length: count }, (_, i) => i).sort((a, b) => {
-    const ka = triples[a * 3 + 2] * URL_GRID_SIZE + triples[a * 3 + 1];
-    const kb = triples[b * 3 + 2] * URL_GRID_SIZE + triples[b * 3 + 1];
-    return ka - kb;
-  });
-
-  // Two buildings can't start on the same tile, so one bit per tile is enough
-  // and we never write a single coordinate
-  const origins = new Set<number>();
+  const idAt = new Map<number, number>();
   for (let i = 0; i < count; i++) {
-    origins.add(
-      (triples[i * 3 + 2] - minY) * width + (triples[i * 3 + 1] - minX)
+    idAt.set(
+      (triples[i * 3 + 2] - minY) * width + (triples[i * 3 + 1] - minX),
+      triples[i * 3]
     );
   }
 
   const writer = new BitWriter();
+  const ids: number[] = [];
+  const covered = new Uint8Array(width * height);
   for (let tile = 0; tile < width * height; tile++) {
-    writer.write(origins.has(tile) ? 1 : 0, 1);
-  }
-  writer.align();
-  for (const i of order) writer.write(triples[i * 3], BITS_PER_BYTE);
-  const bitmapAndIds = writer.finish();
+    if (covered[tile]) continue;
+    const id = idAt.get(tile);
+    writer.write(id === undefined ? 0 : 1, 1);
+    if (id === undefined) continue;
 
-  const body = new Uint8Array(BBOX_BYTES + bitmapAndIds.length);
-  // width-1 because a full-grid city is 256 wide and that doesn't fit in a byte
+    ids.push(id);
+    cover(covered, tile, width, height, sizeOf(id));
+  }
+  const bitmap = writer.finish();
+
+  const body = new Uint8Array(HEADER_BYTES + ids.length + bitmap.length);
+  // width-1 because a city spanning the whole grid is 256 wide, and count-1
+  // for the same reason -- an empty city never gets this far.
   body.set([minX, minY, width - 1, height - 1], 0);
-  body.set(bitmapAndIds, BBOX_BYTES);
+  body[4] = (count - 1) & 0xff;
+  body[5] = (count - 1) >> 8;
+  body.set(ids, HEADER_BYTES);
+  body.set(bitmap, HEADER_BYTES + ids.length);
 
   return deflateSync(body, { level: 9 });
+}
+
+function cover(
+  covered: Uint8Array,
+  tile: number,
+  width: number,
+  height: number,
+  size: { width: number; height: number }
+) {
+  const originX = tile % width;
+  const originY = Math.floor(tile / width);
+  for (let dy = 0; dy < size.height; dy++) {
+    for (let dx = 0; dx < size.width; dx++) {
+      const x = originX + dx;
+      const y = originY + dy;
+      if (x < width && y < height) covered[y * width + x] = 1;
+    }
+  }
 }
 
 export function decompressCity(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
@@ -140,32 +179,39 @@ export function decompressCity(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
     return new Uint8Array(0);
   }
   const body = inflateSync(bytes);
-  if (body.length < BBOX_BYTES) {
-    throw new Error('Malformed data: truncated bounding box');
+  if (body.length < HEADER_BYTES) {
+    throw new Error('Malformed data: truncated header');
   }
 
   const minX = body[0];
   const minY = body[1];
   const width = body[2] + 1;
   const height = body[3] + 1;
-
-  // Walk the box in the same order it was written and collect the set tiles
-  const reader = new BitReader(body, BBOX_BYTES);
-  const xs: number[] = [];
-  const ys: number[] = [];
-  for (let tile = 0; tile < width * height; tile++) {
-    if (reader.read(1)) {
-      xs.push(minX + (tile % width));
-      ys.push(minY + Math.floor(tile / width));
-    }
+  const count = ((body[5] << 8) | body[4]) + 1;
+  if (body.length < HEADER_BYTES + count) {
+    throw new Error(`Malformed data: ${count} buildings do not fit`);
   }
-  reader.align();
+  const ids = body.subarray(HEADER_BYTES, HEADER_BYTES + count);
 
-  const triples = new Uint8Array(xs.length * 3);
-  for (let i = 0; i < xs.length; i++) {
-    triples[i * 3] = reader.read(BITS_PER_BYTE);
-    triples[i * 3 + 1] = xs[i];
-    triples[i * 3 + 2] = ys[i];
+  const reader = new BitReader(body, HEADER_BYTES + count);
+  const triples = new Uint8Array(count * 3);
+  const covered = new Uint8Array(width * height);
+  let placed = 0;
+  for (let tile = 0; tile < width * height && placed < count; tile++) {
+    if (covered[tile]) continue;
+    if (!reader.read(1)) continue;
+
+    const id = ids[placed];
+    triples[placed * 3] = id;
+    triples[placed * 3 + 1] = minX + (tile % width);
+    triples[placed * 3 + 2] = minY + Math.floor(tile / width);
+    placed++;
+    cover(covered, tile, width, height, sizeOf(id));
+  }
+  if (placed !== count) {
+    throw new Error(
+      `Malformed data: expected ${count} buildings, got ${placed}`
+    );
   }
   return triples;
 }

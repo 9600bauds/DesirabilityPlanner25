@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { compressCity, decompressCity } from './compression';
-import { ALL_BLUEPRINTS } from '../data/BLUEPRINTS';
+import { ALL_BLUEPRINTS, BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
 
 describe('compressCity / decompressCity', () => {
   const city = (triples: number[]) => new Uint8Array(triples);
@@ -22,10 +22,11 @@ describe('compressCity / decompressCity', () => {
   });
 
   it('round-trips every blueprint id', () => {
-    const original = new Uint8Array(256 * 3);
-    for (let i = 0; i < 256; i++) {
-      original.set([i, i, 7], i * 3);
-    }
+    const ids = [...BLUEPRINTS_BY_ID.keys()];
+    const original = new Uint8Array(ids.length * 3);
+    ids.forEach((id, i) => {
+      original.set([id, (i % 16) * 16, Math.floor(i / 16) * 16], i * 3);
+    });
 
     expect([...decompressCity(compressCity(original))]).toEqual([...original]);
   });
