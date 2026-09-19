@@ -9,6 +9,7 @@ import {
   GRID_SIZE,
   URL_LEGACY_QUERY_INDEX,
   LEGACY_README_LINK,
+  README_CITY_BUILDINGS,
   README_BASE64_LINK,
   README_HIEROGLYPH_LINK,
 } from '../utils/constants';
@@ -20,7 +21,8 @@ describe('useCityUrl', () => {
   let manager: GridStateManager;
 
   const visit = (url: string) => window.history.replaceState({}, '', url);
-  const cityUrl = () => renderHook(() => useCityUrl(manager)).result;
+  const cityUrl = () =>
+    renderHook(() => useCityUrl(manager, () => null)).result;
   const fragment = () =>
     decodeURIComponent(window.location.hash.replace(/^#/, ''));
 
@@ -35,7 +37,7 @@ describe('useCityUrl', () => {
 
     const result = cityUrl();
 
-    expect(manager.getBuildings().size).toBe(99);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
     expect(window.location.search).toBe('');
     expect(fragment()).toBe(README_HIEROGLYPH_LINK);
     expect(result.current.loadedFromUrl).toBe(true);
@@ -46,7 +48,7 @@ describe('useCityUrl', () => {
 
     const result = cityUrl();
 
-    expect(manager.getBuildings().size).toBe(99);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
     expect(fragment()).toBe(README_HIEROGLYPH_LINK);
     expect(result.current.loadedFromUrl).toBe(true);
   });
@@ -56,7 +58,7 @@ describe('useCityUrl', () => {
 
     const result = cityUrl();
 
-    expect(manager.getBuildings().size).toBe(99);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
     expect(fragment()).toBe(README_HIEROGLYPH_LINK);
     expect(result.current.loadedFromUrl).toBe(true);
   });
@@ -76,7 +78,9 @@ describe('useCityUrl', () => {
 
     expect(window.location.hash).not.toBe('');
     const reopened = new GridStateManager();
-    reopened.loadUInt8Array(decompressCity(glyphsToBytes(fragment())));
+    reopened.loadUInt8Array(
+      decompressCity(glyphsToBytes(fragment())).buildings
+    );
     expect(reopened.getBuildings().size).toBe(1);
   });
 

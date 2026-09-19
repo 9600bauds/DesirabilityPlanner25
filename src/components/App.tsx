@@ -46,7 +46,14 @@ const App: React.FC = () => {
   const gridManagerRef = useRef<GridStateManager>(new GridStateManager());
 
   // ===== URL MANAGEMENT =====
-  const { saveToUrl, loadedFromUrl } = useCityUrl(gridManagerRef.current);
+  const getViewState = useCallback(
+    () => rendererRef.current?.getViewState() ?? null,
+    []
+  );
+  const { saveToUrl, loadedFromUrl, viewStateFromUrl } = useCityUrl(
+    gridManagerRef.current,
+    getViewState
+  );
 
   // ===== GRID STATE MANAGEMENT =====
   const gridStateUpdated = useCallback(() => {
@@ -100,6 +107,7 @@ const App: React.FC = () => {
       rendererRef.current.toggleGridRotation();
       const newRotationState = rendererRef.current.isRotated;
       setIsGridRotated(newRotationState);
+      saveToUrl();
       if (newRotationState === true) {
         showToast(
           'North is now UP (matches what you see in-game)',
@@ -121,6 +129,7 @@ const App: React.FC = () => {
   const zoomLevelUpdated = () => {
     setCanZoomIn(rendererRef?.current?.canZoomIn() ?? false);
     setCanZoomOut(rendererRef?.current?.canZoomOut() ?? false);
+    saveToUrl();
   };
   const handleZoomIn = () => {
     if (rendererRef.current) {
@@ -250,7 +259,7 @@ const App: React.FC = () => {
       const newPixel: Coordinate = getClientCoordinates(event);
       const newTile = rendererRef.current.getMouseCoords(
         event,
-        isInteractionActive(interaction) // If the interaction is already active, then we are not limited to coordinates inside the viewport, we can off-road
+        isInteractionActive(interaction) // If the interaction is already active, then we are not limited to coordinates inside the viewState, we can off-road
       );
       const newDragBox =
         interaction.startTile && newTile
@@ -287,7 +296,9 @@ const App: React.FC = () => {
       const finalState = { ...interaction };
 
       // Process the result based on interaction type
-      if (finalState.type === 'erasing' && finalState.dragBox) {
+      if (finalState.type === 'panning') {
+        saveToUrl();
+      } else if (finalState.type === 'erasing' && finalState.dragBox) {
         tryEraseRect(finalState.dragBox);
       } else if (finalState.type === 'placing' && finalState.currentTile) {
         const blueprint = getSelectedBlueprint();
@@ -310,6 +321,7 @@ const App: React.FC = () => {
       tryEraseRect,
       tryPlaceBlueprint,
       getSelectedBlueprint,
+      saveToUrl,
     ]
   );
 
@@ -325,8 +337,14 @@ const App: React.FC = () => {
 
   // Initialize undo button etc. after loading from URL
   useEffect(() => {
-    if (loadedFromUrl) gridStateUpdated();
-  }, [loadedFromUrl, gridStateUpdated]);
+    if (!loadedFromUrl) return;
+
+    if (viewStateFromUrl.current) {
+      rendererRef.current?.setViewState(viewStateFromUrl.current);
+      setIsGridRotated(viewStateFromUrl.current.rotated);
+    }
+    gridStateUpdated();
+  }, [loadedFromUrl, gridStateUpdated, viewStateFromUrl]);
 
   // Initialize renderer once, don't recreate based on blueprint changes
   useEffect(() => {
@@ -578,6 +596,7 @@ const App: React.FC = () => {
     if (rendererRef.current) {
       rendererRef.current.toggleBuildingTransparency();
       const newTransparencyState = rendererRef.current.transparentBuildings;
+      saveToUrl();
       const snark = gridManagerRef.current.getBuildings().size <= 0;
       if (newTransparencyState === true) {
         showToast(

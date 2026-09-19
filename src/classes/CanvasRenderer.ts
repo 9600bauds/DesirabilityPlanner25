@@ -1,4 +1,5 @@
 import { fillPath } from '../interfaces/BuildingGraphic';
+import { ViewState } from '../utils/viewState';
 import RenderContext from '../interfaces/RenderContext';
 import { createBuilding } from '../types/Blueprint';
 import colors, { getDesirabilityRGB } from '../utils/colors';
@@ -320,6 +321,29 @@ class CanvasRenderer {
     this.offsetY = targetCanvasPoint[1] - gridPointCoord[1] * this.zoomLevel;
 
     this.scheduleRerender(); // Schedule a rerender as the view has changed
+  };
+
+  public getViewState = (): ViewState => {
+    const gridPoint = this.screen2tile(this.viewCenter);
+    return {
+      center: new Tile(
+        Math.min(GRID_MAX_X, Math.max(0, PX_TO_COORD(gridPoint.x))),
+        Math.min(GRID_MAX_Y, Math.max(0, PX_TO_COORD(gridPoint.y)))
+      ),
+      zoom: this.zoomLevel,
+      rotated: this.isRotated,
+      transparent: this.transparentBuildings,
+    };
+  };
+
+  public setViewState = (state: ViewState): void => {
+    this.zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, state.zoom));
+    this.isRotated = state.rotated;
+    this.setBuildingTransparency(state.transparent);
+    this.focusOnGridPoint([
+      COORD_TO_PX(state.center.x) + CELL_PX / 2,
+      COORD_TO_PX(state.center.y) + CELL_PX / 2,
+    ]);
   };
 
   /**

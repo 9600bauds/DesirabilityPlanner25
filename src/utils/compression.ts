@@ -1,5 +1,13 @@
 import { deflateSync, inflateSync } from 'fflate';
 import { BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
+import { BITS_PER_BYTE, BYTES_PER_BUILDING } from './constants';
+import { Rectangle } from './geometry';
+import {
+  bytesToViewState,
+  VIEW_STATE_BYTES,
+  ViewState,
+  viewStateToBytes,
+} from './viewState';
 
 /*
  * Coordinates are never stored. What goes in is the bounding box of the city,
@@ -8,11 +16,9 @@ import { BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
  *
  * Only tiles that could still hold an origin get a bit. Once a building is
  * placed, the rest of its footprint is skipped, because nothing may overlap it.
+ *
+ * Three more bytes may follow, holding the view state.
  */
-
-const URL_GRID_SIZE = 256;
-
-const BITS_PER_BYTE = 8;
 
 class BitWriter {
   private bytes: number[] = [];
@@ -62,7 +68,9 @@ class BitReader {
       if (this.pos >= this.buf.length) {
         throw new Error('Malformed data: bit stream ended early');
       }
-      value = (value << 1) | ((this.buf[this.pos] >>> (7 - this.used)) & 1);
+      value =
+        (value << 1) |
+        ((this.buf[this.pos] >>> (BITS_PER_BYTE - 1 - this.used)) & 1);
       if (++this.used === BITS_PER_BYTE) {
         this.used = 0;
         this.pos++;
@@ -76,6 +84,10 @@ class BitReader {
       this.used = 0;
       this.pos++;
     }
+  }
+
+  get position() {
+    return this.pos;
   }
 }
 
@@ -96,37 +108,29 @@ const sizeOf = (id: number) => {
   return { width: blueprint.width, height: blueprint.height };
 };
 
-export function compressCity(triples: Uint8Array): Uint8Array {
-  if (triples.length % 3 !== 0) {
+export function compressCity(
+  triples: Uint8Array,
+  viewState?: ViewState | null
+): Uint8Array {
+  if (triples.length % BYTES_PER_BUILDING !== 0) {
     throw new Error(
-      `Malformed data: expected a multiple of 3 bytes, got ${triples.length}`
+      `Malformed data: expected a multiple of ${BYTES_PER_BUILDING} bytes, got ${triples.length}`
     );
   }
-  const count = triples.length / 3;
-  if (count === 0) {
+  const box = Rectangle.boundingBoxOfSavedCity(triples);
+  if (!box) {
     return new Uint8Array(0);
   }
-
-  let minX = URL_GRID_SIZE - 1;
-  let minY = URL_GRID_SIZE - 1;
-  let maxX = 0;
-  let maxY = 0;
-  for (let i = 0; i < count; i++) {
-    const x = triples[i * 3 + 1];
-    const y = triples[i * 3 + 2];
-    if (x < minX) minX = x;
-    if (x > maxX) maxX = x;
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
-  }
-  const width = maxX - minX + 1;
-  const height = maxY - minY + 1;
+  const count = triples.length / BYTES_PER_BUILDING;
+  const { width, height } = box;
+  const { x: minX, y: minY } = box.origin;
 
   const idAt = new Map<number, number>();
   for (let i = 0; i < count; i++) {
+    const at = i * BYTES_PER_BUILDING;
     idAt.set(
-      (triples[i * 3 + 2] - minY) * width + (triples[i * 3 + 1] - minX),
-      triples[i * 3]
+      (triples[at + 2] - minY) * width + (triples[at + 1] - minX),
+      triples[at]
     );
   }
 
@@ -144,7 +148,10 @@ export function compressCity(triples: Uint8Array): Uint8Array {
   }
   const bitmap = writer.finish();
 
-  const body = new Uint8Array(HEADER_BYTES + ids.length + bitmap.length);
+  const tail = viewState ? viewStateToBytes(viewState) : new Uint8Array(0);
+  const body = new Uint8Array(
+    HEADER_BYTES + ids.length + bitmap.length + tail.length
+  );
   // width-1 because a city spanning the whole grid is 256 wide, and count-1
   // for the same reason -- an empty city never gets this far.
   body.set([minX, minY, width - 1, height - 1], 0);
@@ -152,6 +159,7 @@ export function compressCity(triples: Uint8Array): Uint8Array {
   body[5] = (count - 1) >> 8;
   body.set(ids, HEADER_BYTES);
   body.set(bitmap, HEADER_BYTES + ids.length);
+  body.set(tail, HEADER_BYTES + ids.length + bitmap.length);
 
   return deflateSync(body, { level: 9 });
 }
@@ -174,9 +182,14 @@ function cover(
   }
 }
 
-export function decompressCity(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
+export interface StoredCity {
+  buildings: Uint8Array<ArrayBuffer>;
+  viewState: ViewState | null;
+}
+
+export function decompressCity(bytes: Uint8Array): StoredCity {
   if (bytes.length === 0) {
-    return new Uint8Array(0);
+    return { buildings: new Uint8Array(0), viewState: null };
   }
   const body = inflateSync(bytes);
   if (body.length < HEADER_BYTES) {
@@ -194,17 +207,21 @@ export function decompressCity(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
   const ids = body.subarray(HEADER_BYTES, HEADER_BYTES + count);
 
   const reader = new BitReader(body, HEADER_BYTES + count);
-  const triples = new Uint8Array(count * 3);
+  const triples = new Uint8Array(count * BYTES_PER_BUILDING);
   const covered = new Uint8Array(width * height);
   let placed = 0;
-  for (let tile = 0; tile < width * height && placed < count; tile++) {
+  for (let tile = 0; tile < width * height; tile++) {
     if (covered[tile]) continue;
     if (!reader.read(1)) continue;
+    if (placed === count) {
+      throw new Error('Malformed data: more buildings than the count says');
+    }
 
     const id = ids[placed];
-    triples[placed * 3] = id;
-    triples[placed * 3 + 1] = minX + (tile % width);
-    triples[placed * 3 + 2] = minY + Math.floor(tile / width);
+    const at = placed * BYTES_PER_BUILDING;
+    triples[at] = id;
+    triples[at + 1] = minX + (tile % width);
+    triples[at + 2] = minY + Math.floor(tile / width);
     placed++;
     cover(covered, tile, width, height, sizeOf(id));
   }
@@ -213,5 +230,11 @@ export function decompressCity(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
       `Malformed data: expected ${count} buildings, got ${placed}`
     );
   }
-  return triples;
+  reader.align();
+
+  const hasViewState = body.length - reader.position >= VIEW_STATE_BYTES;
+  const viewState = hasViewState
+    ? bytesToViewState(body, reader.position)
+    : null;
+  return { buildings: triples, viewState };
 }

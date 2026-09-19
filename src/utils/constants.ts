@@ -1,12 +1,17 @@
 import { Coordinate } from './geometry';
 
-export const GRID_SIZE = 256;
+export const BITS_PER_BYTE = 8;
+
+export const GRID_SIZE_BITS = BITS_PER_BYTE;
+export const GRID_SIZE = 1 << GRID_SIZE_BITS;
 export const GRID_MAX_X = GRID_SIZE - 1;
 export const GRID_MAX_Y = GRID_SIZE - 1;
-export const GRID_SIZE_BITS = 8;
+
+export const BYTES_PER_BUILDING = 3;
 
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 8.0;
+export const DEFAULT_ZOOM = 1.0;
 export const ZOOM_SENSITIVITY_FACTOR = 1.001;
 export const MIN_ZOOM_FOR_LABELS = 0.3;
 export const MIN_LABEL_FONTSIZE_WITHOUT_BREAKS = 12;
@@ -66,6 +71,8 @@ export const MAX_DESIRABILITY_COLOR = 50;
 export const URL_LEGACY_QUERY_INDEX = 'buildings';
 export const LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS: string =
   'desirabilityPlanner_hasSeenInstructions';
+// How many buildings the README city has, so the tests that load it can say so
+export const README_CITY_BUILDINGS = 99;
 export const LEGACY_README_LINK =
   'pXp6pX96pYR6pYl6D357D4N7D4h7W359b4N9cIh9D3l8D3l7D3l9D3h9pXd-33x_cX9_5IF_34N_34iCK4aDKYOCLH-B43yCZ3mCc3mEDXZ6DXZ3DXl3DXx3DX93DYJ3DYV3pYx-TouCXoiGZYmG8X2G8X-G8YGGZnuGAXuFAXuEAXuDAXuCAXx-AX1-AX5-AX9-AYB-AYJ-AYN-AYR-AYV-AYZ-AYd-AYh-AYl-AYmFAYiFAYeFAYOFAYKFAYGFAYCFAX-FAX6FAX2FAYaFAXyFAXuH3oh83oN83n58DIt-DIt_DIuADHuADHt_DHt-AXuBDIp-AYuBiYSGioaGioaHDIWF3oOG3oeGDISFAYF-XIh_coZ_DoaBDY16D419D459DYl3DYx3';
 

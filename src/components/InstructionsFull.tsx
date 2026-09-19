@@ -38,7 +38,8 @@ const FullInstructions: React.FC = () => {
       <p>
         Your current city plan is automatically encoded and saved in the URL of your browser.<br/>
         To save your plan, simply bookmark the current page.<br/>
-        To share it, copy the full URL from your browser's address bar and send it to others.
+        To share it, copy the full URL from your browser's address bar and send it to others.<br/>
+        (If the link looks like a bunch of percent signs, try copying everything except the 'https://...' part.)<br/>
       </p>
 
       <h3>Perspective</h3>

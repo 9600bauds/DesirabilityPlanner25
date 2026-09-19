@@ -1,4 +1,10 @@
-import { COORD_TO_PX, GRID_SIZE } from './constants';
+import {
+  BYTES_PER_BUILDING,
+  COORD_TO_PX,
+  GRID_MAX_X,
+  GRID_MAX_Y,
+  GRID_SIZE,
+} from './constants';
 import * as Collections from 'typescript-collections';
 
 export type Coordinate = [x: number, y: number];
@@ -132,6 +138,31 @@ export class Rectangle {
       minY = Math.min(minY, rect.startY);
       maxX = Math.max(maxX, rect.endX);
       maxY = Math.max(maxY, rect.endY);
+    }
+
+    return new Rectangle(
+      new Tile(minX, minY),
+      maxX - minX + 1,
+      maxY - minY + 1
+    );
+  }
+
+  public static boundingBoxOfSavedCity(triples: Uint8Array): Rectangle | null {
+    if (triples.length === 0) {
+      return null;
+    }
+
+    let minX = GRID_MAX_X;
+    let minY = GRID_MAX_Y;
+    let maxX = 0;
+    let maxY = 0;
+    for (let i = 0; i < triples.length; i += BYTES_PER_BUILDING) {
+      const x = triples[i + 1];
+      const y = triples[i + 2];
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
     }
 
     return new Rectangle(

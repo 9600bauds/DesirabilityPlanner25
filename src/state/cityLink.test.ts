@@ -4,6 +4,7 @@ import { LinkSource, readCityLink, writeCityLink } from './cityLink';
 import {
   URL_LEGACY_QUERY_INDEX,
   LEGACY_README_LINK,
+  README_CITY_BUILDINGS,
   README_BASE64_LINK,
   README_HIEROGLYPH_LINK,
 } from '../utils/constants';
@@ -25,43 +26,43 @@ describe('readCityLink', () => {
   });
 
   it('a legacy link loads its city', () => {
-    const loaded = readCityLink(
+    const viewState = readCityLink(
       manager,
       url({ getQueryState: () => LEGACY_README_LINK })
     );
 
-    expect(loaded).toBe(true);
-    expect(manager.getBuildings().size).toBe(99);
+    expect(viewState).not.toBe(null);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
   });
 
   it('a fragment link loads its city', () => {
-    const loaded = readCityLink(
+    const viewState = readCityLink(
       manager,
       url({ getFragmentState: () => README_BASE64_LINK })
     );
 
-    expect(loaded).toBe(true);
-    expect(manager.getBuildings().size).toBe(99);
+    expect(viewState).not.toBe(null);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
   });
 
   it('a hieroglyph fragment loads its city', () => {
-    const loaded = readCityLink(
+    const viewState = readCityLink(
       manager,
       url({ getFragmentState: () => README_HIEROGLYPH_LINK })
     );
 
-    expect(loaded).toBe(true);
-    expect(manager.getBuildings().size).toBe(99);
+    expect(viewState).not.toBe(null);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
   });
 
   it('a base64 fragment loads its city', () => {
-    const loaded = readCityLink(
+    const viewState = readCityLink(
       manager,
       url({ getFragmentState: () => README_BASE64_LINK })
     );
 
-    expect(loaded).toBe(true);
-    expect(manager.getBuildings().size).toBe(99);
+    expect(viewState).not.toBe(null);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
   });
 
   it('a legacy link is swept off the URL once it has been read', () => {
@@ -81,11 +82,11 @@ describe('readCityLink', () => {
       })
     );
 
-    expect(manager.getBuildings().size).toBe(99);
+    expect(manager.getBuildings().size).toBe(README_CITY_BUILDINGS);
   });
 
   it('an empty URL does nothing', () => {
-    expect(readCityLink(manager, url({}))).toBe(false);
+    expect(readCityLink(manager, url({}))).toBe(null);
     expect(manager.getBuildings().size).toBe(0);
     expect(cleared).toEqual([]);
   });

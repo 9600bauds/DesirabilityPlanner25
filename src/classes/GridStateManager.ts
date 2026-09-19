@@ -3,7 +3,7 @@ import { Tile, Rectangle } from '../utils/geometry';
 import GridState from './GridState';
 import Building from './Building';
 import { BLUEPRINTS_BY_ID } from '../data/BLUEPRINTS';
-import { COORD_TO_UINT16 } from '../utils/constants';
+import { BYTES_PER_BUILDING, COORD_TO_UINT16 } from '../utils/constants';
 
 export interface BlueprintPlacement {
   position: Tile;
@@ -172,7 +172,7 @@ class GridStateManager {
   // The array has 1 uint8 for each building's bpID, 1 for its origin X, and 1 for its Y.
   public getUInt8Array() {
     const buildings = this.activeGridState.getPlacedBuildings();
-    const arr = new Uint8Array(buildings.size * 3);
+    const arr = new Uint8Array(buildings.size * BYTES_PER_BUILDING);
     let currIndex = 0;
     for (const building of buildings) {
       arr[currIndex++] = building.blueprint.id;
@@ -187,7 +187,7 @@ class GridStateManager {
   public loadUInt8Array(arr: Uint8Array<ArrayBuffer>) {
     const blueprintsToAdd: Array<BlueprintPlacement> = [];
     // Process array in groups of 3 (bpID, x, y)
-    for (let i = 0; i < arr.length; i += 3) {
+    for (let i = 0; i < arr.length; i += BYTES_PER_BUILDING) {
       const bpID = arr[i];
       const x = arr[i + 1];
       const y = arr[i + 2];
