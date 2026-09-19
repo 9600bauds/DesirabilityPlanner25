@@ -8,6 +8,8 @@ describe('GridStateManager', () => {
   const GARDEN = ALL_BLUEPRINTS.Garden;
   const STATUE = ALL_BLUEPRINTS['Statue, Small'];
   const GRANARY = ALL_BLUEPRINTS.Granary;
+  const FORT = ALL_BLUEPRINTS.Fort;
+  const FORT_YARD = ALL_BLUEPRINTS['Fort Yard'];
   const ROAD = ALL_BLUEPRINTS.Road;
   const PLAZA = ALL_BLUEPRINTS.Plaza;
 
@@ -87,6 +89,53 @@ describe('GridStateManager', () => {
       ]);
 
       expect(placed).toBe(false);
+      expect(manager.getBuildings().size).toBe(1);
+    });
+  });
+
+  /*
+   * The fort is the one building that isn't a rectangle, so let's add bespoke
+   * tests to ensure it's simulated correctly
+   */
+  describe('the fort', () => {
+    it('a fort occupies its yard, not just itself', () => {
+      manager.tryPlaceBlueprint(new Tile(10, 10), FORT);
+
+      expect(manager.isTileOccupied(new Tile(10, 10))).toBe(true);
+      expect(manager.isTileOccupied(new Tile(12, 12))).toBe(true);
+      expect(manager.isTileOccupied(new Tile(13, 9))).toBe(true);
+      expect(manager.isTileOccupied(new Tile(16, 12))).toBe(true);
+      expect(manager.isTileOccupied(new Tile(17, 12))).toBe(false);
+      expect(manager.isTileOccupied(new Tile(13, 13))).toBe(false);
+    });
+
+    it('the notch above a fort is still free', () => {
+      manager.tryPlaceBlueprint(new Tile(10, 10), FORT);
+
+      for (let x = 10; x <= 12; x++) {
+        expect(manager.isTileOccupied(new Tile(x, 9))).toBe(false);
+        expect(manager.tryPlaceBlueprint(new Tile(x, 9), GARDEN)).toBe(true);
+      }
+      expect(manager.getBuildings().size).toBe(4);
+    });
+
+    it('a fort and its yard stack their desirability', () => {
+      manager.tryPlaceBlueprint(new Tile(10, 10), FORT);
+      const stacked =
+        FORT.desireBox!.baseDesirability +
+        FORT_YARD.desireBox!.baseDesirability;
+
+      expect(manager.valueAt(11, 8)).toBe(stacked);
+      expect(manager.valueAt(14, 8)).toBe(stacked);
+      expect(manager.valueAt(11, 13)).toBe(stacked);
+      expect(manager.valueAt(14, 13)).toBe(stacked);
+    });
+
+    it('placement fails inside a fort yard', () => {
+      manager.tryPlaceBlueprint(new Tile(10, 10), FORT);
+
+      expect(manager.tryPlaceBlueprint(new Tile(14, 10), GARDEN)).toBe(false);
+      expect(manager.tryPlaceBlueprint(new Tile(13, 9), GARDEN)).toBe(false);
       expect(manager.getBuildings().size).toBe(1);
     });
   });
