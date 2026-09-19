@@ -69,5 +69,10 @@ export const LOCALSTORAGE_KEY_SEEN_INSTRUCTIONS: string =
 export const LEGACY_README_LINK =
   'pXp6pX96pYR6pYl6D357D4N7D4h7W359b4N9cIh9D3l8D3l7D3l9D3h9pXd-33x_cX9_5IF_34N_34iCK4aDKYOCLH-B43yCZ3mCc3mEDXZ6DXZ3DXl3DXx3DX93DYJ3DYV3pYx-TouCXoiGZYmG8X2G8X-G8YGGZnuGAXuFAXuEAXuDAXuCAXx-AX1-AX5-AX9-AYB-AYJ-AYN-AYR-AYV-AYZ-AYd-AYh-AYl-AYmFAYiFAYeFAYOFAYKFAYGFAYCFAX-FAX6FAX2FAYaFAXyFAXuH3oh83oN83n58DIt-DIt_DIuADHuADHt_DHt-AXuBDIp-AYuBiYSGioaGioaHDIWF3oOG3oeGDISFAYF-XIh_coZ_DoaBDY16D419D459DYl3DYx3';
 
-export const README_FRAGMENT_LINK =
+// The same city, compressed, in base64url -- what fragments used to be
+export const README_BASE64_LINK =
   'KyuXEEhi4IWBpUDAyw8C9-7d4-ePzi_g51_Kw4gCeHiW8twvfHK_KIaHh4dRh48xnfGx5n0_Ru1iZDUgMu3jx4_3OrvuxaUydv2dGv_z7___998-_thT_5_pf4MQAwA';
+
+// And in hieroglyphs, which is what gets written while it fits
+export const README_HIEROGLYPH_LINK =
+  '𓍏𓍏𓀙𓍋𓊹𓁦𓀕𓀯𓃱𓃻𓋸𓁠𓀅𓌞𓌠𓁏𓅲𓀔𓀸𓀊𓀤𓁃𓄤𓀕𓀊𓋈𓀠𓀃𓁛𓌠𓁓𓁓𓋌𓁨𓁁𓄤𓀳𓁝𓁑𓌰𓀵𓀟𓀟𓀟𓆴𓀟𓀤𓇟𓇉𓃴𓀨𓅊𓄾𓇅𓎃𓃦𓁦𓏎𓄥𓎛𓍙𓃦𓀸𓁔𓀤𓁏𓆼𓇌𓅲𓁂𓃻𓍙𓀲𓃩𓇉𓆳𓂀𓃲𓁈𓂀𓂀𓁏𓄃𓁰𓃰𓃠𓉰𓂀𓀜𓊿𓁙𓁬𓍋𓇕𓊤';

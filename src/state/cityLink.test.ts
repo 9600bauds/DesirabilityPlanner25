@@ -4,7 +4,8 @@ import { LinkSource, readCityLink, writeCityLink } from './cityLink';
 import {
   URL_LEGACY_QUERY_INDEX,
   LEGACY_README_LINK,
-  README_FRAGMENT_LINK,
+  README_BASE64_LINK,
+  README_HIEROGLYPH_LINK,
 } from '../utils/constants';
 
 describe('readCityLink', () => {
@@ -36,7 +37,27 @@ describe('readCityLink', () => {
   it('a fragment link loads its city', () => {
     const loaded = readCityLink(
       manager,
-      url({ getFragmentState: () => README_FRAGMENT_LINK })
+      url({ getFragmentState: () => README_BASE64_LINK })
+    );
+
+    expect(loaded).toBe(true);
+    expect(manager.getBuildings().size).toBe(99);
+  });
+
+  it('a hieroglyph fragment loads its city', () => {
+    const loaded = readCityLink(
+      manager,
+      url({ getFragmentState: () => README_HIEROGLYPH_LINK })
+    );
+
+    expect(loaded).toBe(true);
+    expect(manager.getBuildings().size).toBe(99);
+  });
+
+  it('a base64 fragment loads its city', () => {
+    const loaded = readCityLink(
+      manager,
+      url({ getFragmentState: () => README_BASE64_LINK })
     );
 
     expect(loaded).toBe(true);
@@ -74,10 +95,10 @@ describe('readCityLink', () => {
       expect(writeCityLink(manager)).toBe(null);
     });
 
-    it('a legacy city is written back compressed', () => {
+    it('a legacy city is written back as hieroglyphs', () => {
       readCityLink(manager, url({ getQueryState: () => LEGACY_README_LINK }));
 
-      expect(writeCityLink(manager)).toBe(README_FRAGMENT_LINK);
+      expect(writeCityLink(manager)).toBe(README_HIEROGLYPH_LINK);
     });
   });
 });

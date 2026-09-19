@@ -9,17 +9,20 @@ import {
   GRID_SIZE,
   URL_LEGACY_QUERY_INDEX,
   LEGACY_README_LINK,
-  README_FRAGMENT_LINK,
+  README_BASE64_LINK,
+  README_HIEROGLYPH_LINK,
 } from '../utils/constants';
 
-import { decodeData } from '../utils/encoding';
 import { decompressCity } from '../utils/compression';
+import { glyphsToBytes } from '../utils/glyphs';
 
 describe('useCityUrl', () => {
   let manager: GridStateManager;
 
   const visit = (url: string) => window.history.replaceState({}, '', url);
   const cityUrl = () => renderHook(() => useCityUrl(manager)).result;
+  const fragment = () =>
+    decodeURIComponent(window.location.hash.replace(/^#/, ''));
 
   beforeEach(() => {
     manager = new GridStateManager();
@@ -34,17 +37,27 @@ describe('useCityUrl', () => {
 
     expect(manager.getBuildings().size).toBe(99);
     expect(window.location.search).toBe('');
-    expect(window.location.hash).toBe(`#${README_FRAGMENT_LINK}`);
+    expect(fragment()).toBe(README_HIEROGLYPH_LINK);
     expect(result.current.loadedFromUrl).toBe(true);
   });
 
   it('a fragment link is loaded and left where it is', () => {
-    visit(`/#${README_FRAGMENT_LINK}`);
+    visit(`/#${README_HIEROGLYPH_LINK}`);
 
     const result = cityUrl();
 
     expect(manager.getBuildings().size).toBe(99);
-    expect(window.location.hash).toBe(`#${README_FRAGMENT_LINK}`);
+    expect(fragment()).toBe(README_HIEROGLYPH_LINK);
+    expect(result.current.loadedFromUrl).toBe(true);
+  });
+
+  it('a base64 fragment is loaded and upgraded to hieroglyphs', () => {
+    visit(`/#${README_BASE64_LINK}`);
+
+    const result = cityUrl();
+
+    expect(manager.getBuildings().size).toBe(99);
+    expect(fragment()).toBe(README_HIEROGLYPH_LINK);
     expect(result.current.loadedFromUrl).toBe(true);
   });
 
@@ -63,14 +76,12 @@ describe('useCityUrl', () => {
 
     expect(window.location.hash).not.toBe('');
     const reopened = new GridStateManager();
-    reopened.loadUInt8Array(
-      decompressCity(decodeData(window.location.hash.replace(/^#/, '')))
-    );
+    reopened.loadUInt8Array(decompressCity(glyphsToBytes(fragment())));
     expect(reopened.getBuildings().size).toBe(1);
   });
 
   it('saving an empty city leaves no fragment behind', () => {
-    visit(`/#${README_FRAGMENT_LINK}`);
+    visit(`/#${README_HIEROGLYPH_LINK}`);
     const result = cityUrl();
     manager.eraseRect(new Rectangle(new Tile(0, 0), GRID_SIZE, GRID_SIZE));
 

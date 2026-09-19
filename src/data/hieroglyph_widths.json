@@ -1,0 +1,7303 @@
+[
+  {
+    "char": "𓏤",
+    "description": "Single stroke",
+    "ideogram": ["singularity, Egyptian numeral 1"],
+    "width": 1.17,
+    "height": 4
+  },
+  {
+    "char": "𓏪",
+    "description": "plural strokes (vertical)",
+    "ideogram": [],
+    "width": 1.17,
+    "height": 12
+  },
+  {
+    "char": "𓏺",
+    "description": null,
+    "ideogram": [],
+    "width": 1.17,
+    "height": 4
+  },
+  {
+    "char": "𓊤",
+    "description": "oar",
+    "ideogram": ["oar (wsr)", "Voice (ḫrw)"],
+    "width": 2.52,
+    "height": 12
+  },
+  {
+    "char": "𓏰",
+    "description": null,
+    "ideogram": [],
+    "width": 2.64,
+    "height": 4
+  },
+  {
+    "char": "𓌱",
+    "description": "butcher's knife",
+    "ideogram": [],
+    "width": 2.69,
+    "height": 13
+  },
+  {
+    "char": "𓌠",
+    "description": "harpoon head",
+    "ideogram": [],
+    "width": 2.73,
+    "height": 12
+  },
+  {
+    "char": "𓇕",
+    "description": "lily",
+    "ideogram": ["Upper Egypt (šmꜥw)"],
+    "width": 2.77,
+    "height": 11
+  },
+  {
+    "char": "𓇡",
+    "description": "3 grains vertically",
+    "ideogram": ["Barley (jt)"],
+    "width": 2.78,
+    "height": 13
+  },
+  {
+    "char": "𓂆",
+    "description": "vertical marking of Eye of Horus",
+    "ideogram": ["abbreviation for Heqat-measure grain: 1/64"],
+    "width": 2.8,
+    "height": 9
+  },
+  {
+    "char": "𓐫",
+    "description": null,
+    "ideogram": [],
+    "width": 2.8,
+    "height": 13
+  },
+  {
+    "char": "𓉼",
+    "description": "vertical wooden column",
+    "ideogram": ["Column (ꜥꜣ)", "Great (esp. of size) (ꜥꜣ)"],
+    "width": 2.89,
+    "height": 13
+  },
+  {
+    "char": "𓇛",
+    "description": "Carob seed-pod",
+    "ideogram": ["Carob (nḏm)", "Sweet (nḏm)"],
+    "width": 2.9,
+    "height": 13
+  },
+  {
+    "char": "𓎗",
+    "description": "\"command staff\" (can also be circular)",
+    "ideogram": [],
+    "width": 2.95,
+    "height": 12
+  },
+  {
+    "char": "𓊧",
+    "description": "mooring post",
+    "ideogram": ["mooring post (m(j)njt)"],
+    "width": 2.98,
+    "height": 12
+  },
+  {
+    "char": "𓍐",
+    "description": null,
+    "ideogram": [],
+    "width": 2.98,
+    "height": 13
+  },
+  {
+    "char": "𓂭",
+    "description": "one finger",
+    "ideogram": ["finger (ḏbꜥ)", "abbreviation for 10,000 (ḏbꜥ)"],
+    "width": 3.05,
+    "height": 13
+  },
+  {
+    "char": "𓍛",
+    "description": "fuller's-club",
+    "ideogram": ["ḥm (bil.)"],
+    "width": 3.06,
+    "height": 13
+  },
+  {
+    "char": "𓆬",
+    "description": null,
+    "ideogram": [],
+    "width": 3.15,
+    "height": 14
+  },
+  {
+    "char": "𓌃",
+    "description": "walking stick",
+    "ideogram": ["Speak, word(s) (md(w))", "Staff (mdw)"],
+    "width": 3.16,
+    "height": 13
+  },
+  {
+    "char": "𓌁",
+    "description": "sceptre",
+    "ideogram": ["Electrum (ḏꜥm)"],
+    "width": 3.23,
+    "height": 12
+  },
+  {
+    "char": "𓉺",
+    "description": "column",
+    "ideogram": ["Column (jwn)"],
+    "width": 3.29,
+    "height": 13
+  },
+  {
+    "char": "𓋴",
+    "description": "folded cloth",
+    "ideogram": ["She, her, hers (.s) (Suffix pronoun)"],
+    "width": 3.3,
+    "height": 12
+  },
+  {
+    "char": "𓋿",
+    "description": "shepherd's crook",
+    "ideogram": ["Crook, scepter (ꜥwt)"],
+    "width": 3.3,
+    "height": 12
+  },
+  {
+    "char": "𓏬",
+    "description": null,
+    "ideogram": [],
+    "width": 3.3,
+    "height": 12
+  },
+  {
+    "char": "𓃊",
+    "description": "two dots",
+    "ideogram": [],
+    "width": 3.38,
+    "height": 7
+  },
+  {
+    "char": "𓇩",
+    "description": "bundle of reeds",
+    "ideogram": ["Gang (of workmen (js)"],
+    "width": 3.43,
+    "height": 13
+  },
+  {
+    "char": "𓌞",
+    "description": "crook with package attached",
+    "ideogram": [],
+    "width": 3.52,
+    "height": 12
+  },
+  {
+    "char": "𓍋",
+    "description": "chisel",
+    "ideogram": ["ꜣb mr"],
+    "width": 3.52,
+    "height": 13
+  },
+  {
+    "char": "𓍌",
+    "description": null,
+    "ideogram": [],
+    "width": 3.52,
+    "height": 13
+  },
+  {
+    "char": "𓐪",
+    "description": null,
+    "ideogram": [],
+    "width": 3.54,
+    "height": 13
+  },
+  {
+    "char": "𓐮",
+    "description": null,
+    "ideogram": [],
+    "width": 3.56,
+    "height": 13
+  },
+  {
+    "char": "𓌉",
+    "description": "mace with round head",
+    "ideogram": ["ḥḏ"],
+    "width": 3.6,
+    "height": 12
+  },
+  {
+    "char": "𓌐",
+    "description": "dagger",
+    "ideogram": ["tp"],
+    "width": 3.63,
+    "height": 13
+  },
+  {
+    "char": "𓌟",
+    "description": "harpoon head",
+    "ideogram": ["gn"],
+    "width": 3.68,
+    "height": 12
+  },
+  {
+    "char": "𓏜",
+    "description": null,
+    "ideogram": [],
+    "width": 3.68,
+    "height": 13
+  },
+  {
+    "char": "𓋀",
+    "description": "Emblem of the West",
+    "ideogram": ["West (jmnty, jmntt)", "'\"right\"' (wnmj)"],
+    "width": 3.78,
+    "height": 12
+  },
+  {
+    "char": "𓐬",
+    "description": null,
+    "ideogram": ["Kheker-frieze"],
+    "width": 3.78,
+    "height": 13
+  },
+  {
+    "char": "𓍗",
+    "description": null,
+    "ideogram": [],
+    "width": 3.79,
+    "height": 13
+  },
+  {
+    "char": "𓍘",
+    "description": "'pestle'-(curved top)",
+    "ideogram": ["tj"],
+    "width": 3.79,
+    "height": 13
+  },
+  {
+    "char": "𓌚",
+    "description": "throw stick slanted",
+    "ideogram": [],
+    "width": 3.8,
+    "height": 12
+  },
+  {
+    "char": "𓇋",
+    "description": "reed",
+    "ideogram": ["Reed (j)", "I, me, my (.j)"],
+    "width": 3.8,
+    "height": 13
+  },
+  {
+    "char": "𓎘",
+    "description": "variant of V24 (can also be circular)",
+    "ideogram": ["wḏ (bil.)"],
+    "width": 3.81,
+    "height": 12
+  },
+  {
+    "char": "𓏻",
+    "description": null,
+    "ideogram": [],
+    "width": 3.85,
+    "height": 4
+  },
+  {
+    "char": "𓌙",
+    "description": "throw stick vertically",
+    "ideogram": [],
+    "width": 3.86,
+    "height": 12
+  },
+  {
+    "char": "𓌀",
+    "description": "wꜣs scepter (uꜣs)",
+    "ideogram": ["Power, dominion (wꜣs)", "Iatet (a milk goddess) (jꜣtt)"],
+    "width": 3.88,
+    "height": 12
+  },
+  {
+    "char": "𓏡",
+    "description": "game piece",
+    "ideogram": ["game figure (jbꜣ) abbreviation for dancer (jbꜣ)"],
+    "width": 3.9,
+    "height": 7
+  },
+  {
+    "char": "𓆳",
+    "description": "palm branch",
+    "ideogram": ["Year (rnpt)", "Young (rnp)", "time (tr)"],
+    "width": 3.91,
+    "height": 12
+  },
+  {
+    "char": "𓍢",
+    "description": null,
+    "ideogram": [],
+    "width": 3.91,
+    "height": 6
+  },
+  {
+    "char": "𓎿",
+    "description": "water jar",
+    "ideogram": ["side area (jmw), side (gs)"],
+    "width": 3.93,
+    "height": 13
+  },
+  {
+    "char": "𓋽",
+    "description": "fan",
+    "ideogram": ["Fan (ḫw)", "Protect (ḫwj)"],
+    "width": 3.96,
+    "height": 12
+  },
+  {
+    "char": "𓍡",
+    "description": "pitchfork",
+    "ideogram": [],
+    "width": 3.97,
+    "height": 12
+  },
+  {
+    "char": "𓂵",
+    "description": "nine fingers",
+    "ideogram": ["90,000"],
+    "width": 3.98,
+    "height": 15
+  },
+  {
+    "char": "𓏲",
+    "description": "coil (hieratic equivalent)",
+    "ideogram": [],
+    "width": 4.02,
+    "height": 6
+  },
+  {
+    "char": "𓌢",
+    "description": "arrowhead",
+    "ideogram": ["sn"],
+    "width": 4.05,
+    "height": 13
+  },
+  {
+    "char": "𓀾",
+    "description": "standing mummy",
+    "ideogram": ["Image (twt)"],
+    "width": 4.05,
+    "height": 13
+  },
+  {
+    "char": "𓄠",
+    "description": "three skins tied together",
+    "ideogram": ["Create, give birth (msj)"],
+    "width": 4.06,
+    "height": 12
+  },
+  {
+    "char": "𓉶",
+    "description": "obelisk",
+    "ideogram": ["Obelisk (tḫn)", "Monument (mn)"],
+    "width": 4.06,
+    "height": 13
+  },
+  {
+    "char": "𓎛",
+    "description": "a twisted wick",
+    "ideogram": ["ḥ"],
+    "width": 4.06,
+    "height": 12
+  },
+  {
+    "char": "𓊢",
+    "description": "mast",
+    "ideogram": ["mast (ꜥḥꜥ)", "to stand (ꜥḥꜥ)"],
+    "width": 4.13,
+    "height": 12
+  },
+  {
+    "char": "𓈒",
+    "description": "grain",
+    "ideogram": [],
+    "width": 4.14,
+    "height": 5
+  },
+  {
+    "char": "𓉽",
+    "description": "support",
+    "ideogram": ["Post, support (sḫnt)"],
+    "width": 4.14,
+    "height": 12
+  },
+  {
+    "char": "𓌑",
+    "description": "dagger",
+    "ideogram": [],
+    "width": 4.14,
+    "height": 13
+  },
+  {
+    "char": "𓍊",
+    "description": "clapper-(of-bell) tool/instrument forked-staff, etc.",
+    "ideogram": ["mnḫ"],
+    "width": 4.14,
+    "height": 6
+  },
+  {
+    "char": "𓆄",
+    "description": "feather",
+    "ideogram": [
+      "feather, plumage (šwt)",
+      "Maat (mꜣꜥt)",
+      "Shu (šw)",
+      "True (mꜣꜥ)"
+    ],
+    "width": 4.18,
+    "height": 13
+  },
+  {
+    "char": "𓌣",
+    "description": "arrowhead",
+    "ideogram": [],
+    "width": 4.18,
+    "height": 13
+  },
+  {
+    "char": "𓐢",
+    "description": null,
+    "ideogram": [],
+    "width": 4.18,
+    "height": 13
+  },
+  {
+    "char": "𓆶",
+    "description": "combination of palm branch and stool",
+    "ideogram": ["Young (rnp)"],
+    "width": 4.2,
+    "height": 13
+  },
+  {
+    "char": "𓃉",
+    "description": "one dot",
+    "ideogram": [],
+    "width": 4.2,
+    "height": 5
+  },
+  {
+    "char": "𓇪",
+    "description": "bundle of reeds",
+    "ideogram": [],
+    "width": 4.23,
+    "height": 13
+  },
+  {
+    "char": "𓍖",
+    "description": null,
+    "ideogram": [],
+    "width": 4.23,
+    "height": 12
+  },
+  {
+    "char": "𓇜",
+    "description": "root",
+    "ideogram": ["Date (bnr)", "Sweet (bnr)"],
+    "width": 4.24,
+    "height": 13
+  },
+  {
+    "char": "𓌰",
+    "description": "butcher's knife",
+    "ideogram": ["nm"],
+    "width": 4.28,
+    "height": 13
+  },
+  {
+    "char": "𓐨",
+    "description": null,
+    "ideogram": [],
+    "width": 4.29,
+    "height": 13
+  },
+  {
+    "char": "𓉥",
+    "description": "palace",
+    "ideogram": ["Palace (ꜥḥ)"],
+    "width": 4.3,
+    "height": 13
+  },
+  {
+    "char": "𓍍",
+    "description": "hand drill (hieroglyph)",
+    "ideogram": ["ḥmt"],
+    "width": 4.3,
+    "height": 12
+  },
+  {
+    "char": "𓍏",
+    "description": null,
+    "ideogram": [],
+    "width": 4.3,
+    "height": 12
+  },
+  {
+    "char": "𓎄",
+    "description": null,
+    "ideogram": [],
+    "width": 4.32,
+    "height": 13
+  },
+  {
+    "char": "𓄙",
+    "description": "leg of ox",
+    "ideogram": ["Cow’s leg (wḥm)", "Repeat (wḥm)"],
+    "width": 4.41,
+    "height": 13
+  },
+  {
+    "char": "𓏊",
+    "description": "Beer jug",
+    "ideogram": [
+      "beer (achnqt), containers and its contents, tribute (jnw), victim, attendant (wdpw)"
+    ],
+    "width": 4.45,
+    "height": 7
+  },
+  {
+    "char": "𓋾",
+    "description": "crook",
+    "ideogram": ["Rule, ruler (ḥqꜣ)", "Scepter (ḥqꜣt)"],
+    "width": 4.47,
+    "height": 12
+  },
+  {
+    "char": "𓄤",
+    "description": "heart and windpipe",
+    "ideogram": ["Good, beautiful, perfect, young (nfr)"],
+    "width": 4.5,
+    "height": 12
+  },
+  {
+    "char": "𓍸",
+    "description": "cartouche-(divided)",
+    "ideogram": ["dn"],
+    "width": 4.52,
+    "height": 6
+  },
+  {
+    "char": "𓇍",
+    "description": "combination of reed (M17) and legs walking (D54)",
+    "ideogram": ["Come (jj)"],
+    "width": 4.54,
+    "height": 13
+  },
+  {
+    "char": "𓎭",
+    "description": null,
+    "ideogram": [],
+    "width": 4.55,
+    "height": 4
+  },
+  {
+    "char": "𓎫",
+    "description": "Compare D21, \"mouth,\" and U28/U29, \"fire-drill\"",
+    "ideogram": [],
+    "width": 4.58,
+    "height": 12
+  },
+  {
+    "char": "𓇟",
+    "description": "rhizome",
+    "ideogram": ["Prosper (rwḏ)"],
+    "width": 4.68,
+    "height": 13
+  },
+  {
+    "char": "𓍙",
+    "description": null,
+    "ideogram": [],
+    "width": 4.68,
+    "height": 12
+  },
+  {
+    "char": "𓇞",
+    "description": "tree in vase",
+    "ideogram": [],
+    "width": 4.69,
+    "height": 14
+  },
+  {
+    "char": "𓏫",
+    "description": null,
+    "ideogram": [],
+    "width": 4.69,
+    "height": 12
+  },
+  {
+    "char": "𓐄",
+    "description": null,
+    "ideogram": [],
+    "width": 4.69,
+    "height": 1
+  },
+  {
+    "char": "𓍟",
+    "description": "a support-(to lift)",
+    "ideogram": [],
+    "width": 4.7,
+    "height": 12
+  },
+  {
+    "char": "𓎆",
+    "description": "cattle hobble",
+    "ideogram": ["mḏw (also mḏ)"],
+    "width": 4.7,
+    "height": 4
+  },
+  {
+    "char": "𓎇",
+    "description": null,
+    "ideogram": [],
+    "width": 4.7,
+    "height": 9
+  },
+  {
+    "char": "𓐅",
+    "description": null,
+    "ideogram": [],
+    "width": 4.7,
+    "height": 3
+  },
+  {
+    "char": "𓐆",
+    "description": null,
+    "ideogram": [],
+    "width": 4.7,
+    "height": 6
+  },
+  {
+    "char": "𓐇",
+    "description": null,
+    "ideogram": [],
+    "width": 4.7,
+    "height": 9
+  },
+  {
+    "char": "𓋎",
+    "description": "two arrows crossed over a shield",
+    "ideogram": ["Neith (nt)"],
+    "width": 4.71,
+    "height": 11
+  },
+  {
+    "char": "𓄥",
+    "description": "lung and windpipe",
+    "ideogram": ["Unite, join (smꜣ) (smꜣ)"],
+    "width": 4.72,
+    "height": 13
+  },
+  {
+    "char": "𓆂",
+    "description": "head of vulture",
+    "ideogram": ["Fear (nr)", "Person (rmṯ)"],
+    "width": 4.8,
+    "height": 7
+  },
+  {
+    "char": "𓍞",
+    "description": null,
+    "ideogram": [],
+    "width": 4.8,
+    "height": 13
+  },
+  {
+    "char": "𓌜",
+    "description": "scimitar",
+    "ideogram": [],
+    "width": 4.84,
+    "height": 13
+  },
+  {
+    "char": "𓆠",
+    "description": "fish scale",
+    "ideogram": ["fish scale (nšmt)"],
+    "width": 4.87,
+    "height": 7
+  },
+  {
+    "char": "𓈑",
+    "description": "lump of clay",
+    "ideogram": ["Clay (sjn)"],
+    "width": 4.88,
+    "height": 7
+  },
+  {
+    "char": "𓋂",
+    "description": "sceptre with feathers and string",
+    "ideogram": ["Wekh-fetish of Nefertem (wḫ)"],
+    "width": 4.88,
+    "height": 13
+  },
+  {
+    "char": "𓋃",
+    "description": "sceptre with feathers",
+    "ideogram": ["Wekh-fetish (wḫ)"],
+    "width": 4.88,
+    "height": 13
+  },
+  {
+    "char": "𓂂",
+    "description": "pupil",
+    "ideogram": [
+      "Eye (jr) (Pars-pro-toto substitution)",
+      "abbreviation for Heqat-measure grain: 1/4"
+    ],
+    "width": 4.89,
+    "height": 5
+  },
+  {
+    "char": "𓏘",
+    "description": "half-loaf of bread",
+    "ideogram": [],
+    "width": 4.91,
+    "height": 7
+  },
+  {
+    "char": "𓇝",
+    "description": "rhizome",
+    "ideogram": ["Prosper (rwḏ)"],
+    "width": 4.92,
+    "height": 9
+  },
+  {
+    "char": "𓏑",
+    "description": null,
+    "ideogram": [],
+    "width": 4.93,
+    "height": 7
+  },
+  {
+    "char": "𓄊",
+    "description": "head and neck of animal",
+    "ideogram": ["Power (wsr)"],
+    "width": 4.94,
+    "height": 12
+  },
+  {
+    "char": "𓆼",
+    "description": "one lotus plant",
+    "ideogram": ["1,000 (ḫꜣ)"],
+    "width": 4.94,
+    "height": 13
+  },
+  {
+    "char": "𓊪",
+    "description": "stool",
+    "ideogram": ["Base, mat, stool (p)", "Buto (p)"],
+    "width": 4.94,
+    "height": 6
+  },
+  {
+    "char": "𓍑",
+    "description": "fire-drill",
+    "ideogram": ["ḏꜣ (bil.)"],
+    "width": 4.94,
+    "height": 13
+  },
+  {
+    "char": "𓍒",
+    "description": null,
+    "ideogram": [],
+    "width": 4.94,
+    "height": 13
+  },
+  {
+    "char": "𓍔",
+    "description": "kiln",
+    "ideogram": ["tꜣ"],
+    "width": 4.94,
+    "height": 7
+  },
+  {
+    "char": "𓏐",
+    "description": null,
+    "ideogram": [],
+    "width": 4.94,
+    "height": 7
+  },
+  {
+    "char": "𓇮",
+    "description": "thorn",
+    "ideogram": ["Sharp (spd)", "Thorn (srt)"],
+    "width": 4.95,
+    "height": 13
+  },
+  {
+    "char": "𓌂",
+    "description": "Sekhem scepter",
+    "ideogram": [
+      "Power, force (sḫm)",
+      "ḫrp-scepter, control, direct (ḫrp)",
+      "ꜥbꜣ-scepter (ꜥbꜣ)"
+    ],
+    "width": 4.95,
+    "height": 13
+  },
+  {
+    "char": "𓆁",
+    "description": "head of spoonbill",
+    "ideogram": ["Speak (ḏd) (Ptolemaic)"],
+    "width": 4.95,
+    "height": 7
+  },
+  {
+    "char": "𓌘",
+    "description": "joined pieces of wood",
+    "ideogram": ["rs"],
+    "width": 4.95,
+    "height": 13
+  },
+  {
+    "char": "𓁰",
+    "description": "mummy-shaped god",
+    "ideogram": ["Id. & Det. for Ptah (ptḥ)", "Divine (nṯry)"],
+    "width": 5.01,
+    "height": 12
+  },
+  {
+    "char": "𓋩",
+    "description": "necklace with seal",
+    "ideogram": ["Seal (ḫtm)", "Seal-bearer (sḏꜣwty)"],
+    "width": 5.02,
+    "height": 9
+  },
+  {
+    "char": "𓏹",
+    "description": null,
+    "ideogram": [],
+    "width": 5.04,
+    "height": 6
+  },
+  {
+    "char": "𓉗",
+    "description": "enclosure",
+    "ideogram": ["House, mansion (ḥwt)"],
+    "width": 5.14,
+    "height": 12
+  },
+  {
+    "char": "𓉞",
+    "description": "combination of enclosure and flat loaf",
+    "ideogram": ["House, mansion (ḥwt)"],
+    "width": 5.14,
+    "height": 12
+  },
+  {
+    "char": "𓍱",
+    "description": "rope-(shape)",
+    "ideogram": ["šs (bil.)"],
+    "width": 5.14,
+    "height": 8
+  },
+  {
+    "char": "𓍲",
+    "description": "rope-(shape)",
+    "ideogram": ["šn (bil.)"],
+    "width": 5.14,
+    "height": 8
+  },
+  {
+    "char": "𓍵",
+    "description": null,
+    "ideogram": [],
+    "width": 5.14,
+    "height": 8
+  },
+  {
+    "char": "𓆇",
+    "description": "egg",
+    "ideogram": ["son (sꜣ/zꜣ)"],
+    "width": 5.17,
+    "height": 6
+  },
+  {
+    "char": "𓇅",
+    "description": "papyrus stem",
+    "ideogram": ["Fresh, green, raw (wꜣḏ)", "Lower Egypt (mḥw)"],
+    "width": 5.18,
+    "height": 13
+  },
+  {
+    "char": "𓋸",
+    "description": "sandal",
+    "ideogram": ["Sandal (ṯb)"],
+    "width": 5.19,
+    "height": 13
+  },
+  {
+    "char": "𓐣",
+    "description": null,
+    "ideogram": ["divide (wḏꜥ)"],
+    "width": 5.19,
+    "height": 12
+  },
+  {
+    "char": "𓊓",
+    "description": "domed building",
+    "ideogram": ["Harem, temple chamber (jpt)"],
+    "width": 5.2,
+    "height": 7
+  },
+  {
+    "char": "𓍳",
+    "description": null,
+    "ideogram": [],
+    "width": 5.2,
+    "height": 13
+  },
+  {
+    "char": "𓋆",
+    "description": "scepter with feather",
+    "ideogram": ["Waset (Thebes (wꜣst)", "Iatet (A milk goddess) (jꜣtt)"],
+    "width": 5.21,
+    "height": 12
+  },
+  {
+    "char": "𓂱",
+    "description": "five fingers",
+    "ideogram": ["50,000"],
+    "width": 5.26,
+    "height": 14
+  },
+  {
+    "char": "𓂲",
+    "description": "six fingers",
+    "ideogram": ["60,000"],
+    "width": 5.26,
+    "height": 14
+  },
+  {
+    "char": "𓏌",
+    "description": "Pot",
+    "ideogram": ["nw, jn * (accompanies the signs Aa-27 and Aa-28) get (jnj)"],
+    "width": 5.27,
+    "height": 6
+  },
+  {
+    "char": "𓎤",
+    "description": null,
+    "ideogram": [],
+    "width": 5.28,
+    "height": 7
+  },
+  {
+    "char": "𓄜",
+    "description": "skin of cow with straight tail",
+    "ideogram": ["Spotted, dappled (sꜣb)"],
+    "width": 5.3,
+    "height": 13
+  },
+  {
+    "char": "𓆭",
+    "description": "tree",
+    "ideogram": [
+      "Charm (jmꜣ)",
+      "Sycamore (nht)",
+      "Bright (bꜣq)",
+      "(A tree) (nꜥrt)"
+    ],
+    "width": 5.31,
+    "height": 13
+  },
+  {
+    "char": "𓎃",
+    "description": "lifesaver",
+    "ideogram": ["sꜣ (bil.)"],
+    "width": 5.31,
+    "height": 12
+  },
+  {
+    "char": "𓏴",
+    "description": "Crossed diagonal sticks",
+    "ideogram": [
+      "destroy (ḥḏj), break, divide (wpj), over load (ḏꜣj), cross, meet"
+    ],
+    "width": 5.43,
+    "height": 5
+  },
+  {
+    "char": "𓄈",
+    "description": "head and neck of animal",
+    "ideogram": ["Throat (ḫḫ)", "know (ꜥm)", "swallow (ꜥm)"],
+    "width": 5.46,
+    "height": 12
+  },
+  {
+    "char": "𓊹",
+    "description": "Cloth on pole",
+    "ideogram": ["God (nṯr)"],
+    "width": 5.47,
+    "height": 12
+  },
+  {
+    "char": "𓏇",
+    "description": "Milk jug with handle",
+    "ideogram": ["mi"],
+    "width": 5.51,
+    "height": 13
+  },
+  {
+    "char": "𓇣",
+    "description": "ear of emmer",
+    "ideogram": ["Emmer (bdt)"],
+    "width": 5.55,
+    "height": 12
+  },
+  {
+    "char": "𓐩",
+    "description": null,
+    "ideogram": [],
+    "width": 5.57,
+    "height": 12
+  },
+  {
+    "char": "𓄛",
+    "description": "skin of cow with bent tail",
+    "ideogram": ["Leather, hide (dḥr)"],
+    "width": 5.62,
+    "height": 13
+  },
+  {
+    "char": "𓌹",
+    "description": null,
+    "ideogram": [],
+    "width": 5.62,
+    "height": 14
+  },
+  {
+    "char": "𓌺",
+    "description": null,
+    "ideogram": [],
+    "width": 5.62,
+    "height": 14
+  },
+  {
+    "char": "𓍴",
+    "description": null,
+    "ideogram": [],
+    "width": 5.62,
+    "height": 12
+  },
+  {
+    "char": "𓇄",
+    "description": "nine lotus plants",
+    "ideogram": ["9,000"],
+    "width": 5.63,
+    "height": 14
+  },
+  {
+    "char": "𓄼",
+    "description": "F51 reversed",
+    "ideogram": [],
+    "width": 5.66,
+    "height": 7
+  },
+  {
+    "char": "𓐎",
+    "description": "Pustule",
+    "ideogram": ["bodily growths or conditions, disease"],
+    "width": 5.66,
+    "height": 6
+  },
+  {
+    "char": "𓊽",
+    "description": "reed column",
+    "ideogram": ["Be stable (ḏd)"],
+    "width": 5.67,
+    "height": 13
+  },
+  {
+    "char": "𓊸",
+    "description": "bowl with smoke",
+    "ideogram": ["Incense (snṯr)", "Ba-soul (bꜣ)"],
+    "width": 5.68,
+    "height": 9
+  },
+  {
+    "char": "𓄹",
+    "description": "piece of flesh",
+    "ideogram": ["Flesh (jwf)"],
+    "width": 5.69,
+    "height": 7
+  },
+  {
+    "char": "𓈎",
+    "description": "slope of hill",
+    "ideogram": ["Hill (qꜣꜣ)"],
+    "width": 5.69,
+    "height": 6
+  },
+  {
+    "char": "𓎬",
+    "description": "?stylized ankh (for Isis)(?)",
+    "ideogram": ["ṯt tyet"],
+    "width": 5.7,
+    "height": 13
+  },
+  {
+    "char": "𓂈",
+    "description": "ear",
+    "ideogram": ["to listen (sḏm)", "Ear (msḏr)"],
+    "width": 5.73,
+    "height": 7
+  },
+  {
+    "char": "𓁌",
+    "description": "dwarf",
+    "ideogram": [],
+    "width": 5.75,
+    "height": 13
+  },
+  {
+    "char": "𓆴",
+    "description": "combination of palm branch and flat loaf",
+    "ideogram": ["Year (rnpt)", "time (tr)"],
+    "width": 5.77,
+    "height": 13
+  },
+  {
+    "char": "𓏏",
+    "description": "loaf of bread",
+    "ideogram": ["t"],
+    "width": 5.77,
+    "height": 3
+  },
+  {
+    "char": "𓄽",
+    "description": "excrement",
+    "ideogram": ["Excrement (ḥs)"],
+    "width": 5.79,
+    "height": 7
+  },
+  {
+    "char": "𓍎",
+    "description": "version of U24 (hand drill)",
+    "ideogram": [],
+    "width": 5.8,
+    "height": 12
+  },
+  {
+    "char": "𓎥",
+    "description": null,
+    "ideogram": [],
+    "width": 5.8,
+    "height": 7
+  },
+  {
+    "char": "𓇶",
+    "description": "sunshine",
+    "ideogram": [
+      "Shine (psḏ)",
+      "Rise (wbn)",
+      "Illuminate (sḥḏ)",
+      "Sunfolk (of Heliopolis) (ḥnmmt)"
+    ],
+    "width": 5.83,
+    "height": 9
+  },
+  {
+    "char": "𓏸",
+    "description": null,
+    "ideogram": [],
+    "width": 5.86,
+    "height": 6
+  },
+  {
+    "char": "𓏷",
+    "description": null,
+    "ideogram": [],
+    "width": 5.88,
+    "height": 4
+  },
+  {
+    "char": "𓄉",
+    "description": "head and neck of animal",
+    "ideogram": ["Throat (ḫḫ)", "know (ꜥm)", "swallow (ꜥm)"],
+    "width": 5.9,
+    "height": 13
+  },
+  {
+    "char": "𓉰",
+    "description": "shrine",
+    "ideogram": [
+      "Shrine (jtrt)",
+      "House of the Jar (archaic shrine of Buto) and Lower Egypt (pr-nw)"
+    ],
+    "width": 5.92,
+    "height": 12
+  },
+  {
+    "char": "𓎻",
+    "description": "Pot",
+    "ideogram": [],
+    "width": 5.92,
+    "height": 6
+  },
+  {
+    "char": "𓍠",
+    "description": "plummet",
+    "ideogram": [],
+    "width": 5.95,
+    "height": 11
+  },
+  {
+    "char": "𓐍",
+    "description": "Placenta or sieve",
+    "ideogram": [],
+    "width": 5.96,
+    "height": 6
+  },
+  {
+    "char": "𓐭",
+    "description": null,
+    "ideogram": [],
+    "width": 5.97,
+    "height": 13
+  },
+  {
+    "char": "𓏭",
+    "description": "Dual stroke",
+    "ideogram": [
+      "Egyptian numeral 2, plural, majority, collective concept (e.g. meat, jwf), duality"
+    ],
+    "width": 6.05,
+    "height": 4
+  },
+  {
+    "char": "𓇑",
+    "description": "rush",
+    "ideogram": ["El Kab (nḫb)", "Nekhbet (She of El Kab) (nḫbt)"],
+    "width": 6.07,
+    "height": 12
+  },
+  {
+    "char": "𓏮",
+    "description": null,
+    "ideogram": [],
+    "width": 6.07,
+    "height": 4
+  },
+  {
+    "char": "𓊮",
+    "description": "brazier",
+    "ideogram": [
+      "fire, flame (nsr(sr))",
+      "torch (tkꜣ)",
+      "cook (psj)",
+      "warmth (srf)",
+      "Lamp (ḫꜣbs)"
+    ],
+    "width": 6.08,
+    "height": 11
+  },
+  {
+    "char": "𓌋",
+    "description": "mace with strap",
+    "ideogram": [],
+    "width": 6.09,
+    "height": 12
+  },
+  {
+    "char": "𓂮",
+    "description": "two fingers",
+    "ideogram": ["20,000"],
+    "width": 6.09,
+    "height": 13
+  },
+  {
+    "char": "𓃿",
+    "description": "bovine head",
+    "ideogram": ["nose (fnḏ)", "Front, foremost (ḫnt)"],
+    "width": 6.13,
+    "height": 5
+  },
+  {
+    "char": "𓆅",
+    "description": "hieratic feather",
+    "ideogram": ["feather, plumage (šwt)", "Maat (mꜣꜥt)", "Shu (šw)"],
+    "width": 6.13,
+    "height": 13
+  },
+  {
+    "char": "𓏨",
+    "description": null,
+    "ideogram": [],
+    "width": 6.14,
+    "height": 9
+  },
+  {
+    "char": "𓏩",
+    "description": null,
+    "ideogram": [],
+    "width": 6.14,
+    "height": 9
+  },
+  {
+    "char": "𓌲",
+    "description": "shield",
+    "ideogram": [],
+    "width": 6.15,
+    "height": 12
+  },
+  {
+    "char": "𓏙",
+    "description": "cone- shaped bread",
+    "ideogram": ["ḏj"],
+    "width": 6.18,
+    "height": 13
+  },
+  {
+    "char": "𓏚",
+    "description": null,
+    "ideogram": [],
+    "width": 6.18,
+    "height": 13
+  },
+  {
+    "char": "𓇓",
+    "description": "sedge",
+    "ideogram": [
+      "Sedge (swt)",
+      "King (nswt)",
+      "Upper Egypt(ian) (šmꜥw)",
+      "South, Southern (rs, rsj, šmꜥw)"
+    ],
+    "width": 6.2,
+    "height": 12
+  },
+  {
+    "char": "𓏈",
+    "description": "Milk jug with cover",
+    "ideogram": ["milk (jrṯt), milk container and contents"],
+    "width": 6.2,
+    "height": 13
+  },
+  {
+    "char": "𓏋",
+    "description": "Beer jug with handles",
+    "ideogram": ["ontainer (qracht), containers and their contents"],
+    "width": 6.2,
+    "height": 7
+  },
+  {
+    "char": "𓋄",
+    "description": "wig on pole",
+    "ideogram": ["Great Land (8th nome of Upper Egypt) (tꜣ-wr)"],
+    "width": 6.2,
+    "height": 12
+  },
+  {
+    "char": "𓋐",
+    "description": "niche with serpent",
+    "ideogram": ["Shrine (jtrt), in jtrty “Double shrines”"],
+    "width": 6.21,
+    "height": 12
+  },
+  {
+    "char": "𓂒",
+    "description": "large breast",
+    "ideogram": ["to suckle (snq)", "breast (mnḏ)", "wet nurse (mnꜥt)"],
+    "width": 6.23,
+    "height": 6
+  },
+  {
+    "char": "𓎸",
+    "description": "stone jug",
+    "ideogram": ["Nechnem-oil (nẖnm)"],
+    "width": 6.23,
+    "height": 9
+  },
+  {
+    "char": "𓎹",
+    "description": "stone jug (reversed)",
+    "ideogram": [],
+    "width": 6.23,
+    "height": 9
+  },
+  {
+    "char": "𓁆",
+    "description": "man looking over his shoulder",
+    "ideogram": [],
+    "width": 6.23,
+    "height": 13
+  },
+  {
+    "char": "𓋏",
+    "description": "Bat",
+    "ideogram": ["Bat (bꜣt)"],
+    "width": 6.23,
+    "height": 13
+  },
+  {
+    "char": "𓏗",
+    "description": null,
+    "ideogram": [],
+    "width": 6.23,
+    "height": 6
+  },
+  {
+    "char": "𓏣",
+    "description": "Sistrum",
+    "ideogram": ["Sistrum (sššt)"],
+    "width": 6.23,
+    "height": 13
+  },
+  {
+    "char": "𓊨",
+    "description": "seat throne",
+    "ideogram": ["Seat, place (st)"],
+    "width": 6.24,
+    "height": 13
+  },
+  {
+    "char": "𓋈",
+    "description": "flower with horns",
+    "ideogram": ["Seshat (sšꜣt, sẖꜣt)"],
+    "width": 6.24,
+    "height": 12
+  },
+  {
+    "char": "𓄟",
+    "description": "three skins tied together",
+    "ideogram": ["Create, give birth (msj)"],
+    "width": 6.27,
+    "height": 12
+  },
+  {
+    "char": "𓁊",
+    "description": "man wearing tunic with fringes and holding mace",
+    "ideogram": [],
+    "width": 6.32,
+    "height": 13
+  },
+  {
+    "char": "𓅿",
+    "description": "head of pintail",
+    "ideogram": ["bird (ꜣpd)", "Wring (the neck of a bird (wšn)"],
+    "width": 6.32,
+    "height": 7
+  },
+  {
+    "char": "𓎝",
+    "description": "(fiber) swab (straw broom)",
+    "ideogram": ["sq, ḫsr wꜣḥ bil.-tril. bil. sq (tril. wꜣḥ"],
+    "width": 6.34,
+    "height": 12
+  },
+  {
+    "char": "𓂁",
+    "description": "left part of Eye of Horus",
+    "ideogram": ["abbreviation for Heqat-measure grain: 1/2"],
+    "width": 6.38,
+    "height": 5
+  },
+  {
+    "char": "𓌄",
+    "description": "walking stick with flagellum",
+    "ideogram": ["Club, mace, ꜣms-scepter (ꜣms)"],
+    "width": 6.38,
+    "height": 13
+  },
+  {
+    "char": "𓍶",
+    "description": "shen ring",
+    "ideogram": [],
+    "width": 6.44,
+    "height": 6
+  },
+  {
+    "char": "𓎨",
+    "description": "doubled container (or-added-glyphs) many spellings",
+    "ideogram": ["ḥnty"],
+    "width": 6.45,
+    "height": 13
+  },
+  {
+    "char": "𓊘",
+    "description": "hieratic threshing floor",
+    "ideogram": [],
+    "width": 6.45,
+    "height": 6
+  },
+  {
+    "char": "𓊙",
+    "description": "O50A reversed",
+    "ideogram": [],
+    "width": 6.45,
+    "height": 6
+  },
+  {
+    "char": "𓁦",
+    "description": "goddess with feather",
+    "ideogram": ["Id. & Det. for Maat (mꜣꜥt)"],
+    "width": 6.46,
+    "height": 13
+  },
+  {
+    "char": "𓊺",
+    "description": "combination of cloth on pole and bag",
+    "ideogram": ["Natron (bd, nṯry)"],
+    "width": 6.48,
+    "height": 13
+  },
+  {
+    "char": "𓏎",
+    "description": "combination of pot (W24) and legs walking (D54)",
+    "ideogram": ["fetch"],
+    "width": 6.48,
+    "height": 13
+  },
+  {
+    "char": "𓏦",
+    "description": null,
+    "ideogram": [],
+    "width": 6.53,
+    "height": 4
+  },
+  {
+    "char": "𓏼",
+    "description": null,
+    "ideogram": [],
+    "width": 6.53,
+    "height": 4
+  },
+  {
+    "char": "𓏾",
+    "description": null,
+    "ideogram": [],
+    "width": 6.53,
+    "height": 9
+  },
+  {
+    "char": "𓏿",
+    "description": null,
+    "ideogram": [],
+    "width": 6.53,
+    "height": 9
+  },
+  {
+    "char": "𓐂",
+    "description": null,
+    "ideogram": [],
+    "width": 6.53,
+    "height": 14
+  },
+  {
+    "char": "𓃾",
+    "description": "ox head",
+    "ideogram": [],
+    "width": 6.55,
+    "height": 7
+  },
+  {
+    "char": "𓋜",
+    "description": "headband",
+    "ideogram": ["Fillet (mḏḥ)"],
+    "width": 6.58,
+    "height": 6
+  },
+  {
+    "char": "𓏢",
+    "description": "harp",
+    "ideogram": ["harp"],
+    "width": 6.58,
+    "height": 13
+  },
+  {
+    "char": "𓁇",
+    "description": "Asiatic",
+    "ideogram": [],
+    "width": 6.59,
+    "height": 13
+  },
+  {
+    "char": "𓌏",
+    "description": "axe",
+    "ideogram": [],
+    "width": 6.6,
+    "height": 12
+  },
+  {
+    "char": "𓐡",
+    "description": null,
+    "ideogram": [],
+    "width": 6.63,
+    "height": 7
+  },
+  {
+    "char": "𓂾",
+    "description": "leg",
+    "ideogram": ["leg (rd)", "Gazelle (gḥs)", "foot, part (wꜥrt)"],
+    "width": 6.63,
+    "height": 13
+  },
+  {
+    "char": "𓄰",
+    "description": "uterus",
+    "ideogram": ["vulva, womb, cow (jdt)"],
+    "width": 6.64,
+    "height": 12
+  },
+  {
+    "char": "𓁱",
+    "description": "mummy-shaped god in shrine",
+    "ideogram": ["Id. & Det. for Ptah (ptḥ)", "Divine (nṯry)"],
+    "width": 6.65,
+    "height": 12
+  },
+  {
+    "char": "𓆵",
+    "description": "combination of palm branch and mouth (D21)",
+    "ideogram": [],
+    "width": 6.65,
+    "height": 12
+  },
+  {
+    "char": "𓇔",
+    "description": "combination of sedge (M23) and mouth (D21)",
+    "ideogram": ["South, Southern (rs, rsj, rsw)"],
+    "width": 6.65,
+    "height": 12
+  },
+  {
+    "char": "𓉔",
+    "description": "shelter",
+    "ideogram": ["Courtyard (h)"],
+    "width": 6.65,
+    "height": 6
+  },
+  {
+    "char": "𓊅",
+    "description": "wall",
+    "ideogram": ["Wall (jnb)"],
+    "width": 6.65,
+    "height": 12
+  },
+  {
+    "char": "𓊖",
+    "description": "village",
+    "ideogram": ["Town (njwt)", "Buto (p)"],
+    "width": 6.65,
+    "height": 6
+  },
+  {
+    "char": "𓊗",
+    "description": "threshing floor",
+    "ideogram": ["Threshing floor (spt)", "Time, occasion, etc. (sp)"],
+    "width": 6.65,
+    "height": 6
+  },
+  {
+    "char": "𓋲",
+    "description": "cloth with two strands",
+    "ideogram": ["Linen (mnḫt)"],
+    "width": 6.65,
+    "height": 8
+  },
+  {
+    "char": "𓌨",
+    "description": "butcher's block",
+    "ideogram": ["ẖr"],
+    "width": 6.65,
+    "height": 6
+  },
+  {
+    "char": "𓍹",
+    "description": null,
+    "ideogram": [],
+    "width": 6.65,
+    "height": 11
+  },
+  {
+    "char": "𓍺",
+    "description": null,
+    "ideogram": [],
+    "width": 6.65,
+    "height": 11
+  },
+  {
+    "char": "𓍻",
+    "description": null,
+    "ideogram": [],
+    "width": 6.65,
+    "height": 11
+  },
+  {
+    "char": "𓎅",
+    "description": null,
+    "ideogram": [],
+    "width": 6.65,
+    "height": 7
+  },
+  {
+    "char": "𓏉",
+    "description": "Wine jars",
+    "ideogram": ["wine (jrp)"],
+    "width": 6.65,
+    "height": 7
+  },
+  {
+    "char": "𓐞",
+    "description": null,
+    "ideogram": ["side (gs)"],
+    "width": 6.65,
+    "height": 4
+  },
+  {
+    "char": "𓈇",
+    "description": "irrigation canal",
+    "ideogram": [],
+    "width": 6.66,
+    "height": 3
+  },
+  {
+    "char": "𓎦",
+    "description": null,
+    "ideogram": [],
+    "width": 6.66,
+    "height": 9
+  },
+  {
+    "char": "𓋓",
+    "description": "combination of white crown and village",
+    "ideogram": ["Upper Egypt(ian) (šmꜥw)"],
+    "width": 6.7,
+    "height": 14
+  },
+  {
+    "char": "𓁥",
+    "description": "goddess with horned sun-disk",
+    "ideogram": ["Id. & Det. for Hathor (ḥwt-ḥr)"],
+    "width": 6.7,
+    "height": 13
+  },
+  {
+    "char": "𓁮",
+    "description": "god with falcon head and two plumes",
+    "ideogram": ["Id. & Det. for Montu (mnṯw)"],
+    "width": 6.7,
+    "height": 13
+  },
+  {
+    "char": "𓄮",
+    "description": "ribs",
+    "ideogram": ["Beef ribs (spḥt)"],
+    "width": 6.7,
+    "height": 7
+  },
+  {
+    "char": "𓇽",
+    "description": "star in circle",
+    "ideogram": ["Duat (dwꜣt)"],
+    "width": 6.7,
+    "height": 6
+  },
+  {
+    "char": "𓊕",
+    "description": "enclosed mound",
+    "ideogram": ["Nekhen (nḫn)", "Twice, doubled (sp-snw)"],
+    "width": 6.7,
+    "height": 6
+  },
+  {
+    "char": "𓇢",
+    "description": "3 grains in triangular arrangement",
+    "ideogram": ["Barley (jt)"],
+    "width": 6.71,
+    "height": 7
+  },
+  {
+    "char": "𓂉",
+    "description": "nose, eye and cheek",
+    "ideogram": [
+      "nose (fnḏ)",
+      "smell (sn)",
+      "be happy (ršw)",
+      "face, front (ḫnt)"
+    ],
+    "width": 6.75,
+    "height": 7
+  },
+  {
+    "char": "𓄣",
+    "description": "heart",
+    "ideogram": ["Heart (jb)", "heart (ḥ3ty)"],
+    "width": 6.77,
+    "height": 7
+  },
+  {
+    "char": "𓄱",
+    "description": "uterus",
+    "ideogram": [],
+    "width": 6.78,
+    "height": 12
+  },
+  {
+    "char": "𓐏",
+    "description": "Pustule with liquid issuing from it",
+    "ideogram": [
+      "medical or anatomical condition, specifically soft matter or liquid"
+    ],
+    "width": 6.78,
+    "height": 6
+  },
+  {
+    "char": "𓏁",
+    "description": "water jar with water pouring out",
+    "ideogram": ["clean (qbḥ) (only Ideogram)"],
+    "width": 6.79,
+    "height": 13
+  },
+  {
+    "char": "𓂊",
+    "description": "nose, eye and cheek (cursive)",
+    "ideogram": [
+      "nose (fnḏ)",
+      "smell (sn)",
+      "be happy (ršw)",
+      "face, front (ḫnt)"
+    ],
+    "width": 6.8,
+    "height": 6
+  },
+  {
+    "char": "𓁴",
+    "description": "goddess with feline head and sun with uraeus",
+    "ideogram": [
+      "Id. & Det. for Sekhmet (sḫmt), Menhit (mnḥyt), Mehit (mḥyt), Bastet (bꜣstt)"
+    ],
+    "width": 6.81,
+    "height": 13
+  },
+  {
+    "char": "𓁷",
+    "description": "face",
+    "ideogram": ["face (ḥr)", "on, around, over, for (ḥr)"],
+    "width": 6.81,
+    "height": 7
+  },
+  {
+    "char": "𓁜",
+    "description": "god with falcon head and sun-disk",
+    "ideogram": ["Id. & Det. for Ra (rꜤ)"],
+    "width": 6.82,
+    "height": 13
+  },
+  {
+    "char": "𓁝",
+    "description": "C2A reversed",
+    "ideogram": ["Ra (rꜤ)"],
+    "width": 6.82,
+    "height": 13
+  },
+  {
+    "char": "𓂳",
+    "description": "seven fingers",
+    "ideogram": ["70,000"],
+    "width": 6.83,
+    "height": 14
+  },
+  {
+    "char": "𓂴",
+    "description": "eight fingers",
+    "ideogram": ["80,000"],
+    "width": 6.83,
+    "height": 14
+  },
+  {
+    "char": "𓍰",
+    "description": null,
+    "ideogram": [],
+    "width": 6.85,
+    "height": 12
+  },
+  {
+    "char": "𓎧",
+    "description": null,
+    "ideogram": [],
+    "width": 6.85,
+    "height": 9
+  },
+  {
+    "char": "𓎾",
+    "description": "earthenware pot",
+    "ideogram": ["Heset-pitcher, Senbet-pitcher (snbt) or similar containers"],
+    "width": 6.86,
+    "height": 7
+  },
+  {
+    "char": "𓋹",
+    "description": "life ankh, possibly representing a sandal-strap",
+    "ideogram": ["Life, to live (ꜥnḫ)"],
+    "width": 6.87,
+    "height": 12
+  },
+  {
+    "char": "𓎺",
+    "description": "cup",
+    "ideogram": ["determinative for goblet (jab)"],
+    "width": 6.88,
+    "height": 5
+  },
+  {
+    "char": "𓎼",
+    "description": "ring stand/earthenware pot",
+    "ideogram": ["seat (nst)"],
+    "width": 6.88,
+    "height": 6
+  },
+  {
+    "char": "𓁶",
+    "description": "head",
+    "ideogram": [
+      "head (tp) (ḏꜣḏꜣ)",
+      "back of head (ḥꜣ)",
+      "behind (ḥꜣ)",
+      "neglect, to leave behind (mkḥꜣ)"
+    ],
+    "width": 6.88,
+    "height": 7
+  },
+  {
+    "char": "𓃋",
+    "description": "three dots",
+    "ideogram": [],
+    "width": 6.89,
+    "height": 7
+  },
+  {
+    "char": "𓃌",
+    "description": "four dots",
+    "ideogram": [],
+    "width": 6.89,
+    "height": 7
+  },
+  {
+    "char": "𓇤",
+    "description": "stack (of grain)",
+    "ideogram": ["Pile, stack (ꜥḥꜥ, ꜥḥꜥw)"],
+    "width": 6.89,
+    "height": 7
+  },
+  {
+    "char": "𓇷",
+    "description": "moon with lower half obscured",
+    "ideogram": [
+      "Primeval time (pꜣwt)",
+      "Ennead (psḏt)",
+      "New moon festival (psḏntyw)"
+    ],
+    "width": 6.89,
+    "height": 7
+  },
+  {
+    "char": "𓋪",
+    "description": "ring",
+    "ideogram": ["Ring (jwꜥw)"],
+    "width": 6.89,
+    "height": 7
+  },
+  {
+    "char": "𓐐",
+    "description": null,
+    "ideogram": [],
+    "width": 6.89,
+    "height": 6
+  },
+  {
+    "char": "𓃀",
+    "description": "foot",
+    "ideogram": ["place (bw)"],
+    "width": 6.9,
+    "height": 11
+  },
+  {
+    "char": "𓇦",
+    "description": "bundle of flax",
+    "ideogram": ["End, limit (ḏr)"],
+    "width": 6.9,
+    "height": 6
+  },
+  {
+    "char": "𓉴",
+    "description": "pyramid",
+    "ideogram": ["Pyramid (mr)"],
+    "width": 6.9,
+    "height": 13
+  },
+  {
+    "char": "𓉸",
+    "description": "stela",
+    "ideogram": ["Stela (ꜥḥꜥw)", "Decree (wḏ)"],
+    "width": 6.9,
+    "height": 13
+  },
+  {
+    "char": "𓊋",
+    "description": "corner of wall",
+    "ideogram": [
+      "Corner, angle, court of magistrates (qnbt)",
+      "Gateway (ꜥrrt)"
+    ],
+    "width": 6.9,
+    "height": 7
+  },
+  {
+    "char": "𓊌",
+    "description": "stone",
+    "ideogram": ["Stone (jnr)"],
+    "width": 6.9,
+    "height": 4
+  },
+  {
+    "char": "𓊒",
+    "description": "domed building",
+    "ideogram": ["Harem, temple chamber (jpt)"],
+    "width": 6.9,
+    "height": 7
+  },
+  {
+    "char": "𓋥",
+    "description": "pectoral",
+    "ideogram": [
+      "Sparkle, gleam, glitter (ṯḥn)",
+      "Faience (ṯḥnt)",
+      "Malachite (šsmt)"
+    ],
+    "width": 6.9,
+    "height": 12
+  },
+  {
+    "char": "𓎽",
+    "description": "flat ring stand",
+    "ideogram": ["seat (nst)"],
+    "width": 6.9,
+    "height": 7
+  },
+  {
+    "char": "𓏖",
+    "description": "loaf with decoration",
+    "ideogram": ["pꜣt (phoneme pꜣ)"],
+    "width": 6.91,
+    "height": 6
+  },
+  {
+    "char": "𓇨",
+    "description": "basket of fruit or grain",
+    "ideogram": ["End, limit (ḏr)", "Bind together (dmꜣ)"],
+    "width": 6.91,
+    "height": 7
+  },
+  {
+    "char": "𓇳",
+    "description": "sun",
+    "ideogram": ["Ra, the sun (rꜥ)", "Day (hrw)"],
+    "width": 6.92,
+    "height": 7
+  },
+  {
+    "char": "𓇵",
+    "description": "combination of sun (N5) and butcher's block",
+    "ideogram": ["Every day (ẖrt-hrw)"],
+    "width": 6.92,
+    "height": 12
+  },
+  {
+    "char": "𓆩",
+    "description": "shell",
+    "ideogram": [],
+    "width": 6.93,
+    "height": 7
+  },
+  {
+    "char": "𓆪",
+    "description": "L6 reversed",
+    "ideogram": [],
+    "width": 6.93,
+    "height": 7
+  },
+  {
+    "char": "𓂑",
+    "description": "small breast",
+    "ideogram": ["to suckle (snq)", "breast (mnḏ)", "wet nurse (mnꜥt)"],
+    "width": 6.95,
+    "height": 4
+  },
+  {
+    "char": "𓈅",
+    "description": "short tongue of land",
+    "ideogram": ["Riverbank (jdb)", "Revert, divert (wḏb)"],
+    "width": 6.95,
+    "height": 4
+  },
+  {
+    "char": "𓈞",
+    "description": "well with ripple of water",
+    "ideogram": ["Copper (ḥmt)", "Metal (bjꜣ)", "Wife (ḥmt)"],
+    "width": 6.95,
+    "height": 7
+  },
+  {
+    "char": "𓏳",
+    "description": "Oval",
+    "ideogram": ["round (šnw)"],
+    "width": 6.95,
+    "height": 4
+  },
+  {
+    "char": "𓄇",
+    "description": "leopard head",
+    "ideogram": ["Strength (pḥty)", "Moment (ꜣt)"],
+    "width": 6.95,
+    "height": 10
+  },
+  {
+    "char": "𓇸",
+    "description": "moon with lower section obscured",
+    "ideogram": [
+      "Primeval time (pꜣwt)",
+      "Ennead (psḏt)",
+      "New moon festival (psḏntyw)"
+    ],
+    "width": 6.95,
+    "height": 7
+  },
+  {
+    "char": "𓈟",
+    "description": "well with line of water",
+    "ideogram": ["Copper (ḥmt)", "Metal (bjꜣ)", "Wife (ḥmt)"],
+    "width": 6.96,
+    "height": 7
+  },
+  {
+    "char": "𓁚",
+    "description": "god with sun-disk and uraeus",
+    "ideogram": ["Ra (rꜤ)"],
+    "width": 7,
+    "height": 13
+  },
+  {
+    "char": "𓀲",
+    "description": "king wearing white crown",
+    "ideogram": ["King of Upper Egypt (nsw)", "Osiris (wsjr)"],
+    "width": 7.11,
+    "height": 13
+  },
+  {
+    "char": "𓁓",
+    "description": "combination of woman giving birth and three skins tied together",
+    "ideogram": ["to give birth (msj)"],
+    "width": 7.12,
+    "height": 12
+  },
+  {
+    "char": "𓋁",
+    "description": "spear, Emblem of the East",
+    "ideogram": ["East (jꜣbty, jꜣbtt)", "Left (jꜣbj)"],
+    "width": 7.2,
+    "height": 12
+  },
+  {
+    "char": "𓁢",
+    "description": "god with jackal head",
+    "ideogram": [
+      "Id. & Det. for Anubis (jnpw)",
+      "Id. & Det. for Wepwawet (wp-wꜣwt)"
+    ],
+    "width": 7.2,
+    "height": 13
+  },
+  {
+    "char": "𓁣",
+    "description": "god with Seth-animal head",
+    "ideogram": ["Id. & Det. for Seth (stḫ, stẖ, stš)"],
+    "width": 7.2,
+    "height": 13
+  },
+  {
+    "char": "𓀣",
+    "description": "man with hands raised behind him",
+    "ideogram": ["to turn away (Ꜥn)"],
+    "width": 7.22,
+    "height": 13
+  },
+  {
+    "char": "𓀳",
+    "description": "king wearing white crown with sceptre",
+    "ideogram": ["King of Upper Egypt (nsw)", "Osiris (wsjr)"],
+    "width": 7.26,
+    "height": 13
+  },
+  {
+    "char": "𓄾",
+    "description": "divine rod with ram head",
+    "ideogram": [],
+    "width": 7.27,
+    "height": 12
+  },
+  {
+    "char": "𓁋",
+    "description": "man holding sistrum",
+    "ideogram": ["Ihy (jḥy)", "Great God (Ptolemaic) (nṯr-Ꜥꜣ)"],
+    "width": 7.28,
+    "height": 13
+  },
+  {
+    "char": "𓁙",
+    "description": "woman holding sistrum",
+    "ideogram": [],
+    "width": 7.3,
+    "height": 13
+  },
+  {
+    "char": "𓐟",
+    "description": null,
+    "ideogram": ["back (sꜣ)"],
+    "width": 7.33,
+    "height": 7
+  },
+  {
+    "char": "𓐠",
+    "description": null,
+    "ideogram": ["back (sꜣ)"],
+    "width": 7.33,
+    "height": 9
+  },
+  {
+    "char": "𓁟",
+    "description": "god with ibis head",
+    "ideogram": ["Id. & Det. for Thoth (ḏḥwty)"],
+    "width": 7.35,
+    "height": 13
+  },
+  {
+    "char": "𓃱",
+    "description": "giraffe",
+    "ideogram": ["giraffe (mmj, sr)", "fortell (sr)"],
+    "width": 7.37,
+    "height": 12
+  },
+  {
+    "char": "𓃇",
+    "description": "Sidelock of hair",
+    "ideogram": ["Sidelock (ḥnsqty)"],
+    "width": 7.41,
+    "height": 13
+  },
+  {
+    "char": "𓂐",
+    "description": "liquid issuing from lips",
+    "ideogram": ["spit (psg)", "to spit, to vomit (bšj)", "blood (snf)"],
+    "width": 7.44,
+    "height": 6
+  },
+  {
+    "char": "𓁫",
+    "description": "god with two plumes and scimitar",
+    "ideogram": [
+      "Amun is with his Strong Arm (Amunherkhepeshef) (jmn-ḥr-ḫpš.f)"
+    ],
+    "width": 7.45,
+    "height": 13
+  },
+  {
+    "char": "𓁬",
+    "description": "C14 reversed",
+    "ideogram": [
+      "Amun is with his Strong Arm (Amunherkhepeshef) (jmn-ḥr-ḫpš.f)"
+    ],
+    "width": 7.45,
+    "height": 13
+  },
+  {
+    "char": "𓈕",
+    "description": "ingot of metal",
+    "ideogram": [],
+    "width": 7.45,
+    "height": 7
+  },
+  {
+    "char": "𓀥",
+    "description": "man dancing with arms to the front",
+    "ideogram": ["(see above)"],
+    "width": 7.45,
+    "height": 13
+  },
+  {
+    "char": "𓋼",
+    "description": "sunshade",
+    "ideogram": ["Shadow, shade, sunshade (ḫꜣbyt, šwt)", "Standard (sryt)"],
+    "width": 7.45,
+    "height": 12
+  },
+  {
+    "char": "𓀯",
+    "description": "king with uraeus",
+    "ideogram": [
+      "king (nsw)",
+      "majesty (ḥm)",
+      "I, me, my (when speaker is a king) (.j)"
+    ],
+    "width": 7.46,
+    "height": 13
+  },
+  {
+    "char": "𓊍",
+    "description": "stair single",
+    "ideogram": ["Throne, stairs (ḫndw)"],
+    "width": 7.47,
+    "height": 7
+  },
+  {
+    "char": "𓈔",
+    "description": "ingot of metal",
+    "ideogram": ["Iron (bjꜣ)", "Copper (ḥmt)"],
+    "width": 7.48,
+    "height": 7
+  },
+  {
+    "char": "𓀵",
+    "description": "king wearing red crown",
+    "ideogram": ["King of Lower Egypt (bjtj)", "King (nsw)"],
+    "width": 7.48,
+    "height": 13
+  },
+  {
+    "char": "𓍣",
+    "description": null,
+    "ideogram": [],
+    "width": 7.51,
+    "height": 6
+  },
+  {
+    "char": "𓀟",
+    "description": "hastening man",
+    "ideogram": ["bring (jnj)"],
+    "width": 7.52,
+    "height": 13
+  },
+  {
+    "char": "𓉱",
+    "description": "façade of shrine",
+    "ideogram": ["Booth (sḥ)"],
+    "width": 7.52,
+    "height": 13
+  },
+  {
+    "char": "𓁛",
+    "description": "god with falcon head and sun-disk holding ankh",
+    "ideogram": ["Ideogram and Determinative for Ra (rꜤ)"],
+    "width": 7.52,
+    "height": 13
+  },
+  {
+    "char": "𓁞",
+    "description": "C2 reversed",
+    "ideogram": ["Ra (rꜤ)"],
+    "width": 7.52,
+    "height": 13
+  },
+  {
+    "char": "𓀢",
+    "description": "man with hands raised in front",
+    "ideogram": ["praise, adore, laud, thank (dwꜣ)"],
+    "width": 7.54,
+    "height": 13
+  },
+  {
+    "char": "𓀶",
+    "description": "king wearing red crown with sceptre",
+    "ideogram": ["Atum (jtmw)"],
+    "width": 7.55,
+    "height": 13
+  },
+  {
+    "char": "𓁵",
+    "description": "god wearing red crown with scepter",
+    "ideogram": ["Id. & Det. for Atum (jtmw)"],
+    "width": 7.55,
+    "height": 13
+  },
+  {
+    "char": "𓉯",
+    "description": "shrine",
+    "ideogram": [
+      "Shrine (jtrt)",
+      "House of the Jar (archaic shrine of Buto) and Lower Egypt (pr-nw)"
+    ],
+    "width": 7.59,
+    "height": 12
+  },
+  {
+    "char": "𓌸",
+    "description": null,
+    "ideogram": [],
+    "width": 7.59,
+    "height": 11
+  },
+  {
+    "char": "𓁯",
+    "description": "squatting god",
+    "ideogram": ["Id. & Det. for Tatenen (tꜣ-ṯnn)"],
+    "width": 7.61,
+    "height": 13
+  },
+  {
+    "char": "𓀛",
+    "description": "king with staff and mace with round head",
+    "ideogram": ["monarch, lord, ruler(jty)"],
+    "width": 7.63,
+    "height": 13
+  },
+  {
+    "char": "𓀤",
+    "description": "man dancing with arms to the back",
+    "ideogram": [
+      "dance (ḫbj)",
+      "cheer, rejoice (hy-hnw)",
+      "dance, dancer (jb)"
+    ],
+    "width": 7.63,
+    "height": 13
+  },
+  {
+    "char": "𓆎",
+    "description": "crocodile scales",
+    "ideogram": ["black, dark (km)"],
+    "width": 7.67,
+    "height": 5
+  },
+  {
+    "char": "𓁧",
+    "description": "goddess with feather holding ankh",
+    "ideogram": ["Id. & Det. for Maat (mꜣꜥt)"],
+    "width": 7.7,
+    "height": 13
+  },
+  {
+    "char": "𓀧",
+    "description": "man pounding in a mortar",
+    "ideogram": ["to stomp (ḫwsj)"],
+    "width": 7.71,
+    "height": 13
+  },
+  {
+    "char": "𓁳",
+    "description": "god with falcon head and moon",
+    "ideogram": ["Id. & Det. for Khonsu (ḫnsw)"],
+    "width": 7.73,
+    "height": 14
+  },
+  {
+    "char": "𓁐",
+    "description": "seated woman",
+    "ideogram": ["woman (zt)", "I, me, my (when speaker is feminine) (.j)"],
+    "width": 7.75,
+    "height": 13
+  },
+  {
+    "char": "𓇥",
+    "description": "bundle of flax",
+    "ideogram": ["End, limit (ḏr)"],
+    "width": 7.77,
+    "height": 7
+  },
+  {
+    "char": "𓁩",
+    "description": "god with two plumes and scepter",
+    "ideogram": ["Id. & Det. for Amun (jmn)"],
+    "width": 7.79,
+    "height": 13
+  },
+  {
+    "char": "𓁪",
+    "description": "C12 reversed",
+    "ideogram": ["Amun (jmn)"],
+    "width": 7.79,
+    "height": 13
+  },
+  {
+    "char": "𓀙",
+    "description": "man holding staff with handkerchief",
+    "ideogram": [
+      "Civil Servant (sr)",
+      "Courtier (smr)",
+      "great (wr)",
+      "strike (ḥwj)"
+    ],
+    "width": 7.8,
+    "height": 13
+  },
+  {
+    "char": "𓋌",
+    "description": "two bows tied vertically",
+    "ideogram": ["Neith (nt)"],
+    "width": 7.81,
+    "height": 12
+  },
+  {
+    "char": "𓀚",
+    "description": "statue of man with staff and scepter of authority",
+    "ideogram": ["statue (ḥnṯ), (twt)"],
+    "width": 7.84,
+    "height": 12
+  },
+  {
+    "char": "𓁤",
+    "description": "ithyphallic god with two plumes, uplifted arm and flagellum",
+    "ideogram": ["Id. & Det. for Min (mnw)"],
+    "width": 7.84,
+    "height": 12
+  },
+  {
+    "char": "𓇊",
+    "description": "combination of clump of papyrus and village",
+    "ideogram": ["Lower Egypt (mḥw)"],
+    "width": 7.84,
+    "height": 14
+  },
+  {
+    "char": "𓊑",
+    "description": "emblem of Min",
+    "ideogram": ["Office, position (jꜣt)"],
+    "width": 7.84,
+    "height": 12
+  },
+  {
+    "char": "𓊼",
+    "description": "combination of cloth on pole and butcher's block",
+    "ideogram": ["Necropolis (ẖrt-nṯr)"],
+    "width": 7.88,
+    "height": 12
+  },
+  {
+    "char": "𓀡",
+    "description": "man upside down",
+    "ideogram": ["headlong or head over heels (sḫd)"],
+    "width": 7.95,
+    "height": 13
+  },
+  {
+    "char": "𓇉",
+    "description": "clump of papyrus",
+    "ideogram": ["Lower Egypt (mḥw)", "Around (ḥꜣ)"],
+    "width": 7.95,
+    "height": 12
+  },
+  {
+    "char": "𓇙",
+    "description": "combination of flowering sedge (M26) and hobble (V20)",
+    "ideogram": ["Upper Egyptian 10’s (mḏw-šmꜥw)"],
+    "width": 7.97,
+    "height": 12
+  },
+  {
+    "char": "𓀜",
+    "description": "man striking with both hands",
+    "ideogram": [
+      "to hit or strike (ḥwj)",
+      "power, strength (nḫt)",
+      "teach lesson or instruct (sbꜣ)",
+      "call (njs)",
+      "be happy (ḥꜥj)"
+    ],
+    "width": 8.02,
+    "height": 13
+  },
+  {
+    "char": "𓇖",
+    "description": "combination of flowering sedge (M26) and mouth (D21)",
+    "ideogram": ["South, Southern (rs, rsj, rsw)"],
+    "width": 8.02,
+    "height": 12
+  },
+  {
+    "char": "𓇗",
+    "description": "flowering sedge",
+    "ideogram": [
+      "Make music (šmꜥ)",
+      "South, Southern, Upper Egypt(ian) (šmꜥw)"
+    ],
+    "width": 8.02,
+    "height": 12
+  },
+  {
+    "char": "𓋝",
+    "description": "broad collar",
+    "ideogram": ["Broad collar (wsḫ)"],
+    "width": 8.09,
+    "height": 7
+  },
+  {
+    "char": "𓃂",
+    "description": "foot under vase from which water flows",
+    "ideogram": ["be pure, clean (wꜥb)"],
+    "width": 8.1,
+    "height": 13
+  },
+  {
+    "char": "𓀖",
+    "description": "child wearing red crown",
+    "ideogram": ["foster child (jmty)"],
+    "width": 8.14,
+    "height": 13
+  },
+  {
+    "char": "𓀭",
+    "description": "seated god",
+    "ideogram": ["I, me, my (when the speaker is a god) (.j)", "God(nṯr)"],
+    "width": 8.19,
+    "height": 13
+  },
+  {
+    "char": "𓀮",
+    "description": "seated god with Was-sceptre",
+    "ideogram": ["I, me, my (when the speaker is a god) (.j)", "God(nṯr)"],
+    "width": 8.19,
+    "height": 13
+  },
+  {
+    "char": "𓃻",
+    "description": "baboon",
+    "ideogram": [
+      "Thoth (ḏḥwty)",
+      "King (nswt) (Ptolemaic)",
+      "beautiful, good (nfr) (Ptolemaic)",
+      "scribe (sẖꜣ) (Ptolemaic)",
+      "son (sꜣ) (Ptolemaic)",
+      "speak (ḏd) (Ptolemaic)"
+    ],
+    "width": 8.2,
+    "height": 11
+  },
+  {
+    "char": "𓏶",
+    "description": "two planks crossed and joined",
+    "ideogram": [],
+    "width": 8.21,
+    "height": 13
+  },
+  {
+    "char": "𓀞",
+    "description": "man with one arm pointing forward",
+    "ideogram": ["call (njs, Ꜥš)"],
+    "width": 8.22,
+    "height": 13
+  },
+  {
+    "char": "𓎯",
+    "description": "Oil jar",
+    "ideogram": ["Ointment (mrḥt), oil"],
+    "width": 8.22,
+    "height": 13
+  },
+  {
+    "char": "𓎰",
+    "description": "Oil-jar without ties",
+    "ideogram": ["Bas-container (bꜣs)"],
+    "width": 8.22,
+    "height": 13
+  },
+  {
+    "char": "𓃅",
+    "description": "two toes oriented leftward",
+    "ideogram": ["toe (sꜣḥ)", "The god Sah (sꜣḥ)"],
+    "width": 8.24,
+    "height": 8
+  },
+  {
+    "char": "𓀗",
+    "description": "bent man leaning on staff",
+    "ideogram": [
+      "old, to be fragile (jꜣw)",
+      "elder (smsw)",
+      "great (wr)",
+      "to lean (rhn)",
+      "to hit (ḥwj)"
+    ],
+    "width": 8.25,
+    "height": 13
+  },
+  {
+    "char": "𓏂",
+    "description": "water jar with water pouring out and ring stand",
+    "ideogram": ["Libation (qbḥ), (qbb)"],
+    "width": 8.28,
+    "height": 13
+  },
+  {
+    "char": "𓌿",
+    "description": null,
+    "ideogram": [],
+    "width": 8.3,
+    "height": 12
+  },
+  {
+    "char": "𓍀",
+    "description": null,
+    "ideogram": [],
+    "width": 8.3,
+    "height": 12
+  },
+  {
+    "char": "𓎵",
+    "description": "metal vessel",
+    "ideogram": ["boiler (wḥꜣt)"],
+    "width": 8.33,
+    "height": 6
+  },
+  {
+    "char": "𓁍",
+    "description": "man holding up knife",
+    "ideogram": ["Black eye paint (msdmt)"],
+    "width": 8.35,
+    "height": 13
+  },
+  {
+    "char": "𓂻",
+    "description": "legs walking",
+    "ideogram": ["stride (nmtt)", "come (jw)"],
+    "width": 8.38,
+    "height": 6
+  },
+  {
+    "char": "𓂽",
+    "description": "legs walking backwards",
+    "ideogram": ["come (jw)"],
+    "width": 8.38,
+    "height": 6
+  },
+  {
+    "char": "𓆣",
+    "description": "dung beetle",
+    "ideogram": [
+      "dung beetle/scarab, become, emerge, manifest (ḫpr)",
+      "land (tꜣ) (Late period)"
+    ],
+    "width": 8.4,
+    "height": 12
+  },
+  {
+    "char": "𓁭",
+    "description": "god wearing red crown with ankh",
+    "ideogram": ["Id. & Det. for Atum (jtmw)"],
+    "width": 8.42,
+    "height": 13
+  },
+  {
+    "char": "𓉕",
+    "description": "winding wall from upper-left corner",
+    "ideogram": ["Avenue (mrrt)"],
+    "width": 8.42,
+    "height": 6
+  },
+  {
+    "char": "𓉖",
+    "description": "winding wall from lower-left corner",
+    "ideogram": ["Avenue (mrrt)"],
+    "width": 8.42,
+    "height": 6
+  },
+  {
+    "char": "𓋑",
+    "description": "white crown",
+    "ideogram": [
+      "White crown (ḥḏt, wrt, wrrt)",
+      "Beautiful, good (nfr) (Ptolemaic)",
+      "Kingship (nsyt)",
+      "King( of Upper Egypt) (nswt)",
+      "Upper Egypt(ian) (šmꜥw)"
+    ],
+    "width": 8.43,
+    "height": 12
+  },
+  {
+    "char": "𓇇",
+    "description": "clump of papyrus with buds",
+    "ideogram": ["Lower Egypt (mḥw)", "Around (ḥꜣ)"],
+    "width": 8.48,
+    "height": 12
+  },
+  {
+    "char": "𓇈",
+    "description": "combination of clump of papyrus with buds and village",
+    "ideogram": ["Lower Egypt (mḥw)"],
+    "width": 8.48,
+    "height": 14
+  },
+  {
+    "char": "𓋤",
+    "description": null,
+    "ideogram": [
+      "Sparkle, gleam, glitter (ṯḥn)",
+      "Faience (ṯḥnt)",
+      "Malachite (šsmt)"
+    ],
+    "width": 8.48,
+    "height": 13
+  },
+  {
+    "char": "𓂼",
+    "description": "hieratic legs walking",
+    "ideogram": [],
+    "width": 8.51,
+    "height": 8
+  },
+  {
+    "char": "𓄔",
+    "description": "ear of bovine",
+    "ideogram": ["Ear (msḏr)", "leaf (ḏrḏ)", "hear, listen (sḏm)"],
+    "width": 8.51,
+    "height": 6
+  },
+  {
+    "char": "𓂓",
+    "description": "two arms upraised",
+    "ideogram": ["the Ka (life spirit) (kꜣ)"],
+    "width": 8.54,
+    "height": 8
+  },
+  {
+    "char": "𓂗",
+    "description": "combination of two arms upraised (D28) and club",
+    "ideogram": ["mortuary priest (ḥm-kꜣ)"],
+    "width": 8.54,
+    "height": 12
+  },
+  {
+    "char": "𓎶",
+    "description": "granite bowl",
+    "ideogram": ["red granite (mꜣṯ)"],
+    "width": 8.56,
+    "height": 6
+  },
+  {
+    "char": "𓄕",
+    "description": "hieratic ear of bovine",
+    "ideogram": ["Ear (msḏr)", "hear, listen (sḏm)"],
+    "width": 8.57,
+    "height": 6
+  },
+  {
+    "char": "𓌥",
+    "description": "float",
+    "ideogram": ["ḏb ḏbꜣ"],
+    "width": 8.57,
+    "height": 13
+  },
+  {
+    "char": "𓂘",
+    "description": "arms embracing",
+    "ideogram": ["enclose (jnq)", "embrace (ḥpt, sḫn)", "open the arms (pgꜣ)"],
+    "width": 8.59,
+    "height": 10
+  },
+  {
+    "char": "𓄨",
+    "description": "backbone and ribs",
+    "ideogram": ["Back (jꜣt)"],
+    "width": 8.59,
+    "height": 6
+  },
+  {
+    "char": "𓄬",
+    "description": "vertebrae",
+    "ideogram": ["Slaughtering, massacre (šꜥt)"],
+    "width": 8.59,
+    "height": 8
+  },
+  {
+    "char": "𓊔",
+    "description": "enclosed mound",
+    "ideogram": ["Nekhen (nḫn)"],
+    "width": 8.59,
+    "height": 3
+  },
+  {
+    "char": "𓌅",
+    "description": "flagellum",
+    "ideogram": ["Flail (nḫꜣḫꜣ)"],
+    "width": 8.59,
+    "height": 10
+  },
+  {
+    "char": "𓌗",
+    "description": "bowstring",
+    "ideogram": ["rwḏ"],
+    "width": 8.59,
+    "height": 9
+  },
+  {
+    "char": "𓉐",
+    "description": "house",
+    "ideogram": ["House (pr)"],
+    "width": 8.6,
+    "height": 5
+  },
+  {
+    "char": "𓋇",
+    "description": "flower with horns",
+    "ideogram": ["Seshat (sšꜣt, sẖꜣt)"],
+    "width": 8.6,
+    "height": 12
+  },
+  {
+    "char": "𓀹",
+    "description": "beardless man seated and holding knife",
+    "ideogram": ["belonging to, keeper (jrj)", "Guardian, keeper (jrj)"],
+    "width": 8.66,
+    "height": 13
+  },
+  {
+    "char": "𓀨",
+    "description": "man building wall",
+    "ideogram": ["to build (qd)"],
+    "width": 8.66,
+    "height": 13
+  },
+  {
+    "char": "𓁖",
+    "description": "woman on chair with child on lap",
+    "ideogram": ["to nurse, to nurture, to care for (rnn)"],
+    "width": 8.67,
+    "height": 13
+  },
+  {
+    "char": "𓅱",
+    "description": "quail chick",
+    "ideogram": ["Field, district, region (w)"],
+    "width": 8.68,
+    "height": 12
+  },
+  {
+    "char": "𓀺",
+    "description": "seated Syrian holding stick",
+    "ideogram": ["foreigner, Asian (ꜥꜣmw)"],
+    "width": 8.7,
+    "height": 13
+  },
+  {
+    "char": "𓂖",
+    "description": "arms embracing club",
+    "ideogram": ["mortuary priest (ḥm-kꜣ)"],
+    "width": 8.7,
+    "height": 13
+  },
+  {
+    "char": "𓆘",
+    "description": "erect cobra on basket",
+    "ideogram": ["Wadjet (wꜣḏt)", "Lady (nbt)"],
+    "width": 8.7,
+    "height": 13
+  },
+  {
+    "char": "𓀓",
+    "description": "man bowing down",
+    "ideogram": ["to bend or bow oneself (ksj)"],
+    "width": 8.71,
+    "height": 13
+  },
+  {
+    "char": "𓀦",
+    "description": "man with stick and bundle on shoulder",
+    "ideogram": [
+      "to herd, shepherd (mnjw)",
+      "journey, tramp (ḫwsj)",
+      "construction, (qd)",
+      "foreign, strange(šmꜣw)"
+    ],
+    "width": 8.71,
+    "height": 13
+  },
+  {
+    "char": "𓇫",
+    "description": "piece of wood",
+    "ideogram": ["Juniper (wꜥn)", "Cedar (ꜥš)"],
+    "width": 8.71,
+    "height": 3
+  },
+  {
+    "char": "𓄖",
+    "description": "hind-quarters of lion",
+    "ideogram": ["hindquarters, back part (pḥt)", "strength (pḥty)"],
+    "width": 8.73,
+    "height": 8
+  },
+  {
+    "char": "𓀋",
+    "description": "man steadying basket on head",
+    "ideogram": [
+      "work, toil (kꜣt)",
+      "load (verb or noun), burden (ꜣdp)",
+      "carry, haul (fꜣj)"
+    ],
+    "width": 8.77,
+    "height": 13
+  },
+  {
+    "char": "𓐑",
+    "description": "Part of steering gear of a ship",
+    "ideogram": ["hasten (ḥjp), hepet-device (ḥpt)"],
+    "width": 8.81,
+    "height": 8
+  },
+  {
+    "char": "𓊱",
+    "description": "high table with offerings",
+    "ideogram": ["offering table (ḫꜣwt)"],
+    "width": 8.82,
+    "height": 13
+  },
+  {
+    "char": "𓋛",
+    "description": "shuty-crown (two falcon feathers)",
+    "ideogram": ["shuty-crown (šwty)"],
+    "width": 8.83,
+    "height": 12
+  },
+  {
+    "char": "𓈆",
+    "description": "broad tongue of land",
+    "ideogram": ["Riverbank (jdb)", "Revert, divert (wḏb)"],
+    "width": 8.84,
+    "height": 4
+  },
+  {
+    "char": "𓁒",
+    "description": "woman giving birth",
+    "ideogram": ["to give birth (msj)", "conceive (jwr)"],
+    "width": 8.84,
+    "height": 12
+  },
+  {
+    "char": "𓇌",
+    "description": "two reeds",
+    "ideogram": [],
+    "width": 8.84,
+    "height": 13
+  },
+  {
+    "char": "𓊀",
+    "description": "gateway",
+    "ideogram": ["Gate (sbꜣ)"],
+    "width": 8.84,
+    "height": 13
+  },
+  {
+    "char": "𓋯",
+    "description": "apron",
+    "ideogram": ["Shendyt kilt (šndyt/šnḏyt)"],
+    "width": 8.84,
+    "height": 11
+  },
+  {
+    "char": "𓇱",
+    "description": "sky with sceptre",
+    "ideogram": ["Darkness (kkw)", "Night (grḥ)"],
+    "width": 8.85,
+    "height": 12
+  },
+  {
+    "char": "𓈋",
+    "description": "two hills",
+    "ideogram": ["Mountain (ḏw)"],
+    "width": 8.85,
+    "height": 6
+  },
+  {
+    "char": "𓈌",
+    "description": "sun over mountain",
+    "ideogram": ["Horizon (ꜣḫt)"],
+    "width": 8.85,
+    "height": 7
+  },
+  {
+    "char": "𓎩",
+    "description": null,
+    "ideogram": [],
+    "width": 8.85,
+    "height": 8
+  },
+  {
+    "char": "𓁅",
+    "description": "man sowing seeds",
+    "ideogram": ["Spill, pour (stj)"],
+    "width": 8.87,
+    "height": 13
+  },
+  {
+    "char": "𓀝",
+    "description": "man striking, with left arm hanging behind back",
+    "ideogram": ["to hit or strike (ḥwj)"],
+    "width": 8.89,
+    "height": 13
+  },
+  {
+    "char": "𓁑",
+    "description": "pregnant woman",
+    "ideogram": ["to be pregnant (bkꜣ)", "conceive (jwr)"],
+    "width": 8.92,
+    "height": 13
+  },
+  {
+    "char": "𓎮",
+    "description": null,
+    "ideogram": [],
+    "width": 8.92,
+    "height": 4
+  },
+  {
+    "char": "𓁠",
+    "description": "god with ram head",
+    "ideogram": ["Id. & Det. for Khnum (ẖnmw)"],
+    "width": 8.96,
+    "height": 13
+  },
+  {
+    "char": "𓆗",
+    "description": "cobra erect as on the forehead of the Pharaoh",
+    "ideogram": ["Uraeus (jꜥrt)", "Lady (nbt) (Ptolemaic)"],
+    "width": 9.02,
+    "height": 14
+  },
+  {
+    "char": "𓋘",
+    "description": "combination of red crown and village",
+    "ideogram": ["Lower Egypt(ian), North (mḥw)"],
+    "width": 9.02,
+    "height": 15
+  },
+  {
+    "char": "𓂯",
+    "description": "three fingers",
+    "ideogram": ["30,000"],
+    "width": 9.06,
+    "height": 13
+  },
+  {
+    "char": "𓄝",
+    "description": "cow's skin pierced by arrow",
+    "ideogram": ["Shoot, ejaculate, shine (sṯj)"],
+    "width": 9.07,
+    "height": 13
+  },
+  {
+    "char": "𓁄",
+    "description": "man threatening with stick",
+    "ideogram": [],
+    "width": 9.08,
+    "height": 13
+  },
+  {
+    "char": "𓆫",
+    "description": "scorpion",
+    "ideogram": ["Serket (srqt)"],
+    "width": 9.11,
+    "height": 12
+  },
+  {
+    "char": "𓀃",
+    "description": "seated man with hands raised",
+    "ideogram": ["offer, praise, beseech (dwꜣ)", "hide, conceal (jmn)"],
+    "width": 9.15,
+    "height": 13
+  },
+  {
+    "char": "𓀘",
+    "description": "man leaning on forked staff",
+    "ideogram": ["elder (smsw)"],
+    "width": 9.15,
+    "height": 13
+  },
+  {
+    "char": "𓁂",
+    "description": "man holding loaf on mat",
+    "ideogram": ["An offering which the King gives (ḥtp-dj-nsw)"],
+    "width": 9.2,
+    "height": 13
+  },
+  {
+    "char": "𓏽",
+    "description": null,
+    "ideogram": [],
+    "width": 9.2,
+    "height": 4
+  },
+  {
+    "char": "𓐀",
+    "description": null,
+    "ideogram": [],
+    "width": 9.2,
+    "height": 9
+  },
+  {
+    "char": "𓐁",
+    "description": null,
+    "ideogram": [],
+    "width": 9.2,
+    "height": 9
+  },
+  {
+    "char": "𓅆",
+    "description": "falcon on standard",
+    "ideogram": ["God (nṯr)", "King (nswt) (Rarely)"],
+    "width": 9.2,
+    "height": 12
+  },
+  {
+    "char": "𓁔",
+    "description": "woman suckling child",
+    "ideogram": [
+      "to nurse, to nurture, to care for (rnn)",
+      "wet nurse (noun def. 1) (mnꜥt)"
+    ],
+    "width": 9.27,
+    "height": 13
+  },
+  {
+    "char": "𓀴",
+    "description": "king wearing white crown with flagellum",
+    "ideogram": ["King of Upper Egypt (nsw)", "Atum (jtmw)"],
+    "width": 9.27,
+    "height": 13
+  },
+  {
+    "char": "𓀎",
+    "description": "soldier with bow and quiver",
+    "ideogram": [
+      "soldier, company/unit of soldiers (mnfyt), army/expedition (mšꜥ)"
+    ],
+    "width": 9.28,
+    "height": 13
+  },
+  {
+    "char": "𓐈",
+    "description": null,
+    "ideogram": [],
+    "width": 9.3,
+    "height": 6
+  },
+  {
+    "char": "𓐉",
+    "description": null,
+    "ideogram": [],
+    "width": 9.3,
+    "height": 6
+  },
+  {
+    "char": "𓐊",
+    "description": null,
+    "ideogram": [],
+    "width": 9.3,
+    "height": 9
+  },
+  {
+    "char": "𓐋",
+    "description": null,
+    "ideogram": [],
+    "width": 9.3,
+    "height": 9
+  },
+  {
+    "char": "𓌤",
+    "description": "fishingnet",
+    "ideogram": ["iꜥḥ"],
+    "width": 9.34,
+    "height": 8
+  },
+  {
+    "char": "𓀠",
+    "description": "man with hands raised on either side",
+    "ideogram": ["to be high, in high spirits, elevate (qꜣj)", "mourn (ḥꜣj)"],
+    "width": 9.38,
+    "height": 13
+  },
+  {
+    "char": "𓌆",
+    "description": "covering for head and neck",
+    "ideogram": [],
+    "width": 9.44,
+    "height": 11
+  },
+  {
+    "char": "𓀅",
+    "description": "seated man hiding behind wall",
+    "ideogram": ["hide (jmn)"],
+    "width": 9.46,
+    "height": 13
+  },
+  {
+    "char": "𓀻",
+    "description": "noble on chair",
+    "ideogram": [
+      "courtier (smr)",
+      "I, me, my (when speaker is a nobleman) (.j)",
+      "noble (šps)"
+    ],
+    "width": 9.49,
+    "height": 13
+  },
+  {
+    "char": "𓀼",
+    "description": "noble on chair with flagellum",
+    "ideogram": ["to be of noble blood (špsj)", "undertake a task (špsj)"],
+    "width": 9.49,
+    "height": 13
+  },
+  {
+    "char": "𓌖",
+    "description": "two crossed arrows",
+    "ideogram": [],
+    "width": 9.53,
+    "height": 9
+  },
+  {
+    "char": "𓆀",
+    "description": "head of heron",
+    "ideogram": ["Be effective (ꜣḫ)"],
+    "width": 9.54,
+    "height": 7
+  },
+  {
+    "char": "𓁃",
+    "description": "man applying hoe to ground",
+    "ideogram": [],
+    "width": 9.55,
+    "height": 13
+  },
+  {
+    "char": "𓅝",
+    "description": "sacred Ibis on standard",
+    "ideogram": ["Ibis (hb)", "Thoth (ḏḥwtj)"],
+    "width": 9.56,
+    "height": 12
+  },
+  {
+    "char": "𓀆",
+    "description": "seated man under vase from which water flows",
+    "ideogram": ["to be clean (wꜤb)"],
+    "width": 9.58,
+    "height": 13
+  },
+  {
+    "char": "𓋨",
+    "description": "seal with necklace",
+    "ideogram": ["Seal (ḫtm)", "Seal-bearer (sḏꜣwty)"],
+    "width": 9.58,
+    "height": 9
+  },
+  {
+    "char": "𓋺",
+    "description": "sunshade",
+    "ideogram": ["Shadow, shade, sunshade (ḫꜣbyt, šwt)", "Standard (sryt)"],
+    "width": 9.59,
+    "height": 12
+  },
+  {
+    "char": "𓋻",
+    "description": "sunshade",
+    "ideogram": ["Shadow, shade, sunshade (ḫꜣbyt, šwt)", "Standard (sryt)"],
+    "width": 9.59,
+    "height": 12
+  },
+  {
+    "char": "𓀷",
+    "description": "king wearing red crown with flagellum",
+    "ideogram": ["King of Lower Egypt (bjtj)"],
+    "width": 9.62,
+    "height": 13
+  },
+  {
+    "char": "𓆽",
+    "description": "two lotus plants",
+    "ideogram": ["2,000"],
+    "width": 9.63,
+    "height": 13
+  },
+  {
+    "char": "𓅈",
+    "description": "falcon in boat",
+    "ideogram": ["Nemty (nmty)"],
+    "width": 9.66,
+    "height": 12
+  },
+  {
+    "char": "𓉵",
+    "description": "pedestal of sun temple",
+    "ideogram": ["Ascend (jꜥ(r))"],
+    "width": 9.69,
+    "height": 11
+  },
+  {
+    "char": "𓉷",
+    "description": "obelisk and pedestal of sun temple",
+    "ideogram": [],
+    "width": 9.69,
+    "height": 12
+  },
+  {
+    "char": "𓀂",
+    "description": "man sitting on heel",
+    "ideogram": ["sit, besiege, dwell (ḥmsj)"],
+    "width": 9.7,
+    "height": 13
+  },
+  {
+    "char": "𓁡",
+    "description": "god with ram head holding ankh",
+    "ideogram": ["Id. & Det. for Khnum (ẖnmw)"],
+    "width": 9.71,
+    "height": 13
+  },
+  {
+    "char": "𓀄",
+    "description": "crouching man hiding behind wall",
+    "ideogram": ["hide (jmn)"],
+    "width": 9.73,
+    "height": 13
+  },
+  {
+    "char": "𓄪",
+    "description": "backbone and spinal cord",
+    "ideogram": ["Spinal cord (jmꜣḫ)", "Veneration, reveredness (jmꜣḫ)"],
+    "width": 9.73,
+    "height": 9
+  },
+  {
+    "char": "𓅉",
+    "description": "falcon on collar of beads",
+    "ideogram": ["Horus/Falcon of Gold (ḥr-nbw/bjk-nbw)"],
+    "width": 9.75,
+    "height": 13
+  },
+  {
+    "char": "𓅦",
+    "description": "ostrich",
+    "ideogram": ["ostrich (njw)"],
+    "width": 9.75,
+    "height": 12
+  },
+  {
+    "char": "𓃠",
+    "description": "cat",
+    "ideogram": ["Cat (mjw)", "When (ḫft-ḥr) (Ptolemaic)"],
+    "width": 9.77,
+    "height": 13
+  },
+  {
+    "char": "𓐧",
+    "description": null,
+    "ideogram": ["garment priest (smꜣ)"],
+    "width": 9.79,
+    "height": 12
+  },
+  {
+    "char": "𓀁",
+    "description": "man with hand to mouth",
+    "ideogram": [
+      "eat (wnm)",
+      "drink (zwr)",
+      "speak, think, recount (sḏd)",
+      "refrain from speech, be(come) silent (gr)",
+      "plan, plot (kꜣj)",
+      "love (mrj)"
+    ],
+    "width": 9.82,
+    "height": 13
+  },
+  {
+    "char": "𓁎",
+    "description": "seated man with raised right arm and left arm hanging down",
+    "ideogram": [],
+    "width": 9.82,
+    "height": 13
+  },
+  {
+    "char": "𓆦",
+    "description": "fly",
+    "ideogram": ["fly (ꜥff)"],
+    "width": 9.83,
+    "height": 12
+  },
+  {
+    "char": "𓀀",
+    "description": "seated man",
+    "ideogram": ["I, me, my (masculine) (.j)", "man (z)"],
+    "width": 9.84,
+    "height": 13
+  },
+  {
+    "char": "𓁁",
+    "description": "seated man holding stick",
+    "ideogram": [],
+    "width": 9.84,
+    "height": 13
+  },
+  {
+    "char": "𓋔",
+    "description": "red crown",
+    "ideogram": [
+      "Red crown (dšrt, nt)",
+      "King (of Lower Egypt) (bjty)",
+      "Lower Egypt(ian), North (mḥw)"
+    ],
+    "width": 9.84,
+    "height": 12
+  },
+  {
+    "char": "𓋖",
+    "description": "Pschent Crown",
+    "ideogram": [
+      "Double crown (sḫmty) (lit. ‘two powers’)",
+      "Upper and Lower Egypt (šmꜥw-mḥw)",
+      "Dual king (nswt-bjty)"
+    ],
+    "width": 9.84,
+    "height": 12
+  },
+  {
+    "char": "𓄁",
+    "description": "hippopotamus head",
+    "ideogram": ["Moment (ꜣt)", "head (dp)"],
+    "width": 9.88,
+    "height": 7
+  },
+  {
+    "char": "𓍓",
+    "description": null,
+    "ideogram": [],
+    "width": 9.96,
+    "height": 12
+  },
+  {
+    "char": "𓎈",
+    "description": null,
+    "ideogram": [],
+    "width": 10.01,
+    "height": 9
+  },
+  {
+    "char": "𓎉",
+    "description": null,
+    "ideogram": [],
+    "width": 10.01,
+    "height": 9
+  },
+  {
+    "char": "𓎏",
+    "description": null,
+    "ideogram": [],
+    "width": 10.01,
+    "height": 4
+  },
+  {
+    "char": "𓏞",
+    "description": "Scribe's equipment",
+    "ideogram": ["to write; writing; to become finely ground"],
+    "width": 10.05,
+    "height": 13
+  },
+  {
+    "char": "𓏟",
+    "description": "Scribe's equipment",
+    "ideogram": ["(as above)"],
+    "width": 10.05,
+    "height": 13
+  },
+  {
+    "char": "𓆉",
+    "description": "turtle",
+    "ideogram": ["Turtle (št)"],
+    "width": 10.09,
+    "height": 7
+  },
+  {
+    "char": "𓀔",
+    "description": "child sitting with hand to mouth",
+    "ideogram": [
+      "young, child (šrj)",
+      "orphan (nmḥ)",
+      "child (ẖrd, ḫy)",
+      "infant (nnj)"
+    ],
+    "width": 10.15,
+    "height": 13
+  },
+  {
+    "char": "𓁕",
+    "description": "woman suckling child (simplified)",
+    "ideogram": [],
+    "width": 10.16,
+    "height": 13
+  },
+  {
+    "char": "𓄃",
+    "description": "hartebeest head",
+    "ideogram": ["wise, skilled (šsꜣ)"],
+    "width": 10.21,
+    "height": 12
+  },
+  {
+    "char": "𓋧",
+    "description": "\"menat necklace and counterpoise\"",
+    "ideogram": ["Menat (mnjt)"],
+    "width": 10.22,
+    "height": 13
+  },
+  {
+    "char": "𓀕",
+    "description": "child sitting with arms hanging down",
+    "ideogram": [
+      "Noble/Aristocratic Supplement for A3 and A17 sitting, sitting youth"
+    ],
+    "width": 10.23,
+    "height": 13
+  },
+  {
+    "char": "𓁘",
+    "description": "woman holding lotus flower",
+    "ideogram": [],
+    "width": 10.23,
+    "height": 13
+  },
+  {
+    "char": "𓆐",
+    "description": "tadpole",
+    "ideogram": ["100,000 (ḥfn)"],
+    "width": 10.23,
+    "height": 13
+  },
+  {
+    "char": "𓆰",
+    "description": "plant",
+    "ideogram": ["True of Voice (mꜣꜥ-ḫrw)"],
+    "width": 10.23,
+    "height": 11
+  },
+  {
+    "char": "𓀍",
+    "description": "seated man holding scepter of authority and shepherd's crook",
+    "ideogram": ["friend (ḫnms)"],
+    "width": 10.26,
+    "height": 13
+  },
+  {
+    "char": "𓀸",
+    "description": "shepherd seated and wrapped in mantle, holding stick",
+    "ideogram": ["shepherd (mnjw)", "guard (sꜣw)"],
+    "width": 10.27,
+    "height": 13
+  },
+  {
+    "char": "𓍜",
+    "description": null,
+    "ideogram": [],
+    "width": 10.27,
+    "height": 8
+  },
+  {
+    "char": "𓏯",
+    "description": "Diagonal stroke (from hieratic)",
+    "ideogram": [],
+    "width": 10.27,
+    "height": 7
+  },
+  {
+    "char": "𓀰",
+    "description": "king with uraeus and flagellum",
+    "ideogram": [
+      "king (nsw)",
+      "majesty (ḥm)",
+      "I, me, my (when speaker is a king) (.j)"
+    ],
+    "width": 10.3,
+    "height": 13
+  },
+  {
+    "char": "𓀱",
+    "description": "king with uraeus and flagellum",
+    "ideogram": [
+      "king (nsw)",
+      "majesty (ḥm)",
+      "I, me, my (when speaker is a king) (.j)"
+    ],
+    "width": 10.3,
+    "height": 13
+  },
+  {
+    "char": "𓃑",
+    "description": "nine dots",
+    "ideogram": [],
+    "width": 10.39,
+    "height": 11
+  },
+  {
+    "char": "𓃍",
+    "description": "five dots",
+    "ideogram": [],
+    "width": 10.4,
+    "height": 7
+  },
+  {
+    "char": "𓃎",
+    "description": "six dots",
+    "ideogram": [],
+    "width": 10.4,
+    "height": 7
+  },
+  {
+    "char": "𓄆",
+    "description": "forepart of ram",
+    "ideogram": ["Terror, awe (šfyt)"],
+    "width": 10.47,
+    "height": 12
+  },
+  {
+    "char": "𓇎",
+    "description": "heaped conical cakes between reed (M17) and club",
+    "ideogram": ["Pleasing (ꜥꜣb)", "Offerings, provisions (ꜥꜣbt)"],
+    "width": 10.47,
+    "height": 13
+  },
+  {
+    "char": "𓅊",
+    "description": "falcon with sun on head",
+    "ideogram": ["Ra-Horus (rꜥ-ḥrw)"],
+    "width": 10.48,
+    "height": 13
+  },
+  {
+    "char": "𓀊",
+    "description": "man performing hnw-rite",
+    "ideogram": ["rejoice, celebrate, to be jubilant (hnw)"],
+    "width": 10.49,
+    "height": 13
+  },
+  {
+    "char": "𓁗",
+    "description": "queen wearing diadem and holding flower",
+    "ideogram": [],
+    "width": 10.49,
+    "height": 13
+  },
+  {
+    "char": "𓊿",
+    "description": "falcon and feather on standard",
+    "ideogram": ["West (jmnty, jmntt)"],
+    "width": 10.52,
+    "height": 12
+  },
+  {
+    "char": "𓀏",
+    "description": "man with arms tied behind his back",
+    "ideogram": ["enemy (ḫfty)", "rebel (sbj)"],
+    "width": 10.53,
+    "height": 13
+  },
+  {
+    "char": "𓌊",
+    "description": "combination of mace with round head and two hills",
+    "ideogram": [],
+    "width": 10.54,
+    "height": 13
+  },
+  {
+    "char": "𓅍",
+    "description": "image of falcon on standard",
+    "ideogram": [],
+    "width": 10.55,
+    "height": 10
+  },
+  {
+    "char": "𓉠",
+    "description": "combination of enclosure, flat loaf and basket",
+    "ideogram": ["Nephthys (nbt-ḥwt)"],
+    "width": 10.56,
+    "height": 12
+  },
+  {
+    "char": "𓉨",
+    "description": "part of battlemented enclosure",
+    "ideogram": ["Portal (sbḫt)"],
+    "width": 10.56,
+    "height": 10
+  },
+  {
+    "char": "𓊁",
+    "description": "façade of palace",
+    "ideogram": ["Palace (srḫ)"],
+    "width": 10.56,
+    "height": 12
+  },
+  {
+    "char": "𓀩",
+    "description": "man kneading into vessel",
+    "ideogram": ["brewer (ꜥftj)", "grind (nḏ)"],
+    "width": 10.61,
+    "height": 13
+  },
+  {
+    "char": "𓇧",
+    "description": "wide bundle of flax",
+    "ideogram": ["Bind together (dmꜣ)"],
+    "width": 10.61,
+    "height": 8
+  },
+  {
+    "char": "𓋚",
+    "description": "Atef crown",
+    "ideogram": ["Atef (ꜣtf)"],
+    "width": 10.63,
+    "height": 13
+  },
+  {
+    "char": "𓇂",
+    "description": "seven lotus plants",
+    "ideogram": ["7,000"],
+    "width": 10.64,
+    "height": 14
+  },
+  {
+    "char": "𓇃",
+    "description": "eight lotus plants",
+    "ideogram": ["8,000"],
+    "width": 10.64,
+    "height": 14
+  },
+  {
+    "char": "𓄌",
+    "description": "horns",
+    "ideogram": [],
+    "width": 10.65,
+    "height": 7
+  },
+  {
+    "char": "𓄩",
+    "description": "backbone and ribs and spinal cord",
+    "ideogram": [],
+    "width": 10.66,
+    "height": 10
+  },
+  {
+    "char": "𓇐",
+    "description": "reeds with root",
+    "ideogram": ["Help (sm)"],
+    "width": 10.68,
+    "height": 12
+  },
+  {
+    "char": "𓄍",
+    "description": "horns with palm branch",
+    "ideogram": ["opening the year (New year festival) (wp[t]-rnpt)"],
+    "width": 10.69,
+    "height": 13
+  },
+  {
+    "char": "𓃨",
+    "description": "wolf on standard with mace",
+    "ideogram": ["Wepwawet (wpj-wꜣwt)"],
+    "width": 10.7,
+    "height": 12
+  },
+  {
+    "char": "𓄋",
+    "description": "horns",
+    "ideogram": ["open (wpj)"],
+    "width": 10.72,
+    "height": 8
+  },
+  {
+    "char": "𓄀",
+    "description": "charging ox head",
+    "ideogram": ["Bull (kꜣ)"],
+    "width": 10.73,
+    "height": 10
+  },
+  {
+    "char": "𓃦",
+    "description": "jackal looking back",
+    "ideogram": [],
+    "width": 10.74,
+    "height": 12
+  },
+  {
+    "char": "𓅲",
+    "description": "combination of quail chick and flat loaf",
+    "ideogram": [],
+    "width": 10.75,
+    "height": 12
+  },
+  {
+    "char": "𓁈",
+    "description": "king on throne holding staff",
+    "ideogram": [],
+    "width": 10.76,
+    "height": 13
+  },
+  {
+    "char": "𓀇",
+    "description": "seated man reaching for libation stone, under vase from which water flows",
+    "ideogram": ["to be clean (wꜤb)"],
+    "width": 10.77,
+    "height": 13
+  },
+  {
+    "char": "𓀈",
+    "description": "seated man reaching down, under vase from which water flows",
+    "ideogram": ["to be clean (wꜤb)"],
+    "width": 10.77,
+    "height": 13
+  },
+  {
+    "char": "𓊳",
+    "description": "low table",
+    "ideogram": [
+      "offering table (ḫꜣwt)",
+      "Offerings (wdḥw)",
+      "Offering, satisfy (ḥtp)"
+    ],
+    "width": 10.77,
+    "height": 6
+  },
+  {
+    "char": "𓊴",
+    "description": "low table with offerings (simplified)",
+    "ideogram": [],
+    "width": 10.77,
+    "height": 7
+  },
+  {
+    "char": "𓆹",
+    "description": "lotus bud with straight stem",
+    "ideogram": ["Lotus bud (nḥbt)"],
+    "width": 10.78,
+    "height": 11
+  },
+  {
+    "char": "𓆢",
+    "description": "catfish",
+    "ideogram": ["Catfish (nꜥr)"],
+    "width": 10.79,
+    "height": 5
+  },
+  {
+    "char": "𓃴",
+    "description": "gazelle",
+    "ideogram": ["gazelle (gḥs)"],
+    "width": 10.8,
+    "height": 13
+  },
+  {
+    "char": "𓂬",
+    "description": "fist",
+    "ideogram": ["grasp (ꜣmm, ḫfꜥ)"],
+    "width": 10.8,
+    "height": 7
+  },
+  {
+    "char": "𓇰",
+    "description": "sky with sceptre",
+    "ideogram": ["Darkness (kkw)", "Night (grḥ)"],
+    "width": 10.81,
+    "height": 10
+  },
+  {
+    "char": "𓉫",
+    "description": "open gateway with serpents",
+    "ideogram": ["Gate (rwt)", "Shroud, door (tꜣyt)"],
+    "width": 10.81,
+    "height": 9
+  },
+  {
+    "char": "𓈍",
+    "description": "rays of sun over hill",
+    "ideogram": ["Appear (ḫꜥj)"],
+    "width": 10.82,
+    "height": 6
+  },
+  {
+    "char": "𓅶",
+    "description": "combination of quail chick and sickle",
+    "ideogram": [],
+    "width": 10.84,
+    "height": 12
+  },
+  {
+    "char": "𓆆",
+    "description": "bird foot",
+    "ideogram": ["Claw (ꜥnt)"],
+    "width": 10.84,
+    "height": 10
+  },
+  {
+    "char": "𓃚",
+    "description": "kid jumping",
+    "ideogram": ["Kid (goat) (jb)"],
+    "width": 10.86,
+    "height": 13
+  },
+  {
+    "char": "𓁨",
+    "description": "god with arms supporting the sky and palm branch on head",
+    "ideogram": ["Id. & Det. for Heh (ḥḥ)", "Million (ḥḥ)"],
+    "width": 10.93,
+    "height": 13
+  },
+  {
+    "char": "𓆺",
+    "description": "lotus bud with winding stem",
+    "ideogram": [],
+    "width": 10.95,
+    "height": 6
+  },
+  {
+    "char": "𓏃",
+    "description": "three water jars in rack",
+    "ideogram": ["water pitchers in the stand (ḫntw), first ḫnt (j)"],
+    "width": 11.02,
+    "height": 13
+  },
+  {
+    "char": "𓉮",
+    "description": "shrine",
+    "ideogram": [
+      "Shrine (jtrt)",
+      "Great House (archaic shrine of El Kab and Upper Egypt) (pr-wr)"
+    ],
+    "width": 11.07,
+    "height": 12
+  },
+  {
+    "char": "𓉤",
+    "description": "combination of shrine in profile and face",
+    "ideogram": [],
+    "width": 11.09,
+    "height": 13
+  },
+  {
+    "char": "𓉬",
+    "description": "shrine in profile",
+    "ideogram": ["Shrine (kꜣrj)"],
+    "width": 11.09,
+    "height": 13
+  },
+  {
+    "char": "𓍤",
+    "description": null,
+    "ideogram": [],
+    "width": 11.1,
+    "height": 6
+  },
+  {
+    "char": "𓍦",
+    "description": null,
+    "ideogram": [],
+    "width": 11.1,
+    "height": 12
+  },
+  {
+    "char": "𓍧",
+    "description": null,
+    "ideogram": [],
+    "width": 11.1,
+    "height": 12
+  },
+  {
+    "char": "𓃲",
+    "description": "oryx",
+    "ideogram": ["gazelle (gḥs, mꜣ-ḥḏ)"],
+    "width": 11.13,
+    "height": 13
+  },
+  {
+    "char": "𓍾",
+    "description": null,
+    "ideogram": [],
+    "width": 11.13,
+    "height": 8
+  },
+  {
+    "char": "𓇆",
+    "description": "combination of papyrus and cobra",
+    "ideogram": ["Fresh, green, raw (wꜣḏ)"],
+    "width": 11.21,
+    "height": 13
+  },
+  {
+    "char": "𓄄",
+    "description": "forepart of hartebeest",
+    "ideogram": ["wise, skilled (šsꜣ)"],
+    "width": 11.24,
+    "height": 13
+  },
+  {
+    "char": "𓃵",
+    "description": "ibex",
+    "ideogram": ["Ibex (njꜣw)"],
+    "width": 11.3,
+    "height": 13
+  },
+  {
+    "char": "𓂫",
+    "description": "hand holding egg",
+    "ideogram": [],
+    "width": 11.33,
+    "height": 6
+  },
+  {
+    "char": "𓆥",
+    "description": "combination of bee, sedge and two flat loafs",
+    "ideogram": ["Dual King (nswt-bjty)"],
+    "width": 11.33,
+    "height": 12
+  },
+  {
+    "char": "𓅳",
+    "description": "two quail chicks",
+    "ideogram": [],
+    "width": 11.34,
+    "height": 12
+  },
+  {
+    "char": "𓁉",
+    "description": "man sitting on heels holding forward cup",
+    "ideogram": [],
+    "width": 11.41,
+    "height": 12
+  },
+  {
+    "char": "𓍯",
+    "description": "lasso",
+    "ideogram": ["wꜣ (bil.)"],
+    "width": 11.45,
+    "height": 12
+  },
+  {
+    "char": "𓃶",
+    "description": "goat with collar",
+    "ideogram": ["Noble, rank, be noble (sꜥḥ)"],
+    "width": 11.48,
+    "height": 13
+  },
+  {
+    "char": "𓀽",
+    "description": "noble squatting with flagellum",
+    "ideogram": ["to be of noble blood (špsj)"],
+    "width": 11.49,
+    "height": 13
+  },
+  {
+    "char": "𓐥",
+    "description": null,
+    "ideogram": [],
+    "width": 11.52,
+    "height": 8
+  },
+  {
+    "char": "𓊊",
+    "description": "falling wall",
+    "ideogram": ["Tilt, favor (gsꜣ)", "Demolish (sẖnn)"],
+    "width": 11.55,
+    "height": 9
+  },
+  {
+    "char": "𓃪",
+    "description": "Set-animal on basket",
+    "ideogram": [],
+    "width": 11.58,
+    "height": 13
+  },
+  {
+    "char": "𓅽",
+    "description": "human-headed bird with bowl with smoke",
+    "ideogram": ["Ba-soul (bꜣ)"],
+    "width": 11.66,
+    "height": 12
+  },
+  {
+    "char": "𓀌",
+    "description": "seated man holding oar",
+    "ideogram": ["to saw (sqdw)", "rower, oarsman (ẖn)"],
+    "width": 11.66,
+    "height": 13
+  },
+  {
+    "char": "𓃡",
+    "description": "dog",
+    "ideogram": ["Dog (ṯsm)"],
+    "width": 11.68,
+    "height": 11
+  },
+  {
+    "char": "𓇴",
+    "description": "sun with uraeus",
+    "ideogram": ["Ra, the sun (rꜥ)", "Day (hrw)"],
+    "width": 11.68,
+    "height": 7
+  },
+  {
+    "char": "𓌈",
+    "description": "mace with round head",
+    "ideogram": [],
+    "width": 11.69,
+    "height": 7
+  },
+  {
+    "char": "𓐕",
+    "description": null,
+    "ideogram": [],
+    "width": 11.69,
+    "height": 11
+  },
+  {
+    "char": "𓍽",
+    "description": null,
+    "ideogram": [],
+    "width": 11.7,
+    "height": 7
+  },
+  {
+    "char": "𓉭",
+    "description": "shrine with fence",
+    "ideogram": [
+      "Shrine (jtrt)",
+      "Great House (archaic shrine of El Kab and Upper Egypt) (pr-wr)"
+    ],
+    "width": 11.7,
+    "height": 13
+  },
+  {
+    "char": "𓁏",
+    "description": "seated man with raised arms",
+    "ideogram": ["Heh (ḥḥ)"],
+    "width": 11.71,
+    "height": 12
+  },
+  {
+    "char": "𓆌",
+    "description": "crocodile with curved tail",
+    "ideogram": ["pull together, be wary (sꜣq)"],
+    "width": 11.73,
+    "height": 7
+  },
+  {
+    "char": "𓌳",
+    "description": "sickle",
+    "ideogram": [],
+    "width": 11.74,
+    "height": 13
+  },
+  {
+    "char": "𓐃",
+    "description": null,
+    "ideogram": [],
+    "width": 11.9,
+    "height": 4
+  },
+  {
+    "char": "𓅘",
+    "description": "guineafowl",
+    "ideogram": [],
+    "width": 11.91,
+    "height": 12
+  },
+  {
+    "char": "𓏧",
+    "description": null,
+    "ideogram": [],
+    "width": 11.91,
+    "height": 4
+  },
+  {
+    "char": "𓄧",
+    "description": "backbone and ribs",
+    "ideogram": ["Slaughtering, massacre (šꜥt)", "Back (jꜣt)"],
+    "width": 11.92,
+    "height": 7
+  },
+  {
+    "char": "𓀑",
+    "description": "man whose head is hit with an axe",
+    "ideogram": [],
+    "width": 11.95,
+    "height": 13
+  },
+  {
+    "char": "𓂰",
+    "description": "four fingers",
+    "ideogram": ["40,000"],
+    "width": 11.95,
+    "height": 13
+  },
+  {
+    "char": "𓃄",
+    "description": "three toes oriented rightward",
+    "ideogram": ["toe (sꜣḥ)"],
+    "width": 11.96,
+    "height": 10
+  },
+  {
+    "char": "𓅬",
+    "description": "goose",
+    "ideogram": ["Bird (ꜣpd)", "Geb (gb)", "Destroy (ḥtm)"],
+    "width": 12.05,
+    "height": 12
+  },
+  {
+    "char": "𓄿",
+    "description": "Egyptian vulture",
+    "ideogram": [],
+    "width": 12.11,
+    "height": 12
+  },
+  {
+    "char": "𓅁",
+    "description": "combination of Egyptian vulture and sickle",
+    "ideogram": [],
+    "width": 12.11,
+    "height": 12
+  },
+  {
+    "char": "𓅂",
+    "description": "buzzard",
+    "ideogram": ["tjw"],
+    "width": 12.11,
+    "height": 12
+  },
+  {
+    "char": "𓇻",
+    "description": "combination of crescent moon (N12) and star (N14)",
+    "ideogram": ["Half-month festival (smdt)"],
+    "width": 12.16,
+    "height": 12
+  },
+  {
+    "char": "𓀪",
+    "description": "man in vessel",
+    "ideogram": ["brewer (ꜥftj)"],
+    "width": 12.16,
+    "height": 12
+  },
+  {
+    "char": "𓈖",
+    "description": "ripple of water",
+    "ideogram": [
+      "To, for (Dative preposition) (n)",
+      "Of (Genitival adjective) (n[j])"
+    ],
+    "width": 12.2,
+    "height": 3
+  },
+  {
+    "char": "𓈗",
+    "description": "three ripples of water",
+    "ideogram": ["Water (mw)"],
+    "width": 12.2,
+    "height": 13
+  },
+  {
+    "char": "𓃗",
+    "description": "horse",
+    "ideogram": ["Horse (ssmt, jbr)"],
+    "width": 12.24,
+    "height": 12
+  },
+  {
+    "char": "𓆤",
+    "description": "bee",
+    "ideogram": ["bee (bjt)"],
+    "width": 12.24,
+    "height": 12
+  },
+  {
+    "char": "𓍷",
+    "description": "cartouche",
+    "ideogram": ["šn rn"],
+    "width": 12.3,
+    "height": 6
+  },
+  {
+    "char": "𓃧",
+    "description": "wolf on standard",
+    "ideogram": ["Wepwawet (wpj-wꜣwt)"],
+    "width": 12.31,
+    "height": 12
+  },
+  {
+    "char": "𓊃",
+    "description": "door bolt",
+    "ideogram": ["Doorbolt (s)"],
+    "width": 12.32,
+    "height": 2
+  },
+  {
+    "char": "𓊄",
+    "description": "combination of bolt and legs",
+    "ideogram": ["Go (sj)"],
+    "width": 12.32,
+    "height": 6
+  },
+  {
+    "char": "𓂇",
+    "description": "diagonal and vertical markings of Eye of Horus",
+    "ideogram": ["Image (twt)"],
+    "width": 12.34,
+    "height": 6
+  },
+  {
+    "char": "𓍼",
+    "description": "Contrast V23A.",
+    "ideogram": [],
+    "width": 12.34,
+    "height": 7
+  },
+  {
+    "char": "𓏄",
+    "description": "three water jars in rack (simplified)",
+    "ideogram": [],
+    "width": 12.34,
+    "height": 12
+  },
+  {
+    "char": "𓏆",
+    "description": "four water jars in rack (simplified)",
+    "ideogram": [],
+    "width": 12.34,
+    "height": 12
+  },
+  {
+    "char": "𓍃",
+    "description": "sled (sledge)",
+    "ideogram": ["tm"],
+    "width": 12.36,
+    "height": 5
+  },
+  {
+    "char": "𓋬",
+    "description": "two whips with shen ring",
+    "ideogram": ["Bring together, collect (dmḏ)"],
+    "width": 12.39,
+    "height": 8
+  },
+  {
+    "char": "𓌇",
+    "description": "mace with flat head",
+    "ideogram": [],
+    "width": 12.39,
+    "height": 3
+  },
+  {
+    "char": "𓏥",
+    "description": "Plural stroke (horizontal)",
+    "ideogram": [],
+    "width": 12.39,
+    "height": 4
+  },
+  {
+    "char": "𓍭",
+    "description": null,
+    "ideogram": [],
+    "width": 12.4,
+    "height": 11
+  },
+  {
+    "char": "𓂜",
+    "description": "arms in gesture of negation",
+    "ideogram": [
+      "not (n, nn)",
+      "that which is not (jwtj)",
+      "to not know (ḫm)",
+      "shrine (ḫm)",
+      "forget (smḫ)"
+    ],
+    "width": 12.42,
+    "height": 3
+  },
+  {
+    "char": "𓌻",
+    "description": "hoe",
+    "ideogram": ["mr"],
+    "width": 12.42,
+    "height": 6
+  },
+  {
+    "char": "𓂝",
+    "description": "forearm (palm upwards)",
+    "ideogram": ["arm (ꜥ)", "cubit (mḥ)"],
+    "width": 12.43,
+    "height": 4
+  },
+  {
+    "char": "𓂠",
+    "description": "forearm with bowl",
+    "ideogram": ["to present (ḥnk)"],
+    "width": 12.43,
+    "height": 4
+  },
+  {
+    "char": "𓃁",
+    "description": "foot and forearm",
+    "ideogram": [],
+    "width": 12.43,
+    "height": 11
+  },
+  {
+    "char": "𓅴",
+    "description": "combination of quail chick and forearm",
+    "ideogram": [],
+    "width": 12.43,
+    "height": 12
+  },
+  {
+    "char": "𓇘",
+    "description": "combination of flowering sedge (M26) and forearm",
+    "ideogram": [
+      "Make music (šmꜥ)",
+      "South, Southern, Upper Egypt(ian) (šmꜥw)"
+    ],
+    "width": 12.43,
+    "height": 12
+  },
+  {
+    "char": "𓉦",
+    "description": "combination of palace and forearm",
+    "ideogram": ["Palace (ꜥḥ)"],
+    "width": 12.43,
+    "height": 13
+  },
+  {
+    "char": "𓊣",
+    "description": "combination of mast and forearm",
+    "ideogram": ["to stand (ꜥḥꜥ)"],
+    "width": 12.43,
+    "height": 12
+  },
+  {
+    "char": "𓎜",
+    "description": null,
+    "ideogram": [],
+    "width": 12.43,
+    "height": 12
+  },
+  {
+    "char": "𓐤",
+    "description": null,
+    "ideogram": ["divide (wḏꜥ)"],
+    "width": 12.43,
+    "height": 12
+  },
+  {
+    "char": "𓃞",
+    "description": "ram",
+    "ideogram": ["Ba-Soul (bꜣ)", "Khnum (ẖnmw)"],
+    "width": 12.44,
+    "height": 11
+  },
+  {
+    "char": "𓄓",
+    "description": "tongue",
+    "ideogram": ["tongue (ns)"],
+    "width": 12.44,
+    "height": 10
+  },
+  {
+    "char": "𓊭",
+    "description": "sarcophagus",
+    "ideogram": ["coffin, burial (qrst), bury (qrs)"],
+    "width": 12.44,
+    "height": 8
+  },
+  {
+    "char": "𓍁",
+    "description": null,
+    "ideogram": [],
+    "width": 12.46,
+    "height": 6
+  },
+  {
+    "char": "𓆛",
+    "description": "tilapia",
+    "ideogram": ["Nile tilapia (jnt)"],
+    "width": 12.47,
+    "height": 7
+  },
+  {
+    "char": "𓂕",
+    "description": "two arms upraised with tail",
+    "ideogram": ["The god Nehebkau (nḥb-kꜣw)"],
+    "width": 12.48,
+    "height": 12
+  },
+  {
+    "char": "𓂙",
+    "description": "arms rowing",
+    "ideogram": ["to row (ẖnj)"],
+    "width": 12.48,
+    "height": 12
+  },
+  {
+    "char": "𓍈",
+    "description": null,
+    "ideogram": [],
+    "width": 12.48,
+    "height": 3
+  },
+  {
+    "char": "𓂡",
+    "description": "forearm with stick",
+    "ideogram": ["strength (nḫt)", "to strike (ḥwj)", "to examine (ḫꜣj)"],
+    "width": 12.48,
+    "height": 5
+  },
+  {
+    "char": "𓂤",
+    "description": "forearm with flail",
+    "ideogram": ["protect (ḫwj)"],
+    "width": 12.48,
+    "height": 5
+  },
+  {
+    "char": "𓌔",
+    "description": "composite bow",
+    "ideogram": [],
+    "width": 12.48,
+    "height": 2
+  },
+  {
+    "char": "𓍿",
+    "description": "tethering rope",
+    "ideogram": [],
+    "width": 12.48,
+    "height": 4
+  },
+  {
+    "char": "𓎀",
+    "description": null,
+    "ideogram": [],
+    "width": 12.48,
+    "height": 4
+  },
+  {
+    "char": "𓎁",
+    "description": "combination of tethering rope (V13) and legs walking (D54)",
+    "ideogram": ["jṯj"],
+    "width": 12.48,
+    "height": 8
+  },
+  {
+    "char": "𓀉",
+    "description": "fatigued man",
+    "ideogram": ["to be tired or weak (wrḏ)"],
+    "width": 12.49,
+    "height": 13
+  },
+  {
+    "char": "𓄲",
+    "description": "intestine",
+    "ideogram": ["Turn about (pẖr)", "Fold, turn back (wḏb)"],
+    "width": 12.49,
+    "height": 4
+  },
+  {
+    "char": "𓄳",
+    "description": "intestine",
+    "ideogram": ["Turn about (pẖr)", "Fold, turn back (wḏb)"],
+    "width": 12.49,
+    "height": 4
+  },
+  {
+    "char": "𓄴",
+    "description": "intestine",
+    "ideogram": ["Turn about (pẖr)", "Fold, turn back (wḏb)"],
+    "width": 12.49,
+    "height": 4
+  },
+  {
+    "char": "𓄵",
+    "description": "intestine",
+    "ideogram": ["Turn about (pẖr)", "Fold, turn back (wḏb)"],
+    "width": 12.49,
+    "height": 4
+  },
+  {
+    "char": "𓄸",
+    "description": "combination of F46 and S29",
+    "ideogram": ["Inscribe (spẖr)"],
+    "width": 12.49,
+    "height": 12
+  },
+  {
+    "char": "𓏱",
+    "description": "Substitute for various human figures",
+    "ideogram": ["for death, die (mwt)"],
+    "width": 12.49,
+    "height": 6
+  },
+  {
+    "char": "𓀫",
+    "description": "man holding necks of two emblematic animals with panther heads",
+    "ideogram": ["Cusae (qjs)"],
+    "width": 12.5,
+    "height": 12
+  },
+  {
+    "char": "𓁹",
+    "description": "eye",
+    "ideogram": [
+      "eye (jrt)",
+      "make, create, do (jrj)",
+      "see (mꜣꜣ)",
+      "watch, to be watchful, to be awake (rs)",
+      "to be blind (šp)"
+    ],
+    "width": 12.5,
+    "height": 3
+  },
+  {
+    "char": "𓁺",
+    "description": "eye touched up with paint",
+    "ideogram": ["eye (jrt)", "view (dgi)", "to be blind (šp)"],
+    "width": 12.5,
+    "height": 4
+  },
+  {
+    "char": "𓁻",
+    "description": "eye with painted upper lid",
+    "ideogram": ["eye (jrt)", "view (dgi)", "to be blind (šp)"],
+    "width": 12.5,
+    "height": 4
+  },
+  {
+    "char": "𓁿",
+    "description": "eye with flowing tears",
+    "ideogram": ["weep (rmj)", "person (rmṯ) (Ptolemaic rebus)"],
+    "width": 12.5,
+    "height": 7
+  },
+  {
+    "char": "𓂀",
+    "description": "Eye of Horus",
+    "ideogram": [
+      "Udjat-eye (wḏꜣt)",
+      "Eye (jrt)",
+      "Bright (bꜣq, in bꜣqt Egypt)"
+    ],
+    "width": 12.5,
+    "height": 9
+  },
+  {
+    "char": "𓂋",
+    "description": "mouth; compare V38",
+    "ideogram": ["mouth, utterance (r[ꜣ])", "Turn about (pẖr)"],
+    "width": 12.5,
+    "height": 3
+  },
+  {
+    "char": "𓂌",
+    "description": "mouth with two strokes",
+    "ideogram": ["2/3 (rꜣwj)"],
+    "width": 12.5,
+    "height": 5
+  },
+  {
+    "char": "𓂍",
+    "description": "mouth with three strokes",
+    "ideogram": ["3/4 (ḫmt-rꜣw)"],
+    "width": 12.5,
+    "height": 6
+  },
+  {
+    "char": "𓂎",
+    "description": "upper lip with teeth",
+    "ideogram": ["Lip (spt)"],
+    "width": 12.5,
+    "height": 2
+  },
+  {
+    "char": "𓂏",
+    "description": "lips",
+    "ideogram": ["(both) lips (sptj)"],
+    "width": 12.5,
+    "height": 4
+  },
+  {
+    "char": "𓂞",
+    "description": "forearm with bread cone",
+    "ideogram": ["give (jmj)", "give (rḏj, ḏj)"],
+    "width": 12.5,
+    "height": 4
+  },
+  {
+    "char": "𓂢",
+    "description": "forearm with palm down and bent upper arm",
+    "ideogram": [
+      "arm (gbꜣ)",
+      "shoulder (rmn)",
+      "left (jꜣbj)",
+      "sing (ḥsj)",
+      "bend (ḥms)",
+      "end (grḥ)",
+      "negation (nj)"
+    ],
+    "width": 12.5,
+    "height": 6
+  },
+  {
+    "char": "𓂣",
+    "description": "forearm with palm down and straight upper arm",
+    "ideogram": ["Cubit (mḥ)"],
+    "width": 12.5,
+    "height": 5
+  },
+  {
+    "char": "𓄦",
+    "description": "backbone and ribs and spinal cord",
+    "ideogram": ["Slaughtering, massacre (šꜥt)", "Back (jꜣt)"],
+    "width": 12.5,
+    "height": 7
+  },
+  {
+    "char": "𓅵",
+    "description": "combination of quail chick and forearm with conical loaf",
+    "ideogram": [],
+    "width": 12.5,
+    "height": 12
+  },
+  {
+    "char": "𓈐",
+    "description": "road with shrubs",
+    "ideogram": ["Path, way (wꜣt)", "Course, road (mṯn)", "Distant (ḥr)"],
+    "width": 12.5,
+    "height": 7
+  },
+  {
+    "char": "𓈘",
+    "description": "canal",
+    "ideogram": ["Canal (mr)", "Beloved [of] (mry)"],
+    "width": 12.5,
+    "height": 4
+  },
+  {
+    "char": "𓊐",
+    "description": "low fence",
+    "ideogram": ["Palm (šsp)", "Receive (šsp)"],
+    "width": 12.5,
+    "height": 6
+  },
+  {
+    "char": "𓊩",
+    "description": "carrying chair",
+    "ideogram": ["Seat, place (st)"],
+    "width": 12.5,
+    "height": 8
+  },
+  {
+    "char": "𓊲",
+    "description": "low table with offerings",
+    "ideogram": [
+      "offering table (ḫꜣwt)",
+      "Offerings (wdḥw)",
+      "Offering, satisfy (ḥtp)"
+    ],
+    "width": 12.5,
+    "height": 11
+  },
+  {
+    "char": "𓋷",
+    "description": "cloth with fringe on the side",
+    "ideogram": ["Perceive (sjꜣ)", "Sia (sjꜣ)"],
+    "width": 12.5,
+    "height": 3
+  },
+  {
+    "char": "𓌎",
+    "description": "axe",
+    "ideogram": [],
+    "width": 12.5,
+    "height": 4
+  },
+  {
+    "char": "𓌒",
+    "description": "bow",
+    "ideogram": ["pḏ"],
+    "width": 12.5,
+    "height": 2
+  },
+  {
+    "char": "𓌼",
+    "description": null,
+    "ideogram": [],
+    "width": 12.5,
+    "height": 6
+  },
+  {
+    "char": "𓎂",
+    "description": "cattle hobble (bil.)",
+    "ideogram": ["sꜣ"],
+    "width": 12.51,
+    "height": 6
+  },
+  {
+    "char": "𓁸",
+    "description": "hair",
+    "ideogram": [
+      "hair (šnj)",
+      "skin (jnm)",
+      "color (jwn)",
+      "empty, barely, loss of hair (wš)"
+    ],
+    "width": 12.52,
+    "height": 6
+  },
+  {
+    "char": "𓁼",
+    "description": "eye with painted lower lid",
+    "ideogram": [
+      "eye make-up / eye paint (msdmt)",
+      "decorate, adorn, to be beautiful (ꜥn)",
+      "view (ptr)",
+      "see (mꜣꜣ) (seldom, rarely used)"
+    ],
+    "width": 12.52,
+    "height": 5
+  },
+  {
+    "char": "𓁽",
+    "description": "eye enclosed in sandy tract",
+    "ideogram": ["decorate, adorn, to be beautiful (ꜥn)"],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓁾",
+    "description": "eye with painted lower lid enclosed in sandy tract",
+    "ideogram": ["decorate, adorn, to be beautiful (ꜥn)"],
+    "width": 12.52,
+    "height": 5
+  },
+  {
+    "char": "𓂃",
+    "description": "eyebrow",
+    "ideogram": ["abbreviation for Heqat-measure grain: 1/8"],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓄶",
+    "description": "intestine",
+    "ideogram": ["Turn about (pẖr)", "Fold, turn back (wḏb)"],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓄷",
+    "description": "intestine",
+    "ideogram": ["Turn about (pẖr)", "Fold, turn back (wḏb)"],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓆮",
+    "description": "combination of tree and branch",
+    "ideogram": ["After, following (m-ḫt)"],
+    "width": 12.52,
+    "height": 13
+  },
+  {
+    "char": "𓆱",
+    "description": "branch",
+    "ideogram": ["Wood (ḫt)", "Throughout (ḫt)"],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓆻",
+    "description": "flower on long twisted stalk",
+    "ideogram": ["Offer (wdn)", "Divert, revert (wḏb)"],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓇒",
+    "description": "two rushes",
+    "ideogram": ["This, that (nn)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓇭",
+    "description": "vine on trellis",
+    "ideogram": ["Wine (jrp)", "Vintner, Gardener (kꜣny)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓇼",
+    "description": "star",
+    "ideogram": [
+      "Star (sbꜣ)",
+      "Praise, adore, thank (dwꜣ)",
+      "5 (djw)",
+      "God (nṯr) (Ptolemaic)"
+    ],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓈈",
+    "description": "irrigation canal system",
+    "ideogram": ["District (spꜣt)"],
+    "width": 12.52,
+    "height": 5
+  },
+  {
+    "char": "𓉑",
+    "description": "combination of house and ankh",
+    "ideogram": ["House of Life (Scriptorium) (pr-ꜥnḫ)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓉒",
+    "description": "combination of house and mace with round head",
+    "ideogram": ["Treasury (pr-ḥḏ)"],
+    "width": 12.52,
+    "height": 13
+  },
+  {
+    "char": "𓉡",
+    "description": "combination of enclosure and falcon",
+    "ideogram": ["Hathor (ḥwt-ḥrw)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓉢",
+    "description": "combination of enclosure and ankh",
+    "ideogram": ["House of Life (ḥwt-ꜥnḫ) (Not to be confused with pr-ꜥnḫ)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓉣",
+    "description": "combination of enclosure and bee",
+    "ideogram": ["House of the king of Lower Egypt (ḥwt-bjty)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓉧",
+    "description": "battlemented enclosure",
+    "ideogram": ["Portal (sbḫt)", "Wide (wsḫ)", "Wide hall (wsḫt)"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓊂",
+    "description": "closing of srḫ-enclosure",
+    "ideogram": [],
+    "width": 12.52,
+    "height": 10
+  },
+  {
+    "char": "𓊏",
+    "description": "fence",
+    "ideogram": ["Palm (šsp)", "Receive (šsp)"],
+    "width": 12.52,
+    "height": 6
+  },
+  {
+    "char": "𓋋",
+    "description": "two bows tied horizontally",
+    "ideogram": ["Neith (nt)"],
+    "width": 12.52,
+    "height": 6
+  },
+  {
+    "char": "𓋮",
+    "description": "garment with ties",
+    "ideogram": ["Foreigner (ꜣꜥꜥ, jꜥꜣw)"],
+    "width": 12.52,
+    "height": 9
+  },
+  {
+    "char": "𓌕",
+    "description": "arrow",
+    "ideogram": [],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓌡",
+    "description": "harpoon",
+    "ideogram": ["wꜥ (bil.)"],
+    "width": 12.52,
+    "height": 5
+  },
+  {
+    "char": "𓌧",
+    "description": "trap",
+    "ideogram": ["sḫt"],
+    "width": 12.52,
+    "height": 5
+  },
+  {
+    "char": "𓍇",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 6
+  },
+  {
+    "char": "𓍉",
+    "description": "adze- on-block",
+    "ideogram": ["stp"],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓍕",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 6
+  },
+  {
+    "char": "𓍝",
+    "description": "scale",
+    "ideogram": ["mḫꜣt"],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓍬",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓍮",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓎙",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓎚",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 2
+  },
+  {
+    "char": "𓏀",
+    "description": "water jar with water",
+    "ideogram": [],
+    "width": 12.52,
+    "height": 11
+  },
+  {
+    "char": "𓐖",
+    "description": "Irrigation tunnels",
+    "ideogram": ["estate (ḏꜣtt)"],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓐗",
+    "description": null,
+    "ideogram": ["rich (ḫwd)"],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓐛",
+    "description": null,
+    "ideogram": ["side area (jmw), side (gs)"],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓐜",
+    "description": null,
+    "ideogram": ["side area (jmw), side (gs)"],
+    "width": 12.52,
+    "height": 4
+  },
+  {
+    "char": "𓐝",
+    "description": null,
+    "ideogram": [],
+    "width": 12.52,
+    "height": 3
+  },
+  {
+    "char": "𓃃",
+    "description": "three toes oriented leftward",
+    "ideogram": ["toe (sꜣḥ)"],
+    "width": 12.52,
+    "height": 10
+  },
+  {
+    "char": "𓃽",
+    "description": "long-horned bull",
+    "ideogram": ["Bull (kꜣ)"],
+    "width": 12.52,
+    "height": 11
+  },
+  {
+    "char": "𓊡",
+    "description": "sail",
+    "ideogram": [
+      "sail (ṯꜣwt)",
+      "sailor (nfw)",
+      "wind, breath (ṯꜣw)",
+      "north wind (mḥyt)"
+    ],
+    "width": 12.52,
+    "height": 12
+  },
+  {
+    "char": "𓋦",
+    "description": "girdle",
+    "ideogram": ["Malachite (šsmt)"],
+    "width": 12.52,
+    "height": 8
+  },
+  {
+    "char": "𓃒",
+    "description": "bull",
+    "ideogram": ["Bull (kꜣ)"],
+    "width": 12.54,
+    "height": 11
+  },
+  {
+    "char": "𓅃",
+    "description": "falcon",
+    "ideogram": [
+      "Horus (ḥrw)",
+      "God (nṯr) (Ptolemaic)",
+      "Above (ḥry) (Ptolemaic)",
+      "lord (nb) (Ptolemaic)"
+    ],
+    "width": 12.54,
+    "height": 13
+  },
+  {
+    "char": "𓅄",
+    "description": "combination of falcon and flaggellum",
+    "ideogram": [
+      "falcon (bjk)",
+      "Horus (ḥrw)",
+      "God (nṯr) (Ptolemaic)",
+      "lord (nb) (Ptolemaic)"
+    ],
+    "width": 12.54,
+    "height": 13
+  },
+  {
+    "char": "𓊛",
+    "description": null,
+    "ideogram": [
+      "ship, boat (dpt, jmw)",
+      "Ships (ꜥhꜥw)",
+      "sail, go downstream (ḫdj)"
+    ],
+    "width": 12.54,
+    "height": 7
+  },
+  {
+    "char": "𓊜",
+    "description": "boat upside down",
+    "ideogram": ["Turn over (pnꜥ)"],
+    "width": 12.54,
+    "height": 7
+  },
+  {
+    "char": "𓀐",
+    "description": "falling man with blood streaming from his head",
+    "ideogram": ["die (mwt)", "enemy (ḫfty)"],
+    "width": 12.55,
+    "height": 13
+  },
+  {
+    "char": "𓅋",
+    "description": "falcon in Sokar barque",
+    "ideogram": ["Sokar (skr)", "Henu-bark (ḥnw)"],
+    "width": 12.55,
+    "height": 12
+  },
+  {
+    "char": "𓅧",
+    "description": "cormorant",
+    "ideogram": ["to enter (ꜥq)"],
+    "width": 12.55,
+    "height": 10
+  },
+  {
+    "char": "𓌶",
+    "description": "mꜣꜥ",
+    "ideogram": [],
+    "width": 12.56,
+    "height": 12
+  },
+  {
+    "char": "𓅏",
+    "description": "image of falcon with two plumes",
+    "ideogram": ["Sopdu (spdw)", "Horus of Nekhen (Hierakonpolis) (ḥrw-nḫnj)"],
+    "width": 12.59,
+    "height": 11
+  },
+  {
+    "char": "𓅚",
+    "description": "lapwing",
+    "ideogram": ["The common (Rekhyt-) people, subjects (rḫyt)"],
+    "width": 12.59,
+    "height": 11
+  },
+  {
+    "char": "𓅛",
+    "description": "lapwing with twisted wings",
+    "ideogram": ["The common (Rekhyt-) people, subjects (rḫyt)"],
+    "width": 12.59,
+    "height": 9
+  },
+  {
+    "char": "𓅟",
+    "description": "flamingo",
+    "ideogram": ["flamingo (dšr)", "red (dšr)"],
+    "width": 12.59,
+    "height": 9
+  },
+  {
+    "char": "𓄂",
+    "description": "forepart of lion",
+    "ideogram": ["Front, foremost, prow (ḥꜣt)"],
+    "width": 12.59,
+    "height": 9
+  },
+  {
+    "char": "𓅎",
+    "description": "combination of image of falcon and flagellum",
+    "ideogram": [
+      "Sopdu (spdw)",
+      "Image (ꜥẖm, ꜥšm, ꜥḫm)",
+      "Falcon (gnḥsw, šnbt)"
+    ],
+    "width": 12.59,
+    "height": 7
+  },
+  {
+    "char": "𓃫",
+    "description": "lying Set-animal",
+    "ideogram": ["Set (stẖ, stš, swty)", "storm (nšnj)"],
+    "width": 12.6,
+    "height": 9
+  },
+  {
+    "char": "𓃮",
+    "description": "panther",
+    "ideogram": ["leopard (ꜣby)"],
+    "width": 12.6,
+    "height": 6
+  },
+  {
+    "char": "𓄢",
+    "description": "tail",
+    "ideogram": ["Tail (sd)"],
+    "width": 12.6,
+    "height": 9
+  },
+  {
+    "char": "𓅓",
+    "description": "owl",
+    "ideogram": [],
+    "width": 12.6,
+    "height": 13
+  },
+  {
+    "char": "𓅗",
+    "description": "combination of owl and mouth (D21)",
+    "ideogram": [],
+    "width": 12.6,
+    "height": 13
+  },
+  {
+    "char": "𓌽",
+    "description": null,
+    "ideogram": [],
+    "width": 12.6,
+    "height": 6
+  },
+  {
+    "char": "𓌾",
+    "description": "grain measure (with plural, for grain particles)",
+    "ideogram": ["dbḥ"],
+    "width": 12.6,
+    "height": 8
+  },
+  {
+    "char": "𓊦",
+    "description": "rudder",
+    "ideogram": ["steering oar (ḥmw)"],
+    "width": 12.61,
+    "height": 13
+  },
+  {
+    "char": "𓃖",
+    "description": "cow suckling calf",
+    "ideogram": ["Be friendly (ꜣms)"],
+    "width": 12.62,
+    "height": 10
+  },
+  {
+    "char": "𓂚",
+    "description": "arms with shield and battle axe",
+    "ideogram": ["Fight, combat (ꜥḥꜣ)"],
+    "width": 12.63,
+    "height": 11
+  },
+  {
+    "char": "𓂟",
+    "description": "forearm with rounded loaf",
+    "ideogram": ["to give (jmj)", "to give (rḏj, ḏj)", "to present (ḥnk)"],
+    "width": 12.63,
+    "height": 4
+  },
+  {
+    "char": "𓂥",
+    "description": "arm with sekhem scepter",
+    "ideogram": ["control (ḫrp)"],
+    "width": 12.63,
+    "height": 6
+  },
+  {
+    "char": "𓂨",
+    "description": "liquid falling from hand",
+    "ideogram": ["to cense, to pour out a libation (jdj)", "dew (jdt, jꜣdt)"],
+    "width": 12.63,
+    "height": 7
+  },
+  {
+    "char": "𓃝",
+    "description": "ram",
+    "ideogram": ["Ba-Soul (bꜣ)", "Khnum (ẖnmw)"],
+    "width": 12.63,
+    "height": 11
+  },
+  {
+    "char": "𓃟",
+    "description": "pig",
+    "ideogram": ["Pig (rrj)"],
+    "width": 12.63,
+    "height": 8
+  },
+  {
+    "char": "𓃷",
+    "description": "baboon",
+    "ideogram": ["baboon (jꜥn, ky, qnd)"],
+    "width": 12.63,
+    "height": 11
+  },
+  {
+    "char": "𓄎",
+    "description": "horns with palm branch and sun",
+    "ideogram": ["opening the year (New year festival) (wp[t]-rnpt)"],
+    "width": 12.63,
+    "height": 13
+  },
+  {
+    "char": "𓄡",
+    "description": "animal's belly",
+    "ideogram": ["body (ẖt)"],
+    "width": 12.63,
+    "height": 3
+  },
+  {
+    "char": "𓅙",
+    "description": "hoopoe",
+    "ideogram": [],
+    "width": 12.63,
+    "height": 10
+  },
+  {
+    "char": "𓅩",
+    "description": "swallow (low)",
+    "ideogram": ["swallow (mnt)", "great, elder (wr)"],
+    "width": 12.63,
+    "height": 7
+  },
+  {
+    "char": "𓏕",
+    "description": null,
+    "ideogram": [],
+    "width": 12.63,
+    "height": 5
+  },
+  {
+    "char": "𓃓",
+    "description": "bull charging",
+    "ideogram": ["Bull (kꜣ)"],
+    "width": 12.63,
+    "height": 9
+  },
+  {
+    "char": "𓃹",
+    "description": "hare",
+    "ideogram": ["Hare (wn)"],
+    "width": 12.63,
+    "height": 9
+  },
+  {
+    "char": "𓉟",
+    "description": "combination of enclosure, flat loaf and wooden column",
+    "ideogram": ["Great house (ḥwt-ꜥꜣt) (Not to be confused with pr-ꜥꜣ)"],
+    "width": 12.63,
+    "height": 12
+  },
+  {
+    "char": "𓉻",
+    "description": "horizontal wooden column",
+    "ideogram": ["Column (ꜥꜣ)", "Great (esp. of size) (ꜥꜣ)"],
+    "width": 12.63,
+    "height": 3
+  },
+  {
+    "char": "𓊻",
+    "description": "combination of cloth on pole, butcher's block and slope of hill",
+    "ideogram": ["Necropolis (ẖrt-nṯr)"],
+    "width": 12.63,
+    "height": 12
+  },
+  {
+    "char": "𓌝",
+    "description": "chariot",
+    "ideogram": ["wrrt"],
+    "width": 12.63,
+    "height": 9
+  },
+  {
+    "char": "𓍄",
+    "description": "sled with jackal head",
+    "ideogram": ["bjꜣ"],
+    "width": 12.63,
+    "height": 8
+  },
+  {
+    "char": "𓃸",
+    "description": "monkey",
+    "ideogram": ["monkey (gjf, qnd)"],
+    "width": 12.64,
+    "height": 10
+  },
+  {
+    "char": "𓅞",
+    "description": "sacred Ibis",
+    "ideogram": [
+      "Ibis (hb)",
+      "Thoth (ḏḥwtj)",
+      "Excellent, skilled (jqr)",
+      "Discern, reckon (jp)"
+    ],
+    "width": 12.64,
+    "height": 12
+  },
+  {
+    "char": "𓅨",
+    "description": "swallow",
+    "ideogram": ["swallow (mnt)", "great, elder (wr)"],
+    "width": 12.64,
+    "height": 8
+  },
+  {
+    "char": "𓇏",
+    "description": "field of reeds",
+    "ideogram": ["Field (sḫt)", "Help (sm)"],
+    "width": 12.64,
+    "height": 12
+  },
+  {
+    "char": "𓂛",
+    "description": "arms with shield and mace",
+    "ideogram": ["Fight, combat (ꜥḥꜣ)"],
+    "width": 12.65,
+    "height": 11
+  },
+  {
+    "char": "𓃩",
+    "description": "Set-animal",
+    "ideogram": ["Set (stẖ, stš, swty)"],
+    "width": 12.65,
+    "height": 13
+  },
+  {
+    "char": "𓃰",
+    "description": "elephant",
+    "ideogram": ["elephant (ꜣbw, ꜣb, dnhr)"],
+    "width": 12.65,
+    "height": 11
+  },
+  {
+    "char": "𓅐",
+    "description": "vulture",
+    "ideogram": ["Mother (mwt)", "vulture (nrt)"],
+    "width": 12.65,
+    "height": 12
+  },
+  {
+    "char": "𓅑",
+    "description": "combination of vulture and flagellum",
+    "ideogram": ["Mother (mwt)", "vulture (nrt)", "Mut (mwt)"],
+    "width": 12.65,
+    "height": 12
+  },
+  {
+    "char": "𓆓",
+    "description": "cobra in repose",
+    "ideogram": ["Cobra (ḏt)"],
+    "width": 12.65,
+    "height": 13
+  },
+  {
+    "char": "𓌌",
+    "description": "combination of mace with round head and cobra",
+    "ideogram": [],
+    "width": 12.65,
+    "height": 14
+  },
+  {
+    "char": "𓌍",
+    "description": "combination of mace with round head and two cobras",
+    "ideogram": [],
+    "width": 12.65,
+    "height": 15
+  },
+  {
+    "char": "𓎓",
+    "description": "Fetter + Cobra",
+    "ideogram": ["mḏ, mḏwt"],
+    "width": 12.65,
+    "height": 13
+  },
+  {
+    "char": "𓅻",
+    "description": "bird pecking at fish",
+    "ideogram": ["to catch fish (ḥꜣm/ḥjm)"],
+    "width": 12.66,
+    "height": 11
+  },
+  {
+    "char": "𓐘",
+    "description": null,
+    "ideogram": ["drf"],
+    "width": 12.66,
+    "height": 3
+  },
+  {
+    "char": "𓃘",
+    "description": "donkey",
+    "ideogram": ["Donkey (ꜥꜣ)"],
+    "width": 12.66,
+    "height": 12
+  },
+  {
+    "char": "𓅪",
+    "description": "sparrow",
+    "ideogram": ["Bad (bjn)", "Small, weak (nḏs)"],
+    "width": 12.66,
+    "height": 8
+  },
+  {
+    "char": "𓅷",
+    "description": "duckling",
+    "ideogram": ["Fledgeling (ṯꜣ)", "Vizier (ṯꜣty)"],
+    "width": 12.66,
+    "height": 11
+  },
+  {
+    "char": "𓃔",
+    "description": "calf",
+    "ideogram": ["Calf (bḥs)"],
+    "width": 12.67,
+    "height": 11
+  },
+  {
+    "char": "𓄏",
+    "description": "horn",
+    "ideogram": ["horn (ꜥb)"],
+    "width": 12.67,
+    "height": 7
+  },
+  {
+    "char": "𓄐",
+    "description": "horn and vase from which water flows",
+    "ideogram": ["purity (ꜥbw)"],
+    "width": 12.67,
+    "height": 8
+  },
+  {
+    "char": "𓆋",
+    "description": "crocodile on shrine",
+    "ideogram": ["Sobek (sbk)"],
+    "width": 12.67,
+    "height": 10
+  },
+  {
+    "char": "𓆨",
+    "description": "centipede",
+    "ideogram": ["centipede (spꜣ)"],
+    "width": 12.67,
+    "height": 4
+  },
+  {
+    "char": "𓅜",
+    "description": "northern bald ibis",
+    "ideogram": ["Be effective, effective (Akh) spirit (ꜣḫ)"],
+    "width": 12.68,
+    "height": 11
+  },
+  {
+    "char": "𓅡",
+    "description": "saddle-billed stork",
+    "ideogram": ["Ba-soul (bꜣ)"],
+    "width": 12.68,
+    "height": 12
+  },
+  {
+    "char": "𓅫",
+    "description": "sparrow (low)",
+    "ideogram": ["Bad (bjn)", "Small, weak (nḏs)"],
+    "width": 12.68,
+    "height": 7
+  },
+  {
+    "char": "𓆊",
+    "description": "crocodile",
+    "ideogram": ["Crocodile (msḥ, jt, ḥntj)", "Sobek (sbk)"],
+    "width": 12.68,
+    "height": 5
+  },
+  {
+    "char": "𓆕",
+    "description": "two cobras",
+    "ideogram": [],
+    "width": 12.68,
+    "height": 13
+  },
+  {
+    "char": "𓆷",
+    "description": "pool with lotus flowers",
+    "ideogram": ["Field, Inundation season (ꜣḫt)", "Field (šꜣ)"],
+    "width": 12.68,
+    "height": 8
+  },
+  {
+    "char": "𓆖",
+    "description": "combination of cobra, flat loaf and sandy tract",
+    "ideogram": ["(linear/stable) eternity (ḏt)"],
+    "width": 12.69,
+    "height": 13
+  },
+  {
+    "char": "𓆸",
+    "description": "lotus flower",
+    "ideogram": ["Lotus (sšn, snšn, nḫb)", "Beautiful (nfr)"],
+    "width": 12.69,
+    "height": 11
+  },
+  {
+    "char": "𓋒",
+    "description": "combination of white crown and basket",
+    "ideogram": ["White crown (ḥḏt, wrt, wrrt)"],
+    "width": 12.69,
+    "height": 13
+  },
+  {
+    "char": "𓌓",
+    "description": "bow",
+    "ideogram": ["pḏ"],
+    "width": 12.69,
+    "height": 3
+  },
+  {
+    "char": "𓃬",
+    "description": "lion",
+    "ideogram": ["lion (mꜣj)", "exclude (šnꜥ)"],
+    "width": 12.7,
+    "height": 8
+  },
+  {
+    "char": "𓅰",
+    "description": "widgeon",
+    "ideogram": ["to fatten (wšꜣ)", "Food (ḏfꜣw)"],
+    "width": 12.7,
+    "height": 9
+  },
+  {
+    "char": "𓆍",
+    "description": "image of crocodile",
+    "ideogram": ["Sobek (sbk)", "image (ꜥẖm, ꜥšm)"],
+    "width": 12.7,
+    "height": 4
+  },
+  {
+    "char": "𓆧",
+    "description": "locust",
+    "ideogram": ["Grasshopper (znḥm)"],
+    "width": 12.7,
+    "height": 6
+  },
+  {
+    "char": "𓆑",
+    "description": "horned viper",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 5
+  },
+  {
+    "char": "𓆯",
+    "description": "combination of tree and horned viper",
+    "ideogram": [
+      "Within him/it (jm.f)",
+      "(A kind of tree) (nḏft)",
+      "(A kind of tree) (ꜣtf)"
+    ],
+    "width": 12.7,
+    "height": 13
+  },
+  {
+    "char": "𓊥",
+    "description": "combination of oar and horned viper",
+    "ideogram": ["says (parenthetic) (ḫrwfj)"],
+    "width": 12.7,
+    "height": 12
+  },
+  {
+    "char": "𓋵",
+    "description": "combination of folded cloth and horned viper",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 12
+  },
+  {
+    "char": "𓋶",
+    "description": "combination of folded cloth and sickle",
+    "ideogram": ["Slaughter (smꜣ)"],
+    "width": 12.7,
+    "height": 12
+  },
+  {
+    "char": "𓌫",
+    "description": "knife-sharpener",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 6
+  },
+  {
+    "char": "𓌬",
+    "description": "combination of knife-sharpener and legs",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 9
+  },
+  {
+    "char": "𓌭",
+    "description": "combination of knife and folded cloth",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 12
+  },
+  {
+    "char": "𓌮",
+    "description": "knife-sharpener of butcher",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 6
+  },
+  {
+    "char": "𓌯",
+    "description": "combination of knife-sharpener and folded cloth",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 12
+  },
+  {
+    "char": "𓌴",
+    "description": "sickle",
+    "ideogram": [],
+    "width": 12.7,
+    "height": 9
+  },
+  {
+    "char": "𓌵",
+    "description": null,
+    "ideogram": [],
+    "width": 12.7,
+    "height": 9
+  },
+  {
+    "char": "𓌷",
+    "description": null,
+    "ideogram": [],
+    "width": 12.7,
+    "height": 9
+  },
+  {
+    "char": "𓍚",
+    "description": null,
+    "ideogram": ["ḫsf"],
+    "width": 12.7,
+    "height": 12
+  },
+  {
+    "char": "𓆏",
+    "description": "frog",
+    "ideogram": [
+      "Heket (ḥqt)",
+      "Frog (ꜥbḫn, qrr)",
+      "Frog (lit. ‘repeating life’) (wḥm-ꜥnḫ)",
+      "100,000 (ḥfn) (see I8)"
+    ],
+    "width": 12.71,
+    "height": 10
+  },
+  {
+    "char": "𓆝",
+    "description": "mullet",
+    "ideogram": ["flathead mullet (ꜥḏw)"],
+    "width": 12.71,
+    "height": 5
+  },
+  {
+    "char": "𓆲",
+    "description": "combination of owl and branch",
+    "ideogram": ["After, following (m-ḫt)"],
+    "width": 12.71,
+    "height": 13
+  },
+  {
+    "char": "𓊟",
+    "description": "sacred barque without steering oar",
+    "ideogram": ["sacred barque (wiꜣ)"],
+    "width": 12.71,
+    "height": 9
+  },
+  {
+    "char": "𓋊",
+    "description": "two broad belemnites",
+    "ideogram": ["Min (mnw)", "Shrine (ḫm)", "Letopolis (ḫm)"],
+    "width": 12.71,
+    "height": 3
+  },
+  {
+    "char": "𓐙",
+    "description": null,
+    "ideogram": [
+      "Raised platform (ṯntt), platform abbreviation for mꜣꜥ in (mꜣꜥ-ḫrw)"
+    ],
+    "width": 12.71,
+    "height": 3
+  },
+  {
+    "char": "𓁀",
+    "description": "mummy on bed",
+    "ideogram": ["lie down, spend the night(sḏr)", "corpse (ẖꜣt)"],
+    "width": 12.72,
+    "height": 8
+  },
+  {
+    "char": "𓃺",
+    "description": "hare (low)",
+    "ideogram": ["See E34"],
+    "width": 12.72,
+    "height": 7
+  },
+  {
+    "char": "𓄗",
+    "description": "foreleg of ox",
+    "ideogram": ["Foreleg (ḫpš)", "power (ḫpš)"],
+    "width": 12.72,
+    "height": 5
+  },
+  {
+    "char": "𓄘",
+    "description": "F23 reversed",
+    "ideogram": ["power (ḫpš)"],
+    "width": 12.72,
+    "height": 5
+  },
+  {
+    "char": "𓅌",
+    "description": "image of falcon",
+    "ideogram": [
+      "Sopdu (spdw)",
+      "Image (ꜥẖm, ꜥšm, ꜥḫm)",
+      "Falcon (gnḥsw, šnbt)"
+    ],
+    "width": 12.72,
+    "height": 7
+  },
+  {
+    "char": "𓆙",
+    "description": "snake",
+    "ideogram": ["Snake (ḥfꜣw)"],
+    "width": 12.72,
+    "height": 7
+  },
+  {
+    "char": "𓋕",
+    "description": "combination of red crown and basket",
+    "ideogram": ["Red crown (dšrt, nt)", "King (of Lower Egypt) (bjty)"],
+    "width": 12.72,
+    "height": 13
+  },
+  {
+    "char": "𓋗",
+    "description": "combination of Pschent Crown and basket",
+    "ideogram": [
+      "Double crown (sḫmty) (lit. ‘two powers’)",
+      "Dual king (nswt-bjty)"
+    ],
+    "width": 12.72,
+    "height": 13
+  },
+  {
+    "char": "𓂩",
+    "description": "hand with palm up",
+    "ideogram": ["hand (ḏrt)", "receive (sšp, šsp)"],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓂿",
+    "description": "leg with knife",
+    "ideogram": ["mutilate (jꜣtj)", "injure (nkn)"],
+    "width": 12.73,
+    "height": 13
+  },
+  {
+    "char": "𓃆",
+    "description": "hand with palm down",
+    "ideogram": [],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓆈",
+    "description": "gecko",
+    "ideogram": ["Multitudes, countless (ꜥšꜣ)", "Lizard (ꜥšꜣ)"],
+    "width": 12.73,
+    "height": 12
+  },
+  {
+    "char": "𓆜",
+    "description": "barbel",
+    "ideogram": ["Abomination (bwt)"],
+    "width": 12.73,
+    "height": 7
+  },
+  {
+    "char": "𓆟",
+    "description": "Petrocephalus bane",
+    "ideogram": ["Fish (rm)"],
+    "width": 12.73,
+    "height": 6
+  },
+  {
+    "char": "𓊞",
+    "description": "sacred barque",
+    "ideogram": ["Ferry, traverse (ḏꜣj)", "sacred barque (wiꜣ)"],
+    "width": 12.73,
+    "height": 9
+  },
+  {
+    "char": "𓋙",
+    "description": "blue crown",
+    "ideogram": ["Khepresh (ḫprš)"],
+    "width": 12.73,
+    "height": 12
+  },
+  {
+    "char": "𓋭",
+    "description": "girdle knot",
+    "ideogram": ["Bind, tie (ṯs)"],
+    "width": 12.73,
+    "height": 4
+  },
+  {
+    "char": "𓎟",
+    "description": "basket (hieroglyph)",
+    "ideogram": ["nb (bil.)"],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓎠",
+    "description": null,
+    "ideogram": [],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓏵",
+    "description": "Crossed diagonal sticks",
+    "ideogram": [
+      "destroy (ḥḏj), break, divide (wpj), over load (ḏꜣj), cross, meet"
+    ],
+    "width": 12.73,
+    "height": 7
+  },
+  {
+    "char": "𓐒",
+    "description": null,
+    "ideogram": ["mat (ṯmꜣ)"],
+    "width": 12.73,
+    "height": 7
+  },
+  {
+    "char": "𓐓",
+    "description": "A Smiting-Blade",
+    "ideogram": ["spr"],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓐔",
+    "description": null,
+    "ideogram": [],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓃏",
+    "description": "seven dots",
+    "ideogram": [],
+    "width": 12.73,
+    "height": 7
+  },
+  {
+    "char": "𓃐",
+    "description": "eight dots",
+    "ideogram": [],
+    "width": 12.73,
+    "height": 7
+  },
+  {
+    "char": "𓄒",
+    "description": "lower jaw-bone of ox",
+    "ideogram": ["jaw (ꜥrt)"],
+    "width": 12.73,
+    "height": 7
+  },
+  {
+    "char": "𓄭",
+    "description": "rib",
+    "ideogram": ["rib (spr)"],
+    "width": 12.73,
+    "height": 5
+  },
+  {
+    "char": "𓇠",
+    "description": "3 grains horizontally",
+    "ideogram": ["Barley (jt)"],
+    "width": 12.73,
+    "height": 4
+  },
+  {
+    "char": "𓎣",
+    "description": null,
+    "ideogram": [],
+    "width": 12.73,
+    "height": 4
+  },
+  {
+    "char": "𓀬",
+    "description": "man on two giraffes",
+    "ideogram": ["Cusae (qjs)"],
+    "width": 12.74,
+    "height": 13
+  },
+  {
+    "char": "𓃭",
+    "description": "lying lion",
+    "ideogram": ["lion (rw)", "lord (nb) (Ptolemaic)"],
+    "width": 12.74,
+    "height": 6
+  },
+  {
+    "char": "𓃼",
+    "description": "baboon with receptacle and basket",
+    "ideogram": ["water-clock (Clepsydra) (šbt)"],
+    "width": 12.74,
+    "height": 12
+  },
+  {
+    "char": "𓄑",
+    "description": "tusk",
+    "ideogram": [],
+    "width": 12.74,
+    "height": 5
+  },
+  {
+    "char": "𓅅",
+    "description": "falcon on basket",
+    "ideogram": [],
+    "width": 12.74,
+    "height": 13
+  },
+  {
+    "char": "𓇾",
+    "description": "land with grains",
+    "ideogram": ["Land, Earth (tꜣ)"],
+    "width": 12.74,
+    "height": 2
+  },
+  {
+    "char": "𓋫",
+    "description": "shoulder-knot",
+    "ideogram": ["Shoot (stj)", "Shesmetet (šsmtt)"],
+    "width": 12.74,
+    "height": 9
+  },
+  {
+    "char": "𓌩",
+    "description": "butcher's block with knife",
+    "ideogram": [],
+    "width": 12.74,
+    "height": 8
+  },
+  {
+    "char": "𓌪",
+    "description": "knife",
+    "ideogram": ["šꜥ"],
+    "width": 12.74,
+    "height": 6
+  },
+  {
+    "char": "𓍂",
+    "description": null,
+    "ideogram": [],
+    "width": 12.74,
+    "height": 6
+  },
+  {
+    "char": "𓎔",
+    "description": "whip",
+    "ideogram": ["mḥ"],
+    "width": 12.74,
+    "height": 7
+  },
+  {
+    "char": "𓎕",
+    "description": null,
+    "ideogram": [],
+    "width": 12.74,
+    "height": 8
+  },
+  {
+    "char": "𓎖",
+    "description": "Contrast V12.",
+    "ideogram": [],
+    "width": 12.74,
+    "height": 8
+  },
+  {
+    "char": "𓎱",
+    "description": "alabaster basin",
+    "ideogram": ["alabaster (šs), festival (ḥꜣb)"],
+    "width": 12.74,
+    "height": 5
+  },
+  {
+    "char": "𓎲",
+    "description": "alabaster basin",
+    "ideogram": [],
+    "width": 12.74,
+    "height": 5
+  },
+  {
+    "char": "𓎴",
+    "description": null,
+    "ideogram": [],
+    "width": 12.74,
+    "height": 11
+  },
+  {
+    "char": "𓐦",
+    "description": null,
+    "ideogram": [],
+    "width": 12.74,
+    "height": 7
+  },
+  {
+    "char": "𓂧",
+    "description": "hand",
+    "ideogram": ["hand (ḏrt)"],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓂷",
+    "description": "one finger (horizontal)",
+    "ideogram": [
+      "finger nail (ꜥnt)",
+      "Activities with finger: measure (ḫꜣj), take (ṯꜣj), press (dqr)"
+    ],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓄯",
+    "description": "bone with meat",
+    "ideogram": [
+      "reward (jsw)",
+      "Heir, inheritor, inheritance (jwꜥ)",
+      "Thigh bone (swt)"
+    ],
+    "width": 12.75,
+    "height": 7
+  },
+  {
+    "char": "𓅇",
+    "description": "falcon in boat",
+    "ideogram": ["Nemty (nmty)"],
+    "width": 12.75,
+    "height": 13
+  },
+  {
+    "char": "𓅮",
+    "description": "pintail flying",
+    "ideogram": ["Fly (pꜣ)"],
+    "width": 12.75,
+    "height": 12
+  },
+  {
+    "char": "𓆃",
+    "description": "wing",
+    "ideogram": ["wing (ḏnḥ)", "fly (pꜣ)"],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓆔",
+    "description": "cobra with feather",
+    "ideogram": [],
+    "width": 12.75,
+    "height": 13
+  },
+  {
+    "char": "𓆡",
+    "description": "puffer",
+    "ideogram": ["Nile pufferfish, angry, discontent (špt)"],
+    "width": 12.75,
+    "height": 12
+  },
+  {
+    "char": "𓇯",
+    "description": "sky",
+    "ideogram": ["Sky, heaven (pt)", "Above (ḥry)"],
+    "width": 12.75,
+    "height": 3
+  },
+  {
+    "char": "𓇿",
+    "description": "land",
+    "ideogram": ["Land, Earth (tꜣ)"],
+    "width": 12.75,
+    "height": 3
+  },
+  {
+    "char": "𓈉",
+    "description": "three hills",
+    "ideogram": ["Foreign land (ḫꜣst)"],
+    "width": 12.75,
+    "height": 6
+  },
+  {
+    "char": "𓈊",
+    "description": "three hills (low)",
+    "ideogram": ["Foreign land (ḫꜣst)"],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓈏",
+    "description": "mound of earth",
+    "ideogram": ["Mound (jꜣt)"],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓈓",
+    "description": "three grains",
+    "ideogram": [],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓈙",
+    "description": "pool",
+    "ideogram": ["Lake, pool (š)"],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓈚",
+    "description": "pool",
+    "ideogram": ["Lake, pool (š)"],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓉪",
+    "description": "gateway with serpents",
+    "ideogram": ["Gate (rwt)", "Shroud, door (tꜣyt)"],
+    "width": 12.75,
+    "height": 9
+  },
+  {
+    "char": "𓉲",
+    "description": "booth with pole",
+    "ideogram": ["Booth (sḥ)", "Festival (ḥ(ꜣ)b)"],
+    "width": 12.75,
+    "height": 13
+  },
+  {
+    "char": "𓉹",
+    "description": "hall of columns",
+    "ideogram": ["Office (ḫꜣ)"],
+    "width": 12.75,
+    "height": 11
+  },
+  {
+    "char": "𓊚",
+    "description": "pile of grain",
+    "ideogram": ["Granary (šnwt)"],
+    "width": 12.75,
+    "height": 11
+  },
+  {
+    "char": "𓊫",
+    "description": "headrest",
+    "ideogram": ["Headrest (wrs)"],
+    "width": 12.75,
+    "height": 8
+  },
+  {
+    "char": "𓊯",
+    "description": "high table with offerings",
+    "ideogram": [
+      "offering table (ḫꜣwt)",
+      "Offerings (wdḥw)",
+      "Offering, satisfy (ḥtp)"
+    ],
+    "width": 12.75,
+    "height": 13
+  },
+  {
+    "char": "𓊶",
+    "description": "narrow censer",
+    "ideogram": ["Cense, fumigate (kꜣp)"],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓊷",
+    "description": "broad censer",
+    "ideogram": ["Cense, fumigate (kꜣp)"],
+    "width": 12.75,
+    "height": 7
+  },
+  {
+    "char": "𓋞",
+    "description": "collar of beads",
+    "ideogram": ["Gold (nbw)", "Lord (nb) (Ptolemaic)"],
+    "width": 12.75,
+    "height": 7
+  },
+  {
+    "char": "𓋟",
+    "description": "combination of collar of beads and foot",
+    "ideogram": ["Gold (nbw)", "Lord (nb) (Ptolemaic)"],
+    "width": 12.75,
+    "height": 11
+  },
+  {
+    "char": "𓋡",
+    "description": "combination of collar of beads and sceptre",
+    "ideogram": ["Electrum (ḏꜥm)"],
+    "width": 12.75,
+    "height": 12
+  },
+  {
+    "char": "𓋢",
+    "description": "combination of collar of beads and sceptre",
+    "ideogram": ["Electrum (ḏꜥm)"],
+    "width": 12.75,
+    "height": 13
+  },
+  {
+    "char": "𓋱",
+    "description": "apron",
+    "ideogram": [],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓌛",
+    "description": "scimitar",
+    "ideogram": [],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓍅",
+    "description": "Pick, opening earth",
+    "ideogram": ["grg gr"],
+    "width": 12.75,
+    "height": 7
+  },
+  {
+    "char": "𓍆",
+    "description": null,
+    "ideogram": [],
+    "width": 12.75,
+    "height": 10
+  },
+  {
+    "char": "𓎷",
+    "description": "deformed granite bowl",
+    "ideogram": ["red granite (mꜣṯ)"],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓏛",
+    "description": "papyrus roll",
+    "ideogram": ["papyrus scroll, book (mḏꜣt)"],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓏝",
+    "description": "Papyrus roll-open",
+    "ideogram": ["papyrus scroll, book (mḏꜣt)"],
+    "width": 12.75,
+    "height": 4
+  },
+  {
+    "char": "𓏠",
+    "description": "Senet board",
+    "ideogram": [],
+    "width": 12.75,
+    "height": 5
+  },
+  {
+    "char": "𓃙",
+    "description": "kid",
+    "ideogram": ["Kid (goat) (jb)"],
+    "width": 12.76,
+    "height": 11
+  },
+  {
+    "char": "𓃥",
+    "description": "jackal",
+    "ideogram": [
+      "jackal, (sꜣb)",
+      "dignitary, senior (sꜣb)",
+      "come (jw)",
+      "East (jꜣbtt)"
+    ],
+    "width": 12.76,
+    "height": 11
+  },
+  {
+    "char": "𓅼",
+    "description": "goose picking up grain",
+    "ideogram": ["to feed (snm)"],
+    "width": 12.76,
+    "height": 7
+  },
+  {
+    "char": "𓅾",
+    "description": "plucked bird",
+    "ideogram": ["to wring (birds' necks) (wšn)", "to fear (snḏ)"],
+    "width": 12.76,
+    "height": 11
+  },
+  {
+    "char": "𓆚",
+    "description": "snake",
+    "ideogram": ["Snake (ḥfꜣw)"],
+    "width": 12.76,
+    "height": 8
+  },
+  {
+    "char": "𓈄",
+    "description": "tongue of land",
+    "ideogram": ["Riverbank (jdb)", "Revert, divert (wḏb)"],
+    "width": 12.76,
+    "height": 4
+  },
+  {
+    "char": "𓊠",
+    "description": "boat with net",
+    "ideogram": ["Release (wḥꜥ)", "Fisherman, fowler (wḥꜥ)"],
+    "width": 12.76,
+    "height": 7
+  },
+  {
+    "char": "𓊰",
+    "description": "table with slices of bread",
+    "ideogram": ["offering table (ḫꜣwt)"],
+    "width": 12.76,
+    "height": 13
+  },
+  {
+    "char": "𓋰",
+    "description": "apron",
+    "ideogram": [],
+    "width": 12.76,
+    "height": 4
+  },
+  {
+    "char": "𓏒",
+    "description": "roll of bread",
+    "ideogram": [],
+    "width": 12.76,
+    "height": 4
+  },
+  {
+    "char": "𓏔",
+    "description": "alternative of X4",
+    "ideogram": [],
+    "width": 12.76,
+    "height": 4
+  },
+  {
+    "char": "𓀒",
+    "description": "man falling",
+    "ideogram": ["trap (ḫr)"],
+    "width": 12.77,
+    "height": 7
+  },
+  {
+    "char": "𓂦",
+    "description": "arm with wand",
+    "ideogram": ["sacred, holy, be holy (ḏsr)"],
+    "width": 12.77,
+    "height": 7
+  },
+  {
+    "char": "𓂪",
+    "description": "hand without thumb",
+    "ideogram": ["hand width (šsp)"],
+    "width": 12.77,
+    "height": 4
+  },
+  {
+    "char": "𓃢",
+    "description": "lying canine",
+    "ideogram": [
+      "Anubis (jnpw)",
+      "He Who is Privy to Secrets (A priestly title) (ḥrj-sštꜣ)"
+    ],
+    "width": 12.77,
+    "height": 12
+  },
+  {
+    "char": "𓃣",
+    "description": "lying canine on shrine",
+    "ideogram": [
+      "Anubis (jnpw)",
+      "He Who is Privy to Secrets (A priestly title) (ḥrj-sštꜣ)"
+    ],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓃤",
+    "description": "lying canine on shrine with flagellum",
+    "ideogram": ["Anubis (jnpw)"],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓄞",
+    "description": "water- skin",
+    "ideogram": ["Save (šdj)", "Read aloud (šdj)"],
+    "width": 12.77,
+    "height": 9
+  },
+  {
+    "char": "𓅹",
+    "description": "three ducklings in pool",
+    "ideogram": ["nest, pond, marsh (sš)"],
+    "width": 12.77,
+    "height": 7
+  },
+  {
+    "char": "𓇲",
+    "description": "sky with rain",
+    "ideogram": ["Dew (jꜣdt)", "Storm (šnyt)"],
+    "width": 12.77,
+    "height": 6
+  },
+  {
+    "char": "𓈀",
+    "description": "sandy tract",
+    "ideogram": ["Horizon (ꜣḫt)", "Island (jw)", "Kilt, loincloth (dꜣjw)"],
+    "width": 12.77,
+    "height": 3
+  },
+  {
+    "char": "𓈁",
+    "description": "combination of sandy tract (N18) and ripple of water (N35)",
+    "ideogram": ["Amun (jmn) (Cryptographic)"],
+    "width": 12.77,
+    "height": 3
+  },
+  {
+    "char": "𓈂",
+    "description": "combination of roll of bread and bolt",
+    "ideogram": ["Shenes (location) (šns)"],
+    "width": 12.77,
+    "height": 3
+  },
+  {
+    "char": "𓈛",
+    "description": "deep pool",
+    "ideogram": ["Lake, pool (š)"],
+    "width": 12.77,
+    "height": 4
+  },
+  {
+    "char": "𓈜",
+    "description": "pool with water",
+    "ideogram": ["Lake, pool (š)"],
+    "width": 12.77,
+    "height": 4
+  },
+  {
+    "char": "𓈝",
+    "description": "pool with legs",
+    "ideogram": ["Go, set out (šm)"],
+    "width": 12.77,
+    "height": 8
+  },
+  {
+    "char": "𓉩",
+    "description": "enclosure with cup and flat loaf",
+    "ideogram": ["Wide hall (wsḫt)"],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓉳",
+    "description": "double platform",
+    "ideogram": ["Sed festival (ḥ(ꜣ)b-sd)"],
+    "width": 12.77,
+    "height": 12
+  },
+  {
+    "char": "𓉿",
+    "description": "door",
+    "ideogram": ["Door (ꜥꜣ)"],
+    "width": 12.77,
+    "height": 4
+  },
+  {
+    "char": "𓊎",
+    "description": "double stairway",
+    "ideogram": ["Ascend (jꜥ(r))"],
+    "width": 12.77,
+    "height": 7
+  },
+  {
+    "char": "𓊝",
+    "description": "ship under sail",
+    "ideogram": ["sail upstream (ḫntj)"],
+    "width": 12.77,
+    "height": 9
+  },
+  {
+    "char": "𓊬",
+    "description": "chest",
+    "ideogram": ["box (hn)"],
+    "width": 12.77,
+    "height": 6
+  },
+  {
+    "char": "𓊵",
+    "description": "loaf on mat",
+    "ideogram": [
+      "Altar, offering, peace, be satisfied, be at peace, rest, set (of the sun) ((ḥtp)"
+    ],
+    "width": 12.77,
+    "height": 6
+  },
+  {
+    "char": "𓋉",
+    "description": "two narrow belemnites",
+    "ideogram": ["Min (mnw)", "Shrine (ḫm)", "Letopolis (ḫm)"],
+    "width": 12.77,
+    "height": 3
+  },
+  {
+    "char": "𓋠",
+    "description": "combination of collar of beads and mace with round head",
+    "ideogram": ["Silver (ḥḏ)"],
+    "width": 12.77,
+    "height": 12
+  },
+  {
+    "char": "𓋣",
+    "description": "pectoral",
+    "ideogram": ["Sparkle, gleam, glitter (ṯḥn)", "Faience (ṯḥnt)"],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓋳",
+    "description": "cloth with fringe on top and folded cloth",
+    "ideogram": ["Clothes, to clothe (ḥbs)", "'Be naked (ḥꜣy)"],
+    "width": 12.77,
+    "height": 12
+  },
+  {
+    "char": "𓌦",
+    "description": "birdtrap",
+    "ideogram": [],
+    "width": 12.77,
+    "height": 9
+  },
+  {
+    "char": "𓎳",
+    "description": "festival chamber, (the tail is also vertical 'Great': ꜥꜣ)",
+    "ideogram": ["festival (ḥb)"],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓐚",
+    "description": null,
+    "ideogram": [
+      "Raised platform (ṯntt), platform abbreviation for mꜣꜥ in (mꜣꜥ-ḫrw)"
+    ],
+    "width": 12.77,
+    "height": 3
+  },
+  {
+    "char": "𓃕",
+    "description": "sacred cow",
+    "ideogram": ["Hesat (ḥsꜣt)"],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓅭",
+    "description": "pintail duck",
+    "ideogram": ["Son (sꜣ/zꜣ)"],
+    "width": 12.77,
+    "height": 12
+  },
+  {
+    "char": "𓇬",
+    "description": "flower",
+    "ideogram": ["Eat (wnm)", "Be, exist (wn)"],
+    "width": 12.77,
+    "height": 13
+  },
+  {
+    "char": "𓈃",
+    "description": "two sandy tracts",
+    "ideogram": ["Two horizons (ꜣḫty)"],
+    "width": 12.78,
+    "height": 7
+  },
+  {
+    "char": "𓀿",
+    "description": "lying mummy",
+    "ideogram": ["death (mnj)"],
+    "width": 12.79,
+    "height": 4
+  },
+  {
+    "char": "𓅣",
+    "description": "heron",
+    "ideogram": ["Heron/Bennu-bird (bnw)"],
+    "width": 12.79,
+    "height": 11
+  },
+  {
+    "char": "𓅤",
+    "description": "heron on perch",
+    "ideogram": ["to inundate (bꜥḥj)"],
+    "width": 12.79,
+    "height": 12
+  },
+  {
+    "char": "𓅺",
+    "description": "two plovers",
+    "ideogram": ["Washerman (rḫtj)"],
+    "width": 12.81,
+    "height": 9
+  },
+  {
+    "char": "𓇹",
+    "description": "crescent moon",
+    "ideogram": ["Moon (jꜥḥ)", "Month (ꜣbd)"],
+    "width": 12.81,
+    "height": 5
+  },
+  {
+    "char": "𓇺",
+    "description": "crescent moon",
+    "ideogram": ["Moon (jꜥḥ)", "Month (ꜣbd)"],
+    "width": 12.81,
+    "height": 5
+  },
+  {
+    "char": "𓉓",
+    "description": "combination of house, oar, tall loaf and beer jug",
+    "ideogram": ["Voice-offering (prt-ḫrw)"],
+    "width": 12.82,
+    "height": 13
+  },
+  {
+    "char": "𓅯",
+    "description": "pintail alighting",
+    "ideogram": ["Alight (ḫnj)"],
+    "width": 12.83,
+    "height": 11
+  },
+  {
+    "char": "𓄫",
+    "description": "backbone and spinal cords",
+    "ideogram": ["Be long, extend (ꜣw)"],
+    "width": 12.84,
+    "height": 11
+  },
+  {
+    "char": "𓃯",
+    "description": "hippopotamus",
+    "ideogram": ["Hippo (db)"],
+    "width": 12.85,
+    "height": 8
+  },
+  {
+    "char": "𓆞",
+    "description": "elephant-snout fish",
+    "ideogram": ["Mormyrus (ẖꜣt)", "Corpse (ẖꜣt)"],
+    "width": 12.89,
+    "height": 5
+  },
+  {
+    "char": "𓄚",
+    "description": "skin of goat",
+    "ideogram": ["Interior (ẖn)"],
+    "width": 12.91,
+    "height": 9
+  },
+  {
+    "char": "𓃈",
+    "description": "arm with reed pen",
+    "ideogram": ["Inscribe (spẖr)"],
+    "width": 12.91,
+    "height": 7
+  },
+  {
+    "char": "𓃛",
+    "description": "newborn hartebeest",
+    "ideogram": [],
+    "width": 13.02,
+    "height": 10
+  },
+  {
+    "char": "𓋍",
+    "description": "combination of land, lung and windpipe, lily, and papyrus",
+    "ideogram": ["To unite the two lands (smꜣ-tꜣwy)"],
+    "width": 13.06,
+    "height": 13
+  },
+  {
+    "char": "𓏓",
+    "description": null,
+    "ideogram": [],
+    "width": 13.3,
+    "height": 4
+  },
+  {
+    "char": "𓃜",
+    "description": "mature bovine lying down",
+    "ideogram": ["Be friendly (ꜣms)", "Cow (jḥ)", "Lady (nbt) (Ptolemaic)"],
+    "width": 13.48,
+    "height": 9
+  },
+  {
+    "char": "𓏅",
+    "description": "four water jars in rack",
+    "ideogram": ["water pitchers in the stand (ḫntw), first ḫnt (j)"],
+    "width": 13.55,
+    "height": 13
+  },
+  {
+    "char": "𓎞",
+    "description": null,
+    "ideogram": [],
+    "width": 13.76,
+    "height": 12
+  },
+  {
+    "char": "𓎡",
+    "description": "basket- with-handle (hieroglyph)",
+    "ideogram": ["k (unil.)"],
+    "width": 13.76,
+    "height": 5
+  },
+  {
+    "char": "𓎢",
+    "description": null,
+    "ideogram": [],
+    "width": 13.76,
+    "height": 5
+  },
+  {
+    "char": "𓅕",
+    "description": "combination of owl and forearm with conical loaf",
+    "ideogram": [],
+    "width": 13.84,
+    "height": 13
+  },
+  {
+    "char": "𓅖",
+    "description": "combination of owl and forearm",
+    "ideogram": ["In the hand (m-ꜥ)"],
+    "width": 13.84,
+    "height": 13
+  },
+  {
+    "char": "𓐌",
+    "description": null,
+    "ideogram": [],
+    "width": 13.9,
+    "height": 6
+  },
+  {
+    "char": "𓅸",
+    "description": "three ducklings in nest",
+    "ideogram": ["nest, pond, marsh (sš)"],
+    "width": 14.09,
+    "height": 7
+  },
+  {
+    "char": "𓅀",
+    "description": "two Egyptian vultures",
+    "ideogram": [],
+    "width": 14.14,
+    "height": 12
+  },
+  {
+    "char": "𓆾",
+    "description": "three lotus plants",
+    "ideogram": ["3,000"],
+    "width": 14.31,
+    "height": 13
+  },
+  {
+    "char": "𓆒",
+    "description": "horned viper crawling out of enclosure",
+    "ideogram": ["Come forth (prj)"],
+    "width": 14.42,
+    "height": 7
+  },
+  {
+    "char": "𓍥",
+    "description": null,
+    "ideogram": [],
+    "width": 14.7,
+    "height": 6
+  },
+  {
+    "char": "𓍨",
+    "description": null,
+    "ideogram": [],
+    "width": 14.7,
+    "height": 12
+  },
+  {
+    "char": "𓍩",
+    "description": null,
+    "ideogram": [],
+    "width": 14.7,
+    "height": 12
+  },
+  {
+    "char": "𓂶",
+    "description": "five fingers (row)",
+    "ideogram": ["50,000"],
+    "width": 14.92,
+    "height": 13
+  },
+  {
+    "char": "𓏍",
+    "description": "three pots",
+    "ideogram": [],
+    "width": 15.27,
+    "height": 6
+  },
+  {
+    "char": "𓄺",
+    "description": "three pieces of flesh horizontally",
+    "ideogram": ["Flesh (jwf)"],
+    "width": 15.3,
+    "height": 7
+  },
+  {
+    "char": "𓎊",
+    "description": null,
+    "ideogram": [],
+    "width": 15.32,
+    "height": 9
+  },
+  {
+    "char": "𓎋",
+    "description": null,
+    "ideogram": [],
+    "width": 15.32,
+    "height": 9
+  },
+  {
+    "char": "𓎎",
+    "description": null,
+    "ideogram": [],
+    "width": 15.32,
+    "height": 13
+  },
+  {
+    "char": "𓎐",
+    "description": null,
+    "ideogram": [],
+    "width": 15.32,
+    "height": 4
+  },
+  {
+    "char": "𓉾",
+    "description": "four supports",
+    "ideogram": ["The 4 supports of the sky (sḫnt)"],
+    "width": 15.39,
+    "height": 12
+  },
+  {
+    "char": "𓅔",
+    "description": "two owls",
+    "ideogram": [],
+    "width": 15.65,
+    "height": 13
+  },
+  {
+    "char": "𓎪",
+    "description": null,
+    "ideogram": [],
+    "width": 16.19,
+    "height": 8
+  },
+  {
+    "char": "𓅒",
+    "description": "vulture and cobra each on a basket",
+    "ideogram": ["Two Ladies (nbtj)"],
+    "width": 16.27,
+    "height": 13
+  },
+  {
+    "char": "𓅠",
+    "description": "glossy ibis",
+    "ideogram": ["to find, discover (gmj)"],
+    "width": 16.63,
+    "height": 8
+  },
+  {
+    "char": "𓅢",
+    "description": "three saddle-billed storks",
+    "ideogram": ["Ba-souls; metaphorically: Power, glory, respect (bꜣw)"],
+    "width": 16.74,
+    "height": 13
+  },
+  {
+    "char": "𓍪",
+    "description": null,
+    "ideogram": [],
+    "width": 18.29,
+    "height": 12
+  },
+  {
+    "char": "𓍫",
+    "description": null,
+    "ideogram": [],
+    "width": 18.29,
+    "height": 6
+  },
+  {
+    "char": "𓆿",
+    "description": "four lotus plants",
+    "ideogram": ["4,000"],
+    "width": 19,
+    "height": 13
+  },
+  {
+    "char": "𓎌",
+    "description": null,
+    "ideogram": [],
+    "width": 20.63,
+    "height": 9
+  },
+  {
+    "char": "𓎍",
+    "description": null,
+    "ideogram": [],
+    "width": 20.63,
+    "height": 9
+  },
+  {
+    "char": "𓎑",
+    "description": null,
+    "ideogram": [],
+    "width": 20.63,
+    "height": 4
+  },
+  {
+    "char": "𓎒",
+    "description": null,
+    "ideogram": [],
+    "width": 23.45,
+    "height": 4
+  },
+  {
+    "char": "𓇀",
+    "description": "five lotus plants",
+    "ideogram": ["5,000"],
+    "width": 23.69,
+    "height": 13
+  }
+]

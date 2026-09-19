@@ -1,7 +1,12 @@
 import GridStateManager from '../classes/GridStateManager';
 import { URL_LEGACY_QUERY_INDEX } from '../utils/constants';
-import { decodeData, encodeData } from '../utils/encoding';
+import { decodeData } from '../utils/encoding';
 import { compressCity, decompressCity } from '../utils/compression';
+import {
+  bytesToGlyphs,
+  glyphsToBytes,
+  isHieroglyphLink,
+} from '../utils/glyphs';
 
 export interface LinkSource {
   getFragmentState: () => string | null;
@@ -22,8 +27,14 @@ export function readCityLink(
 
   try {
     // A legacy link is raw triples; a fragment is compressed
-    const bytes = decodeData(saved);
-    manager.loadUInt8Array(legacy ? bytes : decompressCity(bytes));
+    if (legacy) {
+      manager.loadUInt8Array(decodeData(saved));
+    } else {
+      const bytes = isHieroglyphLink(saved)
+        ? glyphsToBytes(saved)
+        : decodeData(saved);
+      manager.loadUInt8Array(decompressCity(bytes));
+    }
     return true;
   } catch (error) {
     console.error('Could not decode saved URL:', error);
@@ -33,5 +44,7 @@ export function readCityLink(
 
 export function writeCityLink(manager: GridStateManager): string | null {
   const grid = manager.getUInt8Array();
-  return grid.length > 0 ? encodeData(compressCity(grid)) : null;
+  if (grid.length === 0) return null;
+
+  return bytesToGlyphs(compressCity(grid));
 }
