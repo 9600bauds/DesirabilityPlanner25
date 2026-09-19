@@ -16,26 +16,26 @@ const CategoryMenu = ({
   category,
   selectedSubcategory,
 }: CategoryMenuProps) => {
-  let isCategorySelected = false;
+  const subcategories = [...category.subCategories];
 
-  const menuItems: React.ReactNode[] = []; // Create an empty array
+  const buttonProps = {
+    id: category.id,
+    iconPath: category.iconPath,
+    title: category.displayName,
+    isActive: subcategories.some(
+      ([_key, subcat]) => subcat === selectedSubcategory
+    ),
+  };
 
-  category.subCategories.forEach((subcat: Subcategory, key: string) => {
-    let className = '';
-    if (selectedSubcategory === subcat) {
-      isCategorySelected = true;
-      className = 'selectedSubcategory';
-    }
-    menuItems.push(
-      <MenuItem
-        key={key}
-        className={className}
-        onClick={() => selectSubcategory(subcat)}
-      >
-        {subcat.displayName}
-      </MenuItem>
+  if (subcategories.length === 1) {
+    const onlySubcategory = subcategories[0][1];
+    return (
+      <ScalingButton
+        {...buttonProps}
+        onClick={() => selectSubcategory(onlySubcategory)}
+      />
     );
-  });
+  }
 
   return (
     <Menu
@@ -43,16 +43,19 @@ const CategoryMenu = ({
       overflow="auto"
       portal={true}
       direction="left"
-      menuButton={
-        <ScalingButton
-          id={category.id}
-          iconPath={category.iconPath}
-          title={category.displayName}
-          isActive={isCategorySelected}
-        />
-      }
+      menuButton={<ScalingButton {...buttonProps} />}
     >
-      {menuItems}
+      {subcategories.map(([key, subcat]) => (
+        <MenuItem
+          key={key}
+          className={
+            subcat === selectedSubcategory ? 'selectedSubcategory' : ''
+          }
+          onClick={() => selectSubcategory(subcat)}
+        >
+          {subcat.displayName}
+        </MenuItem>
+      ))}
     </Menu>
   );
 };
